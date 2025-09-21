@@ -381,6 +381,8 @@
   <button id="btnCalc">Calculer</button>
   <button id="btnDefault" class="secondary">Valeurs par défaut</button>
   <button id="btnExport" class="secondary">Exporter les paramètres</button>
+  <input type="file" id="importFile" accept=".json" style="display:none;" />
+<button id="btnImport" class="secondary">Importer les paramètres</button>
 </div>
 
 
@@ -966,6 +968,35 @@ console.log("Export lancé !"); // ← ligne de test
   a.click();
   URL.revokeObjectURL(url);
 }
+function importerParametresUtilisateur(jsonData) {
+  if (!jsonData) return;
+
+  document.getElementById('indice').value = jsonData.indice;
+  document.getElementById('valeurPoint').value = jsonData.valeurPoint;
+  document.getElementById('tauxSurcotisation').value = (jsonData.tauxSurcotisation * 100).toFixed(1);
+  document.getElementById('dateReleve').value = jsonData.dateReleve?.slice(0, 10);
+  document.getElementById('trimAssuranceReleve').value = jsonData.trimAssuranceReleve;
+  document.getElementById('joursAssuranceReleve').value = jsonData.joursAssuranceReleve;
+  document.getElementById('trimLiquidablesReleve').value = jsonData.trimLiquidablesReleve;
+  document.getElementById('joursLiquidablesReleve').value = jsonData.joursLiquidablesReleve;
+  document.getElementById('dateNaissance').value = jsonData.dateNaissance?.slice(0, 10);
+  document.getElementById('dateDebut').value = jsonData.dateDebut?.slice(0, 10);
+  document.getElementById('dateFin').value = jsonData.dateFin?.slice(0, 10);
+  document.getElementById('quotiteAvant').value = jsonData.quotiteAvant;
+  document.getElementById('quotite').value = jsonData.quotite;
+  document.getElementById('surcotisation').checked = jsonData.surcotisation;
+  document.getElementById('bonifEnfants').checked = jsonData.conditionsEnfantsAvant2004;
+  document.getElementById('enfantsAvant2004').value = jsonData.nbEnfantsAvant2004;
+
+  const val = autoRemplirTrimestres(new Date(jsonData.dateNaissance));
+  const trSelect = document.getElementById('trimestresRequis');
+  trSelect.innerHTML = val ? `<option value="${val}" selected>${val}</option>` : `<option value="">-- Non défini --</option>`;
+
+  mettreAJourTauxSurcotisation();
+  calculer();
+}
+
+
 		
     // Première charge
     window.addEventListener('DOMContentLoaded', () => {
@@ -987,7 +1018,26 @@ console.log("Export lancé !"); // ← ligne de test
       calculer(); document.getElementById('btnExport').addEventListener('click', exporterParametresUtilisateur);
 
 }
-    });
+document.getElementById('btnImport').addEventListener('click', () => {
+  document.getElementById('importFile').click();
+});
+
+document.getElementById('importFile').addEventListener('change', (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      importerParametresUtilisateur(data);
+    } catch (err) {
+      alert("Fichier invalide ou corrompu.");
+    }
+  };
+  reader.readAsText(file);
+});
+
   </script>
 </body>
 </html>
