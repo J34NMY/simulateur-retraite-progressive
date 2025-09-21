@@ -207,6 +207,7 @@
       <li>amelioration des commentaire dans le JS</li>
       <li>mise en place d'un bouton export et import des parametres utilisateurs"</li>
       <li>Export et import en .json afin de rependre les calcul ultérieurement </li>
+	  <li> rajout des trimestres de bonification pour enfant dans les trimestres d'assurance </li>
           </ul>
   </div>
 
@@ -646,14 +647,27 @@
 
       const joursLiqReleve = Math.floor(liquidablesReleveTr * 90);
       const joursLiqP1 = Math.floor(P1.totalJours * (I.quotiteAvant || 1));
-      const bonifEnfantsJours = I.conditionsEnfantsAvant2004 ? I.nbEnfantsAvant2004 * 4 * 90 : 0;
-      const bonifEnfantsTr = bonifEnfantsJours / 90;
+	  
+	  // Décret n°2003‑1306 du 26 décembre 2003 : bonification enfants
+// 4 trimestres par enfant né ou adopté avant le 01/01/2004
+// Ajoutés à la fois aux jours d’assurance et aux jours liquidables
+
+     // Bonification enfants : ajout aux jours d'assurance ET aux jours liquidables
+const bonifEnfantsJours = I.conditionsEnfantsAvant2004 ? I.nbEnfantsAvant2004 * 4 * 90 : 0;
+const bonifEnfantsTr = bonifEnfantsJours / 90;
+
+// Ajout aux jours d'assurance
+const joursAssBonif = bonifEnfantsJours;
+
+// Ajout aux jours liquidables (déjà présent)
+
+
       const joursLiqP2 = Math.floor(P2.totalJours * (I.surcotisation ? 1 : I.quotite));
 
-      const assuranceFinale = Math.floor((joursAssReleve + joursAssP1 + joursAssP2) / 90);
+      const assuranceFinale = Math.floor((joursAssReleve + joursAssP1 + joursAssP2 + joursAssBonif) / 90);
       const liquidablesFinale = Math.floor((joursLiqReleve + joursLiqP1 + bonifEnfantsJours + joursLiqP2) / 90);
 
-      const assuranceDepart = Math.floor((joursAssReleve + joursAssP1) / 90);
+     const assuranceDepart = Math.floor((joursAssReleve + joursAssP1 + joursAssBonif) / 90); 
       const liquidablesDepart = Math.floor((joursLiqReleve + joursLiqP1 + bonifEnfantsJours) / 90);
 
       // 3.5) Conditions retraite progressive
