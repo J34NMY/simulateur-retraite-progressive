@@ -946,9 +946,12 @@
       nb.value = '';
       nb.disabled = true;
 
-      calculer();// Exporter les paramètres utilisateur  
-   function exporterParametresUtilisateur() {
-  const inputs = lireInputs(); // ← ta fonction existante
+      calculer();
+	       }
+		// Exporter les paramètres utilisateur
+function exporterParametresUtilisateur() {
+console.log("Export lancé !"); // ← ligne de test
+  const inputs = lireInputs();
   const metadata = {
     version: "V.03.5.3",
     decret: "Décret n° 2025‑681 du 15 juillet 2025",
@@ -962,8 +965,8 @@
   a.download = 'parametres_simulateur.json';
   a.click();
   URL.revokeObjectURL(url);
-    }
-
+}
+		
     // Première charge
     window.addEventListener('DOMContentLoaded', () => {
       const caseBonif = document.getElementById("bonifEnfants");
@@ -981,8 +984,8 @@
       // Initialiser la surcotisation
       mettreAJourTauxSurcotisation();
       
-      calculer(); 
-	
+      calculer(); document.getElementById('btnExport').addEventListener('click', exporterParametresUtilisateur);
+
 }
     });
   </script>
