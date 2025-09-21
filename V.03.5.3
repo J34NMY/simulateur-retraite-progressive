@@ -377,7 +377,7 @@
     </div>
   </div>
 
-<div class="actions">
+  <div class="actions">
   <button id="btnCalc">Calculer</button>
   <button id="btnDefault" class="secondary">Valeurs par défaut</button>
   <button id="btnExport" class="secondary">Exporter les paramètres</button>
@@ -468,7 +468,7 @@
       "0.80": 16.20,
       "0.90": 13.65
     };
-
+	
     // === Utilitaires ===
     function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
     function formatEuro(x){ return (isFinite(x)?x:0).toFixed(2) + ' €'; }
@@ -909,7 +909,10 @@
       this.dataset.manual = "true";
     });
 
-    // Valeurs par défaut (scénario test)
+    /**
+	* Remplit le formulaire avec des valeurs par défaut pour test ou démonstration.
+	* Utilisé pour faciliter les essais sans saisie manuelle.
+	*/
     function chargerValeursDefaut() {
       // Rémunération
       document.getElementById('indice').value = 478;
@@ -948,26 +951,43 @@
       nb.value = '';
       nb.disabled = true;
 
-      calculer();
-	       }
-		// Exporter les paramètres utilisateur
+      calculer();  
+}	
+	/**
+	* Exporte les paramètres utilisateur dans un fichier .json.
+	* Inclut les métadonnées réglementaires pour traçabilité.
+	* Utilisé pour archivage, partage ou rechargement ultérieur.
+	*/
 function exporterParametresUtilisateur() {
-console.log("Export lancé !"); // ← ligne de test
+  console.log("Export lancé !"); // Vérification console
+
+  // Lecture des paramètres saisis par l'utilisateur
   const inputs = lireInputs();
+
+  // Métadonnées réglementaires associées à l'export
   const metadata = {
-    version: "V.03.5.3",
-    decret: "Décret n° 2025‑681 du 15 juillet 2025",
-    dateExport: new Date().toISOString()
+    version: "V.03.5.3", // Version du simulateur
+    decret: "Décret n° 2025‑681 du 15 juillet 2025", // Référence réglementaire
+    dateExport: new Date().toISOString() // Horodatage ISO
   };
+
+  // Fusion des données utilisateur + métadonnées
   const exportData = { ...inputs, ...metadata };
+
+  // Création du fichier JSON à télécharger
   const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
+
+  // Déclenchement du téléchargement
   const a = document.createElement('a');
   a.href = url;
   a.download = 'parametres_simulateur.json';
   a.click();
+
+  // Nettoyage de l'URL temporaire
   URL.revokeObjectURL(url);
 }
+
 function importerParametresUtilisateur(jsonData) {
   if (!jsonData) return;
 
@@ -996,15 +1016,18 @@ function importerParametresUtilisateur(jsonData) {
   calculer();
 }
 
+  
 
-		
-    // Première charge
+    // =======================
+// Initialisation du formulaire au chargement
+// =======================
     window.addEventListener('DOMContentLoaded', () => {
+	// Gestion de l'état du champ "nombre d'enfants" selon la case cochée
       const caseBonif = document.getElementById("bonifEnfants");
       const champNbEnfants = document.getElementById("enfantsAvant2004");
       champNbEnfants.disabled = !caseBonif.checked;
       
-      // Initialiser les trimestres requis
+      // Initialisation des trimestres requis selon la date de naissance
       const dateNaissance = document.getElementById('dateNaissance').value;
       if (dateNaissance) {
         const val = autoRemplirTrimestres(new Date(dateNaissance));
@@ -1012,13 +1035,14 @@ function importerParametresUtilisateur(jsonData) {
         trSelect.innerHTML = val ? `<option value="${val}" selected>${val}</option>` : `<option value="">-- Non défini --</option>`;
       }
       
-      // Initialiser la surcotisation
+     // Mise à jour du taux de surcotisation si champ modifié
       mettreAJourTauxSurcotisation();
-      
-      calculer(); document.getElementById('btnExport').addEventListener('click', exporterParametresUtilisateur);
-
-}
-document.getElementById('btnImport').addEventListener('click', () => {
+	 // Calcul initial automatique        
+      calculer(); 
+	  
+	  // Liaison du bouton Export à la fonction d’export
+	  document.getElementById('btnExport').addEventListener('click', exporterParametresUtilisateur);
+	  document.getElementById('btnImport').addEventListener('click', () => {
   document.getElementById('importFile').click();
 });
 
