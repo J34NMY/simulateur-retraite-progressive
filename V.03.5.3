@@ -202,11 +202,12 @@
       <li>Affichage conditionnel des alertes et taux après réduction</li>
       <li>Auto-remplissage des trimestres requis selon la date de naissance</li>
     </ul>
-	<p><strong>Nouveautés V.03.5.3 :</strong></p>
+	 <p><strong>Nouveautés V.03.5.3 :</strong></p>
     <ul>
-      <li>Mise en place d'un bouton export paramètres utilisateur en .json </li>
-	  <li>Mise en place d'un bouton Import paramètres utilisateur en .json </l>
-	  </ul>
+      <li>amelioration des commentaire dans le JS</li>
+      <li>mise en place d'un bouton export et import des parametres utilisateurs"</li>
+      <li>Export et import en .json afin de rependre les calcul ultérieurement </li>
+          </ul>
   </div>
 
   <!-- Formulaire -->
@@ -312,7 +313,7 @@
       <input id="dateReleve" type="date" value="2024-12-31" />
 
       <label for="trimAssuranceReleve">Trimestres d'assurance au relevé</label>
-      <input id="trimAssuranceReleve" type="number" step="1" value="146" />
+      <input id="trimAssuranceReleve" type="number" step="1" value="160" />
 
       <label for="joursAssuranceReleve">Jours d'assurance au relevé</label>
       <input id="joursAssuranceReleve" type="number" step="1" value="84" />
@@ -915,9 +916,9 @@
     });
 
     /**
-	* Remplit le formulaire avec des valeurs par défaut pour test ou démonstration.
-	* Utilisé pour faciliter les essais sans saisie manuelle.
-	*/
+ * Remplit le formulaire avec des valeurs par défaut pour test ou démonstration.
+ * Utilisé pour faciliter les essais sans saisie manuelle.
+ */
     function chargerValeursDefaut() {
       // Rémunération
       document.getElementById('indice').value = 478;
@@ -958,11 +959,11 @@
 
       calculer();  
 }	
-	/**
-	* Exporte les paramètres utilisateur dans un fichier .json.
-	* Inclut les métadonnées réglementaires pour traçabilité.
-	* Utilisé pour archivage, partage ou rechargement ultérieur.
-	*/
+/**
+ * Exporte les paramètres utilisateur dans un fichier .json.
+ * Inclut les métadonnées réglementaires pour traçabilité.
+ * Utilisé pour archivage, partage ou rechargement ultérieur.
+ */
 function exporterParametresUtilisateur() {
   console.log("Export lancé !"); // Vérification console
 
@@ -1066,7 +1067,7 @@ document.getElementById('importFile').addEventListener('change', (event) => {
   };
   reader.readAsText(file);
 });
-
+});
   </script>
 </body>
 </html>
