@@ -186,6 +186,7 @@
   <div style="margin:20px 0;padding:12px;background:#f9f9f9;border-left:4px solid #999;border-radius:6px;">
     <h2 style="margin-top:0;">ℹ️ À propos du simulateur</h2>
     <p><strong>Version :</strong> V.03.5.1 – Auteur : Jean-Michel DI PACO</p>
+	<p><strong>Version réglementaire :</strong> Décret n° 2025‑681 du 15 juillet 2025 – Règle des six mois, barème surcotisation 2024, bonification enfants décret 2003‑1305</p>
     <p><strong>Fonction :</strong> Estimer les pensions dans le cadre de la retraite progressive pour les fonctionnaires d'État.</p>
 	 <p><strong>Principes :</strong></p>
     <ul>
@@ -376,10 +377,12 @@
     </div>
   </div>
 
-  <div class="actions">
-    <button id="btnCalc">Calculer</button>
-    <button id="btnDefault" class="secondary">Valeurs par défaut</button>
-  </div>
+<div class="actions">
+  <button id="btnCalc">Calculer</button>
+  <button id="btnDefault" class="secondary">Valeurs par défaut</button>
+  <button id="btnExport" class="secondary">Exporter les paramètres</button>
+</div>
+
 
   <hr class="sep" />
   <div id="resultat"></div>
@@ -943,7 +946,22 @@
       nb.value = '';
       nb.disabled = true;
 
-      calculer();
+      calculer();// Exporter les paramètres utilisateur  
+   function exporterParametresUtilisateur() {
+  const inputs = lireInputs(); // ← ta fonction existante
+  const metadata = {
+    version: "V.03.5.3",
+    decret: "Décret n° 2025‑681 du 15 juillet 2025",
+    dateExport: new Date().toISOString()
+  };
+  const exportData = { ...inputs, ...metadata };
+  const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'parametres_simulateur.json';
+  a.click();
+  URL.revokeObjectURL(url);
     }
 
     // Première charge
@@ -963,7 +981,9 @@
       // Initialiser la surcotisation
       mettreAJourTauxSurcotisation();
       
-      calculer();
+      calculer(); 
+	
+}
     });
   </script>
 </body>
