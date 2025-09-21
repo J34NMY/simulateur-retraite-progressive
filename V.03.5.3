@@ -207,7 +207,7 @@
       <li>amelioration des commentaire dans le JS</li>
       <li>mise en place d'un bouton export et import des parametres utilisateurs"</li>
       <li>Export et import en .json afin de rependre les calcul ultérieurement </li>
-	  <li> rajout des trimestres de bonification pour enfant dans les trimestres d'assurance </li>
+	  <li>Ajout bonification enfant né avant 2004 au trimestres d'assurance </li>
           </ul>
   </div>
 
@@ -815,9 +815,17 @@ const joursAssBonif = bonifEnfantsJours;
         <h3>Compteurs au départ progressif</h3>
         <p><strong>Assurance au relevé:</strong> ${assuranceReleveTr.toFixed(2)} trimestres</p>
         <p><strong>Liquidables au relevé:</strong> ${liquidablesReleveTr.toFixed(2)} trimestres</p>
-        <p><strong>Bonification enfants:</strong> ${bonifEnfantsTr.toFixed(2)} trimestres <span class="muted">(${bonifEnfantsJours} j)</span></p>
+        ${(I.conditionsEnfantsAvant2004 && I.nbEnfantsAvant2004 > 0) ? `
+  <p><strong>Bonification enfants:</strong> ${bonifEnfantsTr.toFixed(2)} trimestres 
+    <span class="muted">(${bonifEnfantsJours} j)</span>
+    <span class="tooltip" title="Décret n°2003‑1306 du 26 décembre 2003 : 4 trimestres/enfant né ou adopté avant le 01/01/2004, ajoutés aux trimestres d’assurance et liquidables.">ℹ️</span>
+  </p>` : ''}
         <p><strong>Assurance au départ (cumul jours → arrondi final):</strong> ${assuranceDepart} / ${TR}</p>
         <p><strong>Liquidables au départ (cumul jours → arrondi final):</strong> ${liquidablesDepart} / ${TR}</p>
+		<p class="muted">→  ${bonifEnfantsTr.toFixed(2)} trimestres de bonification enfants sont intégrés dans les ${assuranceDepart} trimestres d’assurance et les ${liquidablesDepart} trimestres liquidables affichés ci-dessus.</p>
+
+
+
 
         ${blocSurcotisation}
 
@@ -834,6 +842,15 @@ const joursAssBonif = bonifEnfantsJours;
         <h3>Situation en fin de période</h3>
         <p><strong>Assurance finale (cumul jours → arrondi final):</strong> ${assuranceFinale} / ${TR}</p>
         <p><strong>Liquidables finaux (cumul jours → arrondi final):</strong> ${liquidablesFinale} / ${TR}</p>
+		if (I.conditionsEnfantsAvant2004 && I.nbEnfantsAvant2004 > 0) {
+  const bonifTr = I.nbEnfantsAvant2004 * 4;
+  const bonifJours = bonifTr * 90;
+
+  html += `<p class="muted">→ Les ${bonifTr.toFixed(2)} trimestres de bonification enfants sont intégrés dans les compteurs ci-dessus
+    <span class="tooltip" title="Décret n°2003‑1306 du 26 décembre 2003 : 4 trimestres/enfant né ou adopté avant le 01/01/2004, ajoutés aux trimestres d’assurance et liquidables.">ℹ️</span>
+  </p>`;
+}
+
         <p><strong>Taux de liquidation estimé (fin):</strong> ${(tauxFinal*100).toFixed(2)} %</p>
         <p><strong>Traitement plein temps estimé (fin):</strong> ${formatEuro(traitementFin)}</p>
         <p><strong>Pension définitive estimée:</strong> ${formatEuro(pensionDefinitive)}</p>
