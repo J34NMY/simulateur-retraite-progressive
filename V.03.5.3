@@ -709,6 +709,9 @@ const joursAssBonif = bonifEnfantsJours;
         const tauxApresDecote = Math.max(0, (75 - decoteTotale)) / 100;
         tauxFinal = tauxApresDecote * ratioFin;
       }
+	  // 5 bis) Calcul de l'âge au départ définitif
+const ageDepartDefinitif = (I.dateFin - I.dateNaissance) / (1000 * 60 * 60 * 24 * 365.25);
+
 	  // 6 bis) Surcote si assurance ≥ TR et âge > 62
 let tauxSurcote = 0;
 if (assuranceFinale >= TR && ageDepartDefinitif > 62 && ageDepartDefinitif < 67) {
@@ -723,7 +726,7 @@ if (assuranceFinale >= TR && ageDepartDefinitif > 62 && ageDepartDefinitif < 67)
 
       // 7) Taux plein à 67 ans
       const date67ans = new Date(I.dateNaissance.getFullYear() + 67, I.dateNaissance.getMonth(), I.dateNaissance.getDate());
-      const ageDepartDefinitif = (I.dateFin - I.dateNaissance) / (1000 * 60 * 60 * 24 * 365.25);
+      
       let noteTauxPlein = '';
       if (ageDepartDefinitif >= 67) {
         noteTauxPlein = `Âge du départ définitif : ${ageDepartDefinitif.toFixed(1)} ans → Taux plein automatique (pas de décote).`;
@@ -761,20 +764,22 @@ if (assuranceFinale >= TR && ageDepartDefinitif > 62 && ageDepartDefinitif < 67)
 if (assuranceFinale >= TR && ageDepartDefinitif > 62 && ageDepartDefinitif < 67) {
   const trimestresSurcotes = Math.floor((ageDepartDefinitif - 62) * 4); // 4 trimestres/an
   const tauxSurcoteTotale = trimestresSurcotes * 1.25;
+  const tauxFinalPct = (tauxFinal * 100).toFixed(2);
   const tauxApresSurcotePct = (tauxFinal * 100).toFixed(2);
 
-  blocSurcote = `
+ blocSurcote = `
   <div style="margin-top:10px;padding:8px;border:1px solid #7eb37e;background:#e6fff7;color:#005a2a;border-radius:6px;">
     <strong>Détails de la surcote :</strong><br>
     Trimestres supplémentaires : <strong>${trimestresSurcotes}</strong><br>
     Surcote appliquée : <strong>+ ${tauxSurcoteTotale.toFixed(2)} %</strong><br>
     Taux plein après surcote : <strong>${tauxApresSurcotePct} %</strong><br>
-    Taux final après prorata liquidables : <strong>${(tauxFinal * 100).toFixed(2)} %</strong><br>
+    Taux final après prorata liquidables : <strong>${tauxFinalPct} %</strong><br>
     <span style="color:#007a00;font-weight:bold;">
       ✅ Vous avez dépassé l’âge légal (62 ans) avec le nombre de trimestres requis. Surcote appliquée.
     </span>
   </div>
 `;
+
 
 }
 
