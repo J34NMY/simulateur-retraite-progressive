@@ -799,6 +799,7 @@ if (
     trimestresSurcotes = Math.floor((ageDepartDefinitif - 62) * 4);
     const tauxSurcoteTotale = trimestresSurcotes * 1.25;
 
+    // ✅ Ne générer le bloc que si la surcote est réelle
     if (trimestresSurcotes > 0 && tauxSurcoteTotale > 0) {
         const tauxPleinApresSurcote = Math.min(75 + tauxSurcoteTotale, 80);
         const tauxFinalPct = ((tauxPleinApresSurcote / 100) * ratioFin * 100).toFixed(2);
@@ -817,6 +818,7 @@ if (
         });
     }
 }
+
 
 
       // 9) Bloc Liquidables conditionnel
