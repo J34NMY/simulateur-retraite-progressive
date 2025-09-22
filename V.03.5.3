@@ -711,11 +711,12 @@ const joursAssBonif = bonifEnfantsJours;
       }
 	  // 5 bis) Calcul de l'âge au départ définitif
 const ageDepartDefinitif = (I.dateFin - I.dateNaissance) / (1000 * 60 * 60 * 24 * 365.25);
-
+	let trimestresSurcotes = 0;
 	  // 6 bis) Surcote si assurance ≥ TR et âge > 62
 let tauxSurcote = 0;
 if (assuranceFinale >= TR && ageDepartDefinitif > 62 && ageDepartDefinitif < 67) {
-  const trimestresSurcotes = Math.floor((ageDepartDefinitif - 62) * 4); // 4 trimestres/an
+  trimestresSurcotes = Math.floor((ageDepartDefinitif - 62) * 4);
+ // 4 trimestres/an
   tauxSurcote = trimestresSurcotes * 1.25;
   const tauxApresSurcote = Math.min(75 + tauxSurcote, 80) / 100; // plafond à 80% ?
   tauxFinal = tauxApresSurcote * ratioFin;
@@ -884,6 +885,7 @@ if (assuranceFinale >= TR && ageDepartDefinitif > 62 && ageDepartDefinitif < 67)
   </p>` : ''}
 
 		<p><strong>Taux de liquidation estimé (fin):</strong> ${(tauxFinal*100).toFixed(2)} %</p>
+		${(tauxSurcote > 0) ? `<p class="muted">→ Surcote appliquée : +${tauxSurcote.toFixed(2)} % pour ${trimestresSurcotes} trimestre(s) supplémentaires après 62 ans.</p>` : ''}
         <p><strong>Traitement plein temps estimé (fin):</strong> ${formatEuro(traitementFin)}</p>
         <p><strong>Pension définitive estimée:</strong> ${formatEuro(pensionDefinitive)}</p>
 
