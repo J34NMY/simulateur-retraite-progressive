@@ -641,6 +641,7 @@
     // === Calcul principal ===
     function calculer() {
 	let trimestresSurcotes = 0;
+	   tauxSurcote = 0;
       const I = lireInputs();
 	    let blocDecote = '';
     let blocSurcote = '';
@@ -791,13 +792,9 @@ if (assuranceFinale >= TR && ageDepartDefinitif > 62 && ageDepartDefinitif < 67)
 }
 
 	 // 8Bis) Bloc surcote
-if (
-    assuranceFinale >= TR &&
-    ageDepartDefinitif > 62 &&
-    ageDepartDefinitif < 67
-) {
+if (assuranceFinale >= TR && ageDepartDefinitif > 62 && ageDepartDefinitif < 67) {
     trimestresSurcotes = Math.floor((ageDepartDefinitif - 62) * 4);
-    const tauxSurcoteTotale = trimestresSurcotes * 1.25;
+    tauxSurcote = trimestresSurcotes * 1.25;
 
     // ✅ Ne générer le bloc que si la surcote est réelle
     if (trimestresSurcotes > 0 && tauxSurcoteTotale > 0) {
@@ -913,7 +910,9 @@ if (
   </p>` : ''}
 
 		<p><strong>Taux de liquidation estimé (fin):</strong> ${(tauxFinal*100).toFixed(2)} %</p>
-		${(surcoteAppliquee) ? `<p class="muted">→ Surcote appliquée : +${tauxSurcote.toFixed(2)} % pour ${trimestresSurcotes} trimestre(s) supplémentaires après 62 ans.</p>` : ''}
+		${(trimestresSurcotes > 0 && tauxSurcote > 0)
+    ? `<p class="muted">→ Surcote appliquée : +${tauxSurcote.toFixed(2)} % pour ${trimestresSurcotes} trimestre(s) supplémentaires après 62 ans.</p>`
+    : ''}
         <p><strong>Traitement plein temps estimé (fin):</strong> ${formatEuro(traitementFin)}</p>
         <p><strong>Pension définitive estimée:</strong> ${formatEuro(pensionDefinitive)}</p>
 
