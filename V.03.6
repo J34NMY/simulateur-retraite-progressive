@@ -612,517 +612,107 @@
         tauxContainer.classList.add('hidden');
       }
     }
+function initVariables(I, TR) {
+  const bonifEnfantsJours = I.conditionsEnfantsAvant2004 ? I.nbEnfantsAvant2004 * 4 * 90 : 0;
 
-    // === Calcul principal ===
-    function calculer() {
-	let trimestresSurcotes = 0;
-      const I = lireInputs();
+  const joursAssReleve = Math.floor((I.trimAssuranceReleve + joursEnTrimestres(I.joursAssuranceReleve)) * 90);
+  const joursLiqReleve = Math.floor((I.trimLiquidablesReleve + joursEnTrimestres(I.joursLiquidablesReleve)) * 90);
 
-      // Vérification des dates
-      if (isNaN(I.dateReleve) || isNaN(I.dateDebut) || isNaN(I.dateFin) || I.dateDebut <= I.dateReleve || I.dateFin <= I.dateDebut) {
-        document.getElementById('resultat').innerHTML = `<p class="warn"><strong>Vérifiez les dates :</strong> relevé &lt; départ progressif &lt; départ définitif.</p>`;
-        if (chart) chart.destroy();
-        return;
-      }
+  const P1 = diffDetaillee(I.dateReleve, I.dateDebut);
+  const P2 = diffDetaillee(I.dateDebut, I.dateFin);
 
-      // Auto-remplissage TR requis
-      const val = autoRemplirTrimestres(I.dateNaissance);
-      if (val) {
-        const trSelect = document.getElementById('trimestresRequis');
-        trSelect.innerHTML = `<option value="${val}" selected>${val}</option>`;
-      }
-      const TR = val || I.trimestresRequis;
+  const joursAssP1 = P1.totalJours;
+  const joursAssP2 = P2.totalJours;
+  const joursLiqP1 = Math.floor(P1.totalJours * I.quotiteAvant);
+  const joursLiqP2 = Math.floor(P2.totalJours * (I.surcotisation ? 1 : I.quotite));
 
-      // 1) Photo au relevé
-      const assuranceReleveTr = I.trimAssuranceReleve + joursEnTrimestres(I.joursAssuranceReleve);
-      const liquidablesReleveTr = I.trimLiquidablesReleve + joursEnTrimestres(I.joursLiquidablesReleve);
-
-      // 2) Périodes
-      const P1 = diffDetaillee(I.dateReleve, I.dateDebut);
-      const P2 = diffDetaillee(I.dateDebut, I.dateFin);
-
-      // 3) Jours cumulés
-      const joursAssReleve = Math.floor(assuranceReleveTr * 90);
-      const joursAssP1 = P1.totalJours;
-      const joursAssP2 = P2.totalJours;
-
-      const joursLiqReleve = Math.floor(liquidablesReleveTr * 90);
-      const joursLiqP1 = Math.floor(P1.totalJours * (I.quotiteAvant || 1));
-	  
-	  // Décret n°2003‑1306 du 26 décembre 2003 : bonification enfants
-// 4 trimestres par enfant né ou adopté avant le 01/01/2004
-// Ajoutés à la fois aux jours d’assurance et aux jours liquidables
-
-     // Bonification enfants : ajout aux jours d'assurance ET aux jours liquidables
-const bonifEnfantsJours = I.conditionsEnfantsAvant2004 ? I.nbEnfantsAvant2004 * 4 * 90 : 0;
-const bonifEnfantsTr = bonifEnfantsJours / 90;
-
-// Ajout aux jours d'assurance
-const joursAssBonif = bonifEnfantsJours;
-
-// Ajout aux jours liquidables (déjà présent)
-
-
-      const joursLiqP2 = Math.floor(P2.totalJours * (I.surcotisation ? 1 : I.quotite));
-
-      const assuranceFinale = Math.floor((joursAssReleve + joursAssP1 + joursAssP2 + joursAssBonif) / 90);
-      const liquidablesFinale = Math.floor((joursLiqReleve + joursLiqP1 + bonifEnfantsJours + joursLiqP2) / 90);
-
-     const assuranceDepart = Math.floor((joursAssReleve + joursAssP1 + joursAssBonif) / 90); 
-      const liquidablesDepart = Math.floor((joursLiqReleve + joursLiqP1 + bonifEnfantsJours) / 90);
-
-      // 3.5) Conditions retraite progressive
-      if (!(I.dateNaissance instanceof Date) || isNaN(I.dateNaissance)) {
-        document.getElementById('resultat').innerHTML = `<p class="warn"><strong>Date de naissance manquante :</strong> saisissez votre date pour vérifier les conditions (60 ans + 150 trimestres).</p>`;
-        if (chart) chart.destroy();
-        return;
-      }
-      const ageAuDepartProg = (I.dateDebut - I.dateNaissance) / (1000 * 60 * 60 * 24 * 365.25);
-      if (ageAuDepartProg < 60 || assuranceDepart < 150) {
-        document.getElementById('resultat').innerHTML = `
-          <p class="warn"><strong>Conditions non remplies :</strong><br>
-          - Âge au départ progressif : ${ageAuDepartProg.toFixed(1)} ans (minimum requis : 60 ans)<br>
-          - Trimestres d'assurance au départ progressif : ${assuranceDepart} (minimum requis : 150)</p>
-        `;
-        if (chart) chart.destroy();
-        return;
-      }
-
-      // 4) Revenus pendant la progressive
-      const prog = calcRevenusProgressive({
-        indice: I.indice,
-        valeurPoint: I.valeurPoint,
-        trimLiquidablesDepart: liquidablesDepart,
-        trimRequis: TR,
-        quotite: I.quotite
-      });
-
-      // 5) Estimation fin de période
-      const traitementFin = I.indice * I.valeurPoint;
-
-      // 6) Taux final (décote si assurance < TR)
-      const ratioFin = clamp(liquidablesFinale / TR, 0, 1);
-      let tauxFinal = 0.75 * ratioFin;
-      if (assuranceFinale < TR) {
-        const trimestresManquants = TR - assuranceFinale;
-        const tauxDecoteParTrim = I.dateNaissance.getFullYear() >= 1964 ? 1.09 : 1.25;
-        const decoteTotale = trimestresManquants * tauxDecoteParTrim;
-        const tauxApresDecote = Math.max(0, (75 - decoteTotale)) / 100;
-        tauxFinal = tauxApresDecote * ratioFin;
-      }
-	  // 5 bis) Calcul de l'âge au départ définitif
-const ageDepartDefinitif = (I.dateFin - I.dateNaissance) / (1000 * 60 * 60 * 24 * 365.25);
-	  // 6 bis) Surcote si assurance ≥ TR et âge > 62
-let tauxSurcote = 0;
-let surcoteAppliquee = false;
-if (assuranceFinale >= TR && ageDepartDefinitif > 62 && ageDepartDefinitif < 67) {
-  trimestresSurcotes = Math.floor((ageDepartDefinitif - 62) * 4);
-  tauxSurcote = trimestresSurcotes * 1.25;
-  surcoteAppliquee = true;
-   
- // 4 trimestres/an
-  tauxSurcote = trimestresSurcotes * 1.25;
-  const tauxApresSurcote = Math.min(75 + tauxSurcote, 80) / 100; // plafond à 80% ?
-  tauxFinal = tauxApresSurcote * ratioFin;
+  return {
+    bonifEnfantsJours,
+    joursAssReleve,
+    joursLiqReleve,
+    joursAssP1,
+    joursAssP2,
+    joursLiqP1,
+    joursLiqP2,
+    P1,
+    P2,
+    TR
+  };
 }
+function calculTauxFinal(I, V) {
+  const assuranceFinale = Math.floor((V.joursAssReleve + V.joursAssP1 + V.joursAssP2 + V.bonifEnfantsJours) / 90);
+  const liquidablesFinale = Math.floor((V.joursLiqReleve + V.joursLiqP1 + V.bonifEnfantsJours + V.joursLiqP2) / 90);
+  const ratioFin = clamp(liquidablesFinale / V.TR, 0, 1);
+  const ageDepartDefinitif = (I.dateFin - I.dateNaissance) / (1000 * 60 * 60 * 24 * 365.25);
 
+  let tauxFinal = 0.75 * ratioFin;
+  let tauxSurcote = 0;
+  let trimestresSurcotes = 0;
+  let surcoteAppliquee = false;
 
-      const pensionDefinitive = traitementFin * tauxFinal;
+  if (assuranceFinale < V.TR) {
+    const trimestresManquants = V.TR - assuranceFinale;
+    const tauxDecoteParTrim = I.dateNaissance.getFullYear() >= 1964 ? 1.09 : 1.25;
+    const decoteTotale = trimestresManquants * tauxDecoteParTrim;
+    tauxFinal = Math.max(0, (75 - decoteTotale)) / 100 * ratioFin;
+  }
 
-      // 7) Taux plein à 67 ans
-      const date67ans = new Date(I.dateNaissance.getFullYear() + 67, I.dateNaissance.getMonth(), I.dateNaissance.getDate());
-      
-      let noteTauxPlein = '';
-      if (ageDepartDefinitif >= 67) {
-        noteTauxPlein = `Âge du départ définitif : ${ageDepartDefinitif.toFixed(1)} ans → Taux plein automatique (pas de décote).`;
-      }
+  if (assuranceFinale >= V.TR && ageDepartDefinitif > 62 && ageDepartDefinitif < 67) {
+    trimestresSurcotes = Math.floor((ageDepartDefinitif - 62) * 4);
+    tauxSurcote = trimestresSurcotes * 1.25;
+    tauxFinal = Math.min(75 + tauxSurcote, 80) / 100 * ratioFin;
+    surcoteAppliquee = true;
+  }
 
-      // 8) Bloc décote
-      let blocDecote = '';
-      if (assuranceFinale < TR) {
-        const trimestresManquants = TR - assuranceFinale;
-        const tauxDecoteParTrim = I.dateNaissance.getFullYear() >= 1964 ? 1.09 : 1.25;
-        const decoteTotale = trimestresManquants * tauxDecoteParTrim;
-        const tauxApresDecotePct = (tauxFinal * 100).toFixed(2);
-
-        const joursManquants = trimestresManquants * 90;
-        const dateTauxPlein = new Date(I.dateFin.getTime() + joursManquants * 24 * 60 * 60 * 1000);
-        const dateTauxPleinStr = dateTauxPlein.toLocaleDateString('fr-FR');
-        const date67ansStr = date67ans.toLocaleDateString('fr-FR');
-
-        blocDecote = `
-          <div style="margin-top:10px;padding:8px;border:1px solid #f0b37e;background:#fff7e6;color:#8a5a00;border-radius:6px;">
-            <strong>Détails de la décote :</strong><br>
-            Trimestres manquants : <strong>${trimestresManquants}</strong><br>
-            Décote appliquée : <strong>- ${decoteTotale.toFixed(2)} %</strong><br>
-            Taux après décote : <strong>${tauxApresDecotePct} %</strong><br>
-            Date estimée du taux plein (par trimestres) : <strong>${dateTauxPleinStr}</strong><br>
-            Date d'annulation automatique de la décote à 67 ans : <strong>${date67ansStr}</strong><br>
-            <span style="color:#b30000;font-weight:bold;">
-              Attention : trimestres d'assurance finaux (${assuranceFinale}) &lt; requis (${TR}). Décote appliquée.
-            </span>
-          </div>
-        `;
-      }
-	 // 8Bis) Bloc surcote
-let blocSurcote = '';
-let tauxSurcoteTotale = 0;
-let tauxPleinApresSurcote = 0;
-let tauxFinalPct = (tauxFinal * 100).toFixed(2);
-
-if (assuranceFinale >= TR && ageDepartDefinitif > 62 && ageDepartDefinitif < 67) {
-  trimestresSurcotes = Math.floor((ageDepartDefinitif - 62) * 4); // 4 trimestres/an
-  tauxSurcoteTotale = trimestresSurcotes * 1.25;
-  tauxPleinApresSurcote = Math.min(75 + tauxSurcoteTotale, 80); // plafond à 80%
-  tauxFinalPct = ((tauxPleinApresSurcote / 100) * ratioFin * 100).toFixed(2); // tauxFinal recalculé
-
-  blocSurcote = `
-    <div style="margin-top:10px;padding:8px;border:1px solid #7eb37e;background:#e6fff7;color:#005a2a;border-radius:6px;">
-      <strong>Détails de la surcote :</strong><br>
-      Trimestres supplémentaires : <strong>${trimestresSurcotes}</strong><br>
-      Surcote appliquée : <strong>+ ${tauxSurcoteTotale.toFixed(2)} %</strong><br>
-      Taux plein après surcote : <strong>${tauxPleinApresSurcote.toFixed(2)} %</strong><br>
-      Taux final après prorata liquidables : <strong>${tauxFinalPct} %</strong><br>
-      <span style="color:#007a00;font-weight:bold;">
-        ✅ Vous avez dépassé l’âge légal (62 ans) avec le nombre de trimestres requis. Surcote appliquée.
-      </span>
+  return {
+    tauxFinal,
+    tauxSurcote,
+    trimestresSurcotes,
+    surcoteAppliquee,
+    assuranceFinale,
+    liquidablesFinale,
+    ratioFin,
+    ageDepartDefinitif
+  };
+}
+function affichageUI(I, V, T, revenus) {
+  const res = document.getElementById('resultat');
+  res.innerHTML = `
+    <div class="info">
+      <strong>Résumé pédagogique :</strong><br>
+      Vous partez à <strong>${T.ageDepartDefinitif.toFixed(1)} ans</strong> avec <strong>${T.assuranceFinale}</strong> trimestres d’assurance.<br>
+      ${T.surcoteAppliquee ? `→ ✅ Surcote appliquée : +${T.tauxSurcote.toFixed(2)} %<br>` : ''}
+      ${T.assuranceFinale >= V.TR ? `→ ✅ Décote évitée : assurance ≥ requis<br>` : `→ ⚠️ Décote appliquée : ${V.TR - T.assuranceFinale} trimestres manquants<br>`}
+      ${I.surcotisation ? `→ ✅ Surcotisation activée : +${(V.joursLiqP2 / 90).toFixed(2)} trimestres, coût estimé : ${formatEuro(I.salaireMensuel * I.quotite * 0.15 * V.P2.nbMois)}` : ''}
     </div>
+    <h3>Situation en fin de période</h3>
+    <p><strong>Assurance finale:</strong> ${T.assuranceFinale} / ${V.TR}</p>
+    <p><strong>Liquidables finaux:</strong> ${T.liquidablesFinale} / ${V.TR}</p>
+    <p><strong>Taux de liquidation estimé:</strong> ${(T.tauxFinal * 100).toFixed(2)} %</p>
+    ${(T.surcoteAppliquee) ? `<p class="muted">→ Surcote appliquée : +${T.tauxSurcote.toFixed(2)} % pour ${T.trimestresSurcotes} trimestre(s) supplémentaires après 62 ans.</p>` : ''}
+    <p><strong>Pension définitive estimée:</strong> ${formatEuro(I.indice * I.valeurPoint * T.tauxFinal)}</p>
+    <p class="muted">⚠️ Estimation indicative. Consultez votre service RH pour validation réglementaire.</p>
   `;
 }
 
 
+    // === Calcul principal ===
+    function calculer() {
+	  const I = lireInputs();
+  const TR = autoRemplirTrimestres(I.dateNaissance) || I.trimestresRequis;
 
-      // 9) Bloc Liquidables conditionnel
-      if (liquidablesFinale < TR) {
-        const prorata = liquidablesFinale / TR;
-        const pourcentPerte = (1 - prorata) * 100;
+  const variables = initVariables(I, TR);
+  const taux = calculTauxFinal(I, variables);
+  const revenus = calcRevenusProgressive({
+    indice: I.indice,
+    valeurPoint: I.valeurPoint,
+    trimLiquidablesDepart: Math.floor((variables.joursLiqReleve + variables.joursLiqP1 + variables.bonifEnfantsJours) / 90),
+    trimRequis: TR,
+    quotite: I.quotite
+  });
 
-        const hasTauxRef = (typeof prog.tauxRef !== 'undefined' && prog.tauxRef !== null && !Number.isNaN(prog.tauxRef));
-        let ligneTaux = '';
-        if (hasTauxRef) {
-          const tauxApresReduction = (prog.tauxRef * prorata).toFixed(2);
-          ligneTaux = `Taux après réduction : <strong>${prog.tauxRef.toFixed(2)} % × ${prorata.toFixed(3)} = ${tauxApresReduction} %</strong><br>`;
-        }
+  affichageUI(I, variables, taux, revenus);
 
-        blocDecote += `
-          <div style="margin-top:10px;padding:8px;border:1px solid #f0b37e;background:#fff7e6;color:#8a5a00;border-radius:6px;">
-            <strong>Détails de la réduction – Liquidables :</strong><br>
-            Trimestres liquidables finaux : <strong>${liquidablesFinale}</strong> / <strong>${TR}</strong><br>
-            Prorata appliqué : <strong>${liquidablesFinale} ÷ ${TR} = ${prorata.toFixed(3)}</strong> ( - ${pourcentPerte.toFixed(1)} % )<br>
-            ${ligneTaux}
-            <span style="color:#b30000;font-weight:bold;">
-              Attention : trimestres liquidables finaux (${liquidablesFinale}) &lt; requis (${TR}). Réduction appliquée.
-            </span>
-          </div>
-        `;
-      }
-
-      // 10) Bloc Surcotisation conditionnel
-      let blocSurcotisation = '';
-      if (I.surcotisation) {
-        const joursSansSurcote = Math.floor(P2.totalJours * I.quotite);
-        const joursAvecSurcote = Math.floor(P2.totalJours * 1);
-        const trimestresGagnes = (joursAvecSurcote - joursSansSurcote) / 90;
-        
-        // Calcul du coût de la surcotisation avec le taux paramétrable
-        const traitementPlein = calcTraitementPlein(I.indice, I.valeurPoint);
-        const cotisationSupplementaire = traitementPlein * I.tauxSurcotisation * (P2.totalJours / 30.4375);
-        
-        blocSurcotisation = `
-          <div class="info">
-            <strong>Détails de la surcotisation :</strong><br>
-            Période de retraite progressive : <strong>${P2.annees} an(s), ${P2.mois} mois, ${P2.jours} jours</strong><br>
-            Jours liquidables sans surcotisation : <strong>${joursSansSurcote} j</strong> (à ${I.quotite*100}%)<br>
-            Jours liquidables avec surcotisation : <strong>${joursAvecSurcote} j</strong> (à 100%)<br>
-            Trimestres supplémentaires acquis : <strong>${trimestresGagnes.toFixed(2)}</strong><br>
-            Coût estimé (cotisations supplémentaires) : <strong>${formatEuro(cotisationSupplementaire)}</strong><br>
-            <span style="color:#166534;font-weight:bold;">
-              💡 Estimation basée sur un taux de surcotisation de ${(I.tauxSurcotisation * 100).toFixed(1)}%. 
-              Cette estimation peut varier selon votre situation réelle.
-            </span>
-          </div>
-        `;
-      }
-
-      // 11) Affichage
-      const res = document.getElementById('resultat');
-      res.innerHTML = `
-        <h3>Durées et trimestres (méthode cumul de jours)</h3>
-        <p><strong>Entre relevé et départ progressif:</strong>
-          ${P1.annees} an(s), ${P1.mois} mois, ${P1.jours} jours
-          <span class="muted">(~${P1.anneesDec.toFixed(2)} an(s), ~${Math.round(P1.moisApprox)} mois)</span></p>
-        <p><strong>Entre départ progressif et départ définitif:</strong>
-          ${P2.annees} an(s), ${P2.mois} mois, ${P2.jours} jours
-          <span class="muted">(~${P2.anneesDec.toFixed(2)} an(s), ~${Math.round(P2.moisApprox)} mois)</span></p>
-
-        <hr class="sep">
-        <h3>Compteurs au départ progressif</h3>
-        <p><strong>Assurance au relevé:</strong> ${assuranceReleveTr.toFixed(2)} trimestres</p>
-        <p><strong>Liquidables au relevé:</strong> ${liquidablesReleveTr.toFixed(2)} trimestres</p>
-        ${(I.conditionsEnfantsAvant2004 && I.nbEnfantsAvant2004 > 0) ? `
-  <p><strong>Bonification enfants:</strong> ${bonifEnfantsTr.toFixed(2)} trimestres 
-    <span class="muted">(${bonifEnfantsJours} j)</span>
-    <span class="tooltip" title="Décret n°2003‑1306 du 26 décembre 2003 : 4 trimestres/enfant né ou adopté avant le 01/01/2004, ajoutés aux trimestres d’assurance et liquidables.">ℹ️</span>
-  </p>` : ''}
-        <p><strong>Assurance au départ (cumul jours → arrondi final):</strong> ${assuranceDepart} / ${TR}</p>
-        <p><strong>Liquidables au départ (cumul jours → arrondi final):</strong> ${liquidablesDepart} / ${TR}</p>
-		<p class="muted">→  ${bonifEnfantsTr.toFixed(2)} trimestres de bonification enfants sont intégrés dans les ${assuranceDepart} trimestres d’assurance et les ${liquidablesDepart} trimestres liquidables affichés ci-dessus.</p>
-
-
-
-
-        ${blocSurcotisation}
-
-        <hr class="sep">
-        <h3>Revenus pendant la retraite progressive</h3>
-        <p><strong>Traitement plein temps (au départ):</strong> ${formatEuro(prog.traitementPlein)}</p>
-        <p><strong>Taux de liquidation de référence (au départ):</strong> ${(prog.tauxRef*100).toFixed(2)} %</p>
-        <p><strong>Montant de référence (au départ):</strong> ${formatEuro(prog.montantRef)}</p>
-        <p><strong>Traitement à la quotité:</strong> ${formatEuro(prog.traitementTP)}</p>
-        <p><strong>Pension provisoire:</strong> ${formatEuro(prog.pensionProvisoire)}</p>
-        <p><strong>Total brut mensuel:</strong> ${formatEuro(prog.total)}</p>
-
-        <hr class="sep">
-        <h3>Situation en fin de période</h3>
-        <p><strong>Assurance finale (cumul jours → arrondi final):</strong> ${assuranceFinale} / ${TR}</p>
-        <p><strong>Liquidables finaux (cumul jours → arrondi final):</strong> ${liquidablesFinale} / ${TR}</p>
-		${(I.conditionsEnfantsAvant2004 && I.nbEnfantsAvant2004 > 0) ? `
-  <p class="muted">→  ${bonifEnfantsTr.toFixed(2)} trimestres de bonification enfants sont intégrés dans les compteurs ci-dessus
-    <span class="tooltip" title="Décret n°2003‑1306 du 26 décembre 2003 : 4 trimestres/enfant né ou adopté avant le 01/01/2004, ajoutés aux trimestres d’assurance et liquidables.">ℹ️</span>
-  </p>` : ''}
-
-		<p><strong>Taux de liquidation estimé (fin):</strong> ${(tauxFinal*100).toFixed(2)} %</p>
-		${(surcoteAppliquee) ? `<p class="muted">→ Surcote appliquée : +${tauxSurcote.toFixed(2)} % pour ${trimestresSurcotes} trimestre(s) supplémentaires après 62 ans.</p>` : ''}
-        <p><strong>Traitement plein temps estimé (fin):</strong> ${formatEuro(traitementFin)}</p>
-        <p><strong>Pension définitive estimée:</strong> ${formatEuro(pensionDefinitive)}</p>
-
-        ${blocDecote}
-
-        <p class="muted">Rappels: 1 trimestre = 90 jours; arrondi à l'entier inférieur après cumul global des jours. Assurance: pas de prorata de quotité. Liquidables: proratisés selon la quotité (sauf surcotisation). Bonifs enfants avant 2004: LIQUIDABLES uniquement.</p>
-        <p class="muted">⚠️ Les estimations de cotisations sont indicatives et basées sur les paramètres saisis. Consultez votre service des ressources humaines pour des calculs précis.</p>
-      `;
-
-      // 12) Graphique
-      const quotitesAutorisees = [0.50, 0.60, 0.70, 0.80, 0.90];
-      const labels = quotitesAutorisees.map(q => (q*100).toFixed(0) + ' %');
-      const dataTotal = quotitesAutorisees.map(q => {
-        const r = calcRevenusProgressive({
-          indice: I.indice,
-          valeurPoint: I.valeurPoint,
-          trimLiquidablesDepart: liquidablesDepart,
-          trimRequis: TR,
-          quotite: q
-        });
-        return r.total;
-      });
-      const selectedIndex = quotitesAutorisees.findIndex(q => Math.abs(q - I.quotite) < 1e-9);
-
-      const ctx = document.getElementById('graphique').getContext('2d');
-      if (chart) chart.destroy();
-      chart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels,
-          datasets: [{
-            label: 'Revenu total brut pendant la retraite progressive (€)',
-            data: dataTotal,
-            borderColor: getComputedStyle(document.documentElement).getPropertyValue('--pri').trim() || '#22c55e',
-            backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--pri-200').trim() || 'rgba(34,197,94,0.15)',
-            fill: true,
-            tension: 0.25,
-            pointBackgroundColor: dataTotal.map((_, i) => i === selectedIndex ? 'red' : '#22c55e'),
-            pointBorderColor: dataTotal.map((_, i) => i === selectedIndex ? 'red' : '#22c55e'),
-            pointRadius: dataTotal.map((_, i) => i === selectedIndex ? 6 : 4),
-            pointHoverRadius: dataTotal.map((_, i) => i === selectedIndex ? 7 : 5)
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: { legend: { display: true }, tooltip: { mode: 'index', intersect: false } },
-          interaction: { mode: 'nearest', axis: 'x', intersect: false },
-          scales: {
-            x: { title: { display: true, text: 'Quotité de travail' } },
-            y: { title: { display: true, text: 'Revenu total brut (€)' }, beginAtZero: false }
-          }
-        }
-      });
-    }
-
-    // === Événements ===
-    document.getElementById('btnCalc').addEventListener('click', calculer);
-    document.getElementById('btnDefault').addEventListener('click', chargerValeursDefaut);
-
-    document.getElementById('bonifEnfants').addEventListener('change', (ev) => {
-      const inputEnfants = document.getElementById('enfantsAvant2004');
-      inputEnfants.disabled = !ev.target.checked;
-      if (!ev.target.checked) inputEnfants.value = '';
-    });
-
-    // Auto-remplissage TR requis depuis la date de naissance
-    document.getElementById('dateNaissance').addEventListener('change', () => {
-      const input = document.getElementById('dateNaissance').value;
-      const val = input ? autoRemplirTrimestres(new Date(input)) : '';
-      const trimestreSelect = document.getElementById('trimestresRequis');
-      if (val) {
-        trimestreSelect.innerHTML = `<option value="${val}" selected>${val}</option>`;
-        calculer();
-      }
-    });
-
-    // Script pour le bouton Sources réglementaires
-    document.getElementById('btnSources').addEventListener('click', function () {
-      const bloc = document.getElementById('blocSources');
-      bloc.style.display = bloc.style.display === 'none' ? 'block' : 'none';
-      this.textContent = bloc.style.display === 'block'
-        ? '📚 Masquer les sources réglementaires'
-        : '📚 Voir les sources réglementaires';
-    });
-
-    // Gestion de la surcotisation
-    document.getElementById('surcotisation').addEventListener('change', mettreAJourTauxSurcotisation);
-    document.getElementById('quotite').addEventListener('change', mettreAJourTauxSurcotisation);
-    
-    // Gestion de la modification manuelle du taux
-    document.getElementById('tauxSurcotisation').addEventListener('input', function() {
-      this.dataset.manual = "true";
-    });
-
-    /**
- * Remplit le formulaire avec des valeurs par défaut pour test ou démonstration.
- * Utilisé pour faciliter les essais sans saisie manuelle.
- */
-    function chargerValeursDefaut() {
-      // Rémunération
-      document.getElementById('indice').value = 478;
-      document.getElementById('valeurPoint').value = 4.92278;
-
-      // Relevé (exemple)
-      document.getElementById('dateReleve').value = '2024-12-31';
-      document.getElementById('trimAssuranceReleve').value = 146;
-      document.getElementById('joursAssuranceReleve').value = 84;
-      document.getElementById('trimLiquidablesReleve').value = 142;
-      document.getElementById('joursLiquidablesReleve').value = 86;
-
-      // Naissance et TR requis
-      document.getElementById('dateNaissance').value = '1964-06-25';
-      const val = autoRemplirTrimestres(new Date('1964-06-25'));
-      const trSelect = document.getElementById('trimestresRequis');
-      trSelect.innerHTML = val ? `<option value="${val}" selected>${val}</option>` : `<option value="">-- Non défini --</option>`;
-
-      // Périodes (exemple)
-      document.getElementById('dateDebut').value = '2025-12-01';
-      document.getElementById('dateFin').value = '2027-07-01';
-
-      // Quotités
-      document.getElementById('quotiteAvant').value = "0.80";
-      document.getElementById('quotite').value = "0.80";
-
-      // Paramètres
-      document.getElementById('surcotisation').checked = false;
-      document.getElementById('tauxSurcotisation').value = "10.7";
-      delete document.getElementById('tauxSurcotisation').dataset.manual;
-      mettreAJourTauxSurcotisation();
-
-      // Enfants avant 2004
-      document.getElementById('bonifEnfants').checked = false;
-      const nb = document.getElementById('enfantsAvant2004');
-      nb.value = '';
-      nb.disabled = true;
-
-      calculer();  
-}	
-/**
- * Exporte les paramètres utilisateur dans un fichier .json.
- * Inclut les métadonnées réglementaires pour traçabilité.
- * Utilisé pour archivage, partage ou rechargement ultérieur.
- */
-function exporterParametresUtilisateur() {
-  console.log("Export lancé !"); // Vérification console
-
-  // Lecture des paramètres saisis par l'utilisateur
-  const inputs = lireInputs();
-
-  // Métadonnées réglementaires associées à l'export
-  const metadata = {
-    version: "V.03.5.3", // Version du simulateur
-    decret: "Décret n° 2025‑681 du 15 juillet 2025", // Référence réglementaire
-    dateExport: new Date().toISOString() // Horodatage ISO
-  };
-
-  // Fusion des données utilisateur + métadonnées
-  const exportData = { ...inputs, ...metadata };
-
-  // Création du fichier JSON à télécharger
-  const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-
-  // Déclenchement du téléchargement
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'parametres_simulateur.json';
-  a.click();
-
-  // Nettoyage de l'URL temporaire
-  URL.revokeObjectURL(url);
-}
-
-function importerParametresUtilisateur(jsonData) {
-  if (!jsonData) return;
-
-  document.getElementById('indice').value = jsonData.indice;
-  document.getElementById('valeurPoint').value = jsonData.valeurPoint;
-  document.getElementById('tauxSurcotisation').value = (jsonData.tauxSurcotisation * 100).toFixed(1);
-  document.getElementById('dateReleve').value = jsonData.dateReleve?.slice(0, 10);
-  document.getElementById('trimAssuranceReleve').value = jsonData.trimAssuranceReleve;
-  document.getElementById('joursAssuranceReleve').value = jsonData.joursAssuranceReleve;
-  document.getElementById('trimLiquidablesReleve').value = jsonData.trimLiquidablesReleve;
-  document.getElementById('joursLiquidablesReleve').value = jsonData.joursLiquidablesReleve;
-  document.getElementById('dateNaissance').value = jsonData.dateNaissance?.slice(0, 10);
-  document.getElementById('dateDebut').value = jsonData.dateDebut?.slice(0, 10);
-  document.getElementById('dateFin').value = jsonData.dateFin?.slice(0, 10);
-  document.getElementById('quotiteAvant').value = jsonData.quotiteAvant;
-  document.getElementById('quotite').value = jsonData.quotite;
-  document.getElementById('surcotisation').checked = jsonData.surcotisation;
-  document.getElementById('bonifEnfants').checked = jsonData.conditionsEnfantsAvant2004;
-  document.getElementById('enfantsAvant2004').value = jsonData.nbEnfantsAvant2004;
-
-  const val = autoRemplirTrimestres(new Date(jsonData.dateNaissance));
-  const trSelect = document.getElementById('trimestresRequis');
-  trSelect.innerHTML = val ? `<option value="${val}" selected>${val}</option>` : `<option value="">-- Non défini --</option>`;
-
-  mettreAJourTauxSurcotisation();
-  calculer();
-}
-
-  
-
-    // =======================
-// Initialisation du formulaire au chargement
-// =======================
-    window.addEventListener('DOMContentLoaded', () => {
-	// Gestion de l'état du champ "nombre d'enfants" selon la case cochée
-      const caseBonif = document.getElementById("bonifEnfants");
-      const champNbEnfants = document.getElementById("enfantsAvant2004");
-      champNbEnfants.disabled = !caseBonif.checked;
-      
-      // Initialisation des trimestres requis selon la date de naissance
-      const dateNaissance = document.getElementById('dateNaissance').value;
-      if (dateNaissance) {
-        const val = autoRemplirTrimestres(new Date(dateNaissance));
-        const trSelect = document.getElementById('trimestresRequis');
-        trSelect.innerHTML = val ? `<option value="${val}" selected>${val}</option>` : `<option value="">-- Non défini --</option>`;
-      }
-      
-     // Mise à jour du taux de surcotisation si champ modifié
-      mettreAJourTauxSurcotisation();
-	 // Calcul initial automatique        
-      calculer(); 
-	  
-	  // Liaison du bouton Export à la fonction d’export
-	  document.getElementById('btnExport').addEventListener('click', exporterParametresUtilisateur);
-	  document.getElementById('btnImport').addEventListener('click', () => {
-  document.getElementById('importFile').click();
-});
 
 document.getElementById('importFile').addEventListener('change', (event) => {
   const file = event.target.files[0];
