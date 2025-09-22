@@ -709,6 +709,15 @@ const joursAssBonif = bonifEnfantsJours;
         const tauxApresDecote = Math.max(0, (75 - decoteTotale)) / 100;
         tauxFinal = tauxApresDecote * ratioFin;
       }
+	  // 6 bis) Surcote si assurance ≥ TR et âge > 62
+let tauxSurcote = 0;
+if (assuranceFinale >= TR && ageDepartDefinitif > 62 && ageDepartDefinitif < 67) {
+  const trimestresSurcotes = Math.floor((ageDepartDefinitif - 62) * 4); // 4 trimestres/an
+  tauxSurcote = trimestresSurcotes * 1.25;
+  const tauxApresSurcote = Math.min(75 + tauxSurcote, 80) / 100; // plafond à 80% ?
+  tauxFinal = tauxApresSurcote * ratioFin;
+}
+
 
       const pensionDefinitive = traitementFin * tauxFinal;
 
@@ -747,6 +756,26 @@ const joursAssBonif = bonifEnfantsJours;
           </div>
         `;
       }
+	  // 8Bis) Bloc surcote
+	  let blocSurcote = '';
+if (assuranceFinale >= TR && ageDepartDefinitif > 62 && ageDepartDefinitif < 67) {
+  const trimestresSurcotes = Math.floor((ageDepartDefinitif - 62) * 4); // 4 trimestres/an
+  const tauxSurcoteTotale = trimestresSurcotes * 1.25;
+  const tauxApresSurcotePct = (tauxFinal * 100).toFixed(2);
+
+  blocSurcote = `
+    <div style="margin-top:10px;padding:8px;border:1px solid #7eb37e;background:#e6fff7;color:#005a2a;border-radius:6px;">
+      <strong>Détails de la surcote :</strong><br>
+      Trimestres supplémentaires : <strong>${trimestresSurcotes}</strong><br>
+      Surcote appliquée : <strong>+ ${tauxSurcoteTotale.toFixed(2)} %</strong><br>
+      Taux après surcote : <strong>${tauxApresSurcotePct} %</strong><br>
+      <span style="color:#007a00;font-weight:bold;">
+        ✅ Vous avez dépassé l’âge légal (62 ans) avec le nombre de trimestres requis. Surcote appliquée.
+      </span>
+    </div>
+  `;
+}
+
 
       // 9) Bloc Liquidables conditionnel
       if (liquidablesFinale < TR) {
