@@ -696,9 +696,9 @@ function affichageUI(I, V, T, revenus) {
 }
 
 
-    // === Calcul principal ===
-    function calculer() {
-	  const I = lireInputs();
+   // === Calcul principal ===
+function calculer() {
+  const I = lireInputs();
   const TR = autoRemplirTrimestres(I.dateNaissance) || I.trimestresRequis;
 
   const variables = initVariables(I, TR);
@@ -712,43 +712,12 @@ function affichageUI(I, V, T, revenus) {
   });
 
   affichageUI(I, variables, taux, revenus);
+}
 
-
-document.getElementById('importFile').addEventListener('change', (event) => {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      const data = JSON.parse(e.target.result);
-      importerParametresUtilisateur(data);
-    } catch (err) {
-      alert("Fichier invalide ou corrompu.");
-    }
-  };
-  reader.readAsText(file);
-  
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-   {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      try {
-        const data = JSON.parse(e.target.result);
-        importerParametresUtilisateur(data);
-      } catch (err) {
-        alert("Fichier invalide ou corrompu.");
-      }
-    };
-    reader.readAsText(file);
-  }
+// === Attente du chargement complet de la page ===
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("btnCalc").addEventListener("click", calculer);
+
   document.getElementById("importFile").addEventListener("change", (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -764,9 +733,7 @@ document.addEventListener("DOMContentLoaded", () => {
     };
     reader.readAsText(file);
   });
-  });
-
-
+});
   </script>
 </body>
 </html>
