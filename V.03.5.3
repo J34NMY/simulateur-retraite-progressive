@@ -479,6 +479,31 @@
     // === Utilitaires ===
     function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
     function formatEuro(x){ return (isFinite(x)?x:0).toFixed(2) + ' €'; }
+	function creerBlocConditionnel({ titre, lignes, style = 'info', icone = '', reference = '' }) {
+  const styles = {
+    warn: { bg: '#fff7e6', border: '#f0b37e', text: '#8a5a00' },
+    ok:   { bg: '#ecfdf5', border: '#bbf7d0', text: '#166534' },
+    info: { bg: '#e8f4fc', border: '#3498db', text: '#2c3e50' }
+  };
+  const s = styles[style] || styles.info;
+
+  const contenu = lignes
+    .map(l => `${l.label} : <strong>${l.valeur}</strong>`)
+    .join('<br>');
+
+  return `
+    <div style="margin-top:10px;padding:8px;
+      border:1px solid ${s.border};
+      background:${s.bg};
+      color:${s.text};
+      border-radius:6px;">
+      <strong>${icone} ${titre} :</strong><br>
+      ${contenu}
+      ${reference ? `<br><small class="muted">Réf. : ${reference}</small>` : ''}
+    </div>
+  `;
+}
+
     function joursEnTrimestres(jours){ return (parseFloat(jours)||0) / 90; }
     function diffJours(d1, d2){
       if (!(d1 instanceof Date) || !(d2 instanceof Date) || isNaN(d1) || isNaN(d2)) return 0;
@@ -738,111 +763,93 @@ if (assuranceFinale >= TR && ageDepartDefinitif > 62 && ageDepartDefinitif < 67)
       }
 
       // 8) Bloc décote
-      let blocDecote = '';
-      if (assuranceFinale < TR) {
-        const trimestresManquants = TR - assuranceFinale;
-        const tauxDecoteParTrim = I.dateNaissance.getFullYear() >= 1964 ? 1.09 : 1.25;
-        const decoteTotale = trimestresManquants * tauxDecoteParTrim;
-        const tauxApresDecotePct = (tauxFinal * 100).toFixed(2);
+         if (assuranceFinale < TR) {
+  const trimestresManquants = TR - assuranceFinale;
+  const tauxDecoteParTrim = I.dateNaissance.getFullYear() >= 1964 ? 1.09 : 1.25;
+  const decoteTotale = trimestresManquants * tauxDecoteParTrim;
+  const tauxApresDecotePct = (tauxFinal * 100).toFixed(2);
+  const dateTauxPleinStr = new Date(I.dateFin.getTime() + trimestresManquants * 90 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR');
+  const date67ansStr = date67ans.toLocaleDateString('fr-FR');
 
-        const joursManquants = trimestresManquants * 90;
-        const dateTauxPlein = new Date(I.dateFin.getTime() + joursManquants * 24 * 60 * 60 * 1000);
-        const dateTauxPleinStr = dateTauxPlein.toLocaleDateString('fr-FR');
-        const date67ansStr = date67ans.toLocaleDateString('fr-FR');
+  blocDecote = creerBlocConditionnel({
+    titre: 'Détails de la décote',
+    style: 'warn',
+    icone: '⚠️',
+    lignes: [
+      { label: 'Trimestres manquants', valeur: trimestresManquants },
+      { label: 'Décote appliquée', valeur: `- ${decoteTotale.toFixed(2)} %` },
+      { label: 'Taux après décote', valeur: `${tauxApresDecotePct} %` },
+      { label: 'Date taux plein', valeur: dateTauxPleinStr },
+      { label: 'Annulation à 67 ans', valeur: date67ansStr }
+    ],
+    reference: 'Art. L14 et L15 du Code des pensions'
+  });
+}
 
-        blocDecote = `
-          <div style="margin-top:10px;padding:8px;border:1px solid #f0b37e;background:#fff7e6;color:#8a5a00;border-radius:6px;">
-            <strong>Détails de la décote :</strong><br>
-            Trimestres manquants : <strong>${trimestresManquants}</strong><br>
-            Décote appliquée : <strong>- ${decoteTotale.toFixed(2)} %</strong><br>
-            Taux après décote : <strong>${tauxApresDecotePct} %</strong><br>
-            Date estimée du taux plein (par trimestres) : <strong>${dateTauxPleinStr}</strong><br>
-            Date d'annulation automatique de la décote à 67 ans : <strong>${date67ansStr}</strong><br>
-            <span style="color:#b30000;font-weight:bold;">
-              Attention : trimestres d'assurance finaux (${assuranceFinale}) &lt; requis (${TR}). Décote appliquée.
-            </span>
-          </div>
-        `;
-      }
 	 // 8Bis) Bloc surcote
-let blocSurcote = '';
-let tauxSurcoteTotale = 0;
-let tauxPleinApresSurcote = 0;
-let tauxFinalPct = (tauxFinal * 100).toFixed(2);
-
 if (assuranceFinale >= TR && ageDepartDefinitif > 62 && ageDepartDefinitif < 67) {
-  trimestresSurcotes = Math.floor((ageDepartDefinitif - 62) * 4); // 4 trimestres/an
-  tauxSurcoteTotale = trimestresSurcotes * 1.25;
-  tauxPleinApresSurcote = Math.min(75 + tauxSurcoteTotale, 80); // plafond à 80%
-  tauxFinalPct = ((tauxPleinApresSurcote / 100) * ratioFin * 100).toFixed(2); // tauxFinal recalculé
+  trimestresSurcotes = Math.floor((ageDepartDefinitif - 62) * 4);
+  const tauxSurcoteTotale = trimestresSurcotes * 1.25;
+  const tauxPleinApresSurcote = Math.min(75 + tauxSurcoteTotale, 80);
+  const tauxFinalPct = ((tauxPleinApresSurcote / 100) * ratioFin * 100).toFixed(2);
 
-  blocSurcote = `
-    <div style="margin-top:10px;padding:8px;border:1px solid #7eb37e;background:#e6fff7;color:#005a2a;border-radius:6px;">
-      <strong>Détails de la surcote :</strong><br>
-      Trimestres supplémentaires : <strong>${trimestresSurcotes}</strong><br>
-      Surcote appliquée : <strong>+ ${tauxSurcoteTotale.toFixed(2)} %</strong><br>
-      Taux plein après surcote : <strong>${tauxPleinApresSurcote.toFixed(2)} %</strong><br>
-      Taux final après prorata liquidables : <strong>${tauxFinalPct} %</strong><br>
-      <span style="color:#007a00;font-weight:bold;">
-        ✅ Vous avez dépassé l’âge légal (62 ans) avec le nombre de trimestres requis. Surcote appliquée.
-      </span>
-    </div>
-  `;
+  blocSurcote = creerBlocConditionnel({
+    titre: 'Détails de la surcote',
+    style: 'ok',
+    icone: '✅',
+    lignes: [
+      { label: 'Trimestres supplémentaires', valeur: trimestresSurcotes },
+      { label: 'Surcote appliquée', valeur: `+ ${tauxSurcoteTotale.toFixed(2)} %` },
+      { label: 'Taux plein après surcote', valeur: `${tauxPleinApresSurcote.toFixed(2)} %` },
+      { label: 'Taux final après prorata', valeur: `${tauxFinalPct} %` }
+    ],
+    reference: 'CNRACL – Surcote et décote'
+  });
+}
+
+      // 9) Bloc Liquidables conditionnel
+     if (liquidablesFinale < TR) {
+  const prorata = liquidablesFinale / TR;
+  const pourcentPerte = (1 - prorata) * 100;
+  const tauxApresReduction = (prog.tauxRef * prorata).toFixed(2);
+
+  blocReductionLiquidables = creerBlocConditionnel({
+    titre: 'Réduction – Liquidables',
+    style: 'warn',
+    icone: '⚠️',
+    lignes: [
+      { label: 'Trimestres liquidables finaux', valeur: `${liquidablesFinale} / ${TR}` },
+      { label: 'Prorata appliqué', valeur: `${prorata.toFixed(3)} ( - ${pourcentPerte.toFixed(1)} % )` },
+      { label: 'Taux après réduction', valeur: `${tauxApresReduction} %` }
+    ],
+    reference: 'Art. L13 du Code des pensions'
+  });
 }
 
 
-
-      // 9) Bloc Liquidables conditionnel
-      if (liquidablesFinale < TR) {
-        const prorata = liquidablesFinale / TR;
-        const pourcentPerte = (1 - prorata) * 100;
-
-        const hasTauxRef = (typeof prog.tauxRef !== 'undefined' && prog.tauxRef !== null && !Number.isNaN(prog.tauxRef));
-        let ligneTaux = '';
-        if (hasTauxRef) {
-          const tauxApresReduction = (prog.tauxRef * prorata).toFixed(2);
-          ligneTaux = `Taux après réduction : <strong>${prog.tauxRef.toFixed(2)} % × ${prorata.toFixed(3)} = ${tauxApresReduction} %</strong><br>`;
-        }
-
-        blocDecote += `
-          <div style="margin-top:10px;padding:8px;border:1px solid #f0b37e;background:#fff7e6;color:#8a5a00;border-radius:6px;">
-            <strong>Détails de la réduction – Liquidables :</strong><br>
-            Trimestres liquidables finaux : <strong>${liquidablesFinale}</strong> / <strong>${TR}</strong><br>
-            Prorata appliqué : <strong>${liquidablesFinale} ÷ ${TR} = ${prorata.toFixed(3)}</strong> ( - ${pourcentPerte.toFixed(1)} % )<br>
-            ${ligneTaux}
-            <span style="color:#b30000;font-weight:bold;">
-              Attention : trimestres liquidables finaux (${liquidablesFinale}) &lt; requis (${TR}). Réduction appliquée.
-            </span>
-          </div>
-        `;
-      }
-
       // 10) Bloc Surcotisation conditionnel
-      let blocSurcotisation = '';
       if (I.surcotisation) {
-        const joursSansSurcote = Math.floor(P2.totalJours * I.quotite);
-        const joursAvecSurcote = Math.floor(P2.totalJours * 1);
-        const trimestresGagnes = (joursAvecSurcote - joursSansSurcote) / 90;
-        
-        // Calcul du coût de la surcotisation avec le taux paramétrable
-        const traitementPlein = calcTraitementPlein(I.indice, I.valeurPoint);
-        const cotisationSupplementaire = traitementPlein * I.tauxSurcotisation * (P2.totalJours / 30.4375);
-        
-        blocSurcotisation = `
-          <div class="info">
-            <strong>Détails de la surcotisation :</strong><br>
-            Période de retraite progressive : <strong>${P2.annees} an(s), ${P2.mois} mois, ${P2.jours} jours</strong><br>
-            Jours liquidables sans surcotisation : <strong>${joursSansSurcote} j</strong> (à ${I.quotite*100}%)<br>
-            Jours liquidables avec surcotisation : <strong>${joursAvecSurcote} j</strong> (à 100%)<br>
-            Trimestres supplémentaires acquis : <strong>${trimestresGagnes.toFixed(2)}</strong><br>
-            Coût estimé (cotisations supplémentaires) : <strong>${formatEuro(cotisationSupplementaire)}</strong><br>
-            <span style="color:#166534;font-weight:bold;">
-              💡 Estimation basée sur un taux de surcotisation de ${(I.tauxSurcotisation * 100).toFixed(1)}%. 
-              Cette estimation peut varier selon votre situation réelle.
-            </span>
-          </div>
-        `;
-      }
+  const joursSansSurcote = Math.floor(P2.totalJours * I.quotite);
+  const joursAvecSurcote = Math.floor(P2.totalJours * 1);
+  const trimestresGagnes = (joursAvecSurcote - joursSansSurcote) / 90;
+  const traitementPlein = calcTraitementPlein(I.indice, I.valeurPoint);
+  const cotisationSupplementaire = traitementPlein * I.tauxSurcotisation * (P2.totalJours / 30.4375);
+
+  blocSurcotisation = creerBlocConditionnel({
+    titre: 'Détails de la surcotisation',
+    style: 'info',
+    icone: '💡',
+    lignes: [
+      { label: 'Durée progressive', valeur: `${P2.annees} an(s), ${P2.mois} mois, ${P2.jours} jours` },
+      { label: 'Jours sans surcotisation', valeur: `${joursSansSurcote} j` },
+      { label: 'Jours avec surcotisation', valeur: `${joursAvecSurcote} j` },
+      { label: 'Trimestres supplémentaires', valeur: trimestresGagnes.toFixed(2) },
+      { label: 'Coût estimé', valeur: formatEuro(cotisationSupplementaire) }
+    ],
+    reference: 'Art. 26 du décret n°2011-620'
+  });
+}
+
 
       // 11) Affichage
       const res = document.getElementById('resultat');
