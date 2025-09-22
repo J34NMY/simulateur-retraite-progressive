@@ -711,7 +711,6 @@ const joursAssBonif = bonifEnfantsJours;
       }
 	  // 5 bis) Calcul de l'âge au départ définitif
 const ageDepartDefinitif = (I.dateFin - I.dateNaissance) / (1000 * 60 * 60 * 24 * 365.25);
-	let trimestresSurcotes = 0;
 	  // 6 bis) Surcote si assurance ≥ TR et âge > 62
 let tauxSurcote = 0;
 if (assuranceFinale >= TR && ageDepartDefinitif > 62 && ageDepartDefinitif < 67) {
