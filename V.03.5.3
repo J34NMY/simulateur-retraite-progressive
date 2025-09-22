@@ -642,6 +642,10 @@
     function calculer() {
 	let trimestresSurcotes = 0;
       const I = lireInputs();
+	    let blocDecote = '';
+    let blocSurcote = '';
+    let blocReductionLiquidables = '';
+    let blocSurcotisation = '';
 
       // Vérification des dates
       if (isNaN(I.dateReleve) || isNaN(I.dateDebut) || isNaN(I.dateFin) || I.dateDebut <= I.dateReleve || I.dateFin <= I.dateDebut) {
@@ -787,25 +791,33 @@ if (assuranceFinale >= TR && ageDepartDefinitif > 62 && ageDepartDefinitif < 67)
 }
 
 	 // 8Bis) Bloc surcote
-if (assuranceFinale >= TR && ageDepartDefinitif > 62 && ageDepartDefinitif < 67) {
-  trimestresSurcotes = Math.floor((ageDepartDefinitif - 62) * 4);
-  const tauxSurcoteTotale = trimestresSurcotes * 1.25;
-  const tauxPleinApresSurcote = Math.min(75 + tauxSurcoteTotale, 80);
-  const tauxFinalPct = ((tauxPleinApresSurcote / 100) * ratioFin * 100).toFixed(2);
+if (
+    assuranceFinale >= TR &&
+    ageDepartDefinitif > 62 &&
+    ageDepartDefinitif < 67
+) {
+    trimestresSurcotes = Math.floor((ageDepartDefinitif - 62) * 4);
+    const tauxSurcoteTotale = trimestresSurcotes * 1.25;
 
-  blocSurcote = creerBlocConditionnel({
-    titre: 'Détails de la surcote',
-    style: 'ok',
-    icone: '✅',
-    lignes: [
-      { label: 'Trimestres supplémentaires', valeur: trimestresSurcotes },
-      { label: 'Surcote appliquée', valeur: `+ ${tauxSurcoteTotale.toFixed(2)} %` },
-      { label: 'Taux plein après surcote', valeur: `${tauxPleinApresSurcote.toFixed(2)} %` },
-      { label: 'Taux final après prorata', valeur: `${tauxFinalPct} %` }
-    ],
-    reference: 'CNRACL – Surcote et décote'
-  });
+    if (trimestresSurcotes > 0 && tauxSurcoteTotale > 0) {
+        const tauxPleinApresSurcote = Math.min(75 + tauxSurcoteTotale, 80);
+        const tauxFinalPct = ((tauxPleinApresSurcote / 100) * ratioFin * 100).toFixed(2);
+
+        blocSurcote = creerBlocConditionnel({
+            titre: 'Détails de la surcote',
+            style: 'ok',
+            icone: '✅',
+            lignes: [
+                { label: 'Trimestres supplémentaires', valeur: trimestresSurcotes },
+                { label: 'Surcote appliquée', valeur: `+ ${tauxSurcoteTotale.toFixed(2)} %` },
+                { label: 'Taux plein après surcote', valeur: `${tauxPleinApresSurcote.toFixed(2)} %` },
+                { label: 'Taux final après prorata', valeur: `${tauxFinalPct} %` }
+            ],
+            reference: 'CNRACL – Surcote et décote'
+        });
+    }
 }
+
 
       // 9) Bloc Liquidables conditionnel
      if (liquidablesFinale < TR) {
