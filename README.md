@@ -160,10 +160,3 @@ Légifrance : https://www.legifrance.gouv.fr
 
 Mémo personnel : Ne pas oublier que cet outil est une aide à la décision, pas un document officiel. Toujours recommander ENSAP pour estimation définitive.
 
-**Instructions** :
-1. Créez un fichier nommé `README.md` dans votre dépôt GitHub
-2. Copiez tout le contenu ci-dessus
-3. Collez-le dans le fichier README.md
-4. Sauvegardez
-
-C'est adapté à un usage privé : notes techniques, TODO personnelles, points d'attention code. Si plus tard vous rendez le dépôt public, vous remplacerez par le README PUBLIC que je vous ai fourni.
