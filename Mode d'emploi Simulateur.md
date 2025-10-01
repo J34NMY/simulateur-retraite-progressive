@@ -1,4 +1,4 @@
-markdown# 📖 Mode d'emploi du Simulateur de Retraite Progressive V.04.2.3
+📖 Mode d'emploi du Simulateur de Retraite Progressive V.04.2.3
 
 ## 🎯 Introduction
 
@@ -599,5 +599,6 @@ Si **assurance < trimestres requis** :
 ---
 
 **Version du mode d'emploi :** V.04.2.3 - Octobre 2025
+
 
 **Dernière mise à jour :** Conforme au Décret n°2023-799 du 21 août 2023
