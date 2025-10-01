@@ -1,4 +1,4 @@
-markdown# 🇫🇷 Simulateur de Retraite Progressive - Fonctionnaire d'État
+🇫🇷 Simulateur de Retraite Progressive - Fonctionnaire d'État
 
 ![Version](https://img.shields.io/badge/version-V.04.2.3-brightgreen)
 ![Licence](https://img.shields.io/badge/licence-MIT-blue)
