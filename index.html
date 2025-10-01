@@ -6,21 +6,27 @@
   <style>
     body {
       font-family: "Segoe UI", sans-serif;
-      background-color: #f9f9f9;
+      background: linear-gradient(to bottom right, #e6f2ff, #ffffff);
       color: #333;
       margin: 2em;
       line-height: 1.6;
     }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: #fff;
+      padding: 2em;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .logo {
+      display: block;
+      margin: 0 auto 1em auto;
+      max-width: 180px;
+    }
     h1 {
       color: #005a9c;
-    }
-    .card {
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 1em;
-      max-width: 700px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      text-align: center;
     }
     a {
       color: #0078d4;
@@ -32,17 +38,19 @@
     }
     .infobulle {
       background: #eef;
-      padding: 0.8em;
+      padding: 1em;
       border-left: 4px solid #0078d4;
-      margin-top: 1em;
+      margin-top: 2em;
       font-size: 0.95em;
     }
   </style>
 </head>
 <body>
-  <div class="card">
+  <div class="container">
+    <img src="assets/logo_clarteretraite.png" alt="Logo ClartéRetraite" class="logo">
+
     <h1>🧮 ClartéRetraite – Version V.04.2.3</h1>
-    <p>Simulateur conforme au décret <strong>82-624 modifié au 1er octobre 2025</strong>.</p>
+    <p style="text-align:center;">Simulateur conforme au décret <strong>82-624 modifié au 1er octobre 2025</strong>.</p>
 
     <p><a href="simulateur_retraite_V.04.2.3.html">▶️ Accéder au simulateur</a></p>
     <p><a href="mode_emploi_simulateur.html">📘 Lire le mode d’emploi</a></p>
