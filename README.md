@@ -260,7 +260,7 @@ Tous les contributeurs et testeurs du projet
 
 Première version : Août 2024
 Version actuelle : V.04.2.3
-Lignes de code : ~3200 lignes (HTML + CSS + JS)
+Lignes de code : ~2300 lignes (HTML + CSS + JS)
 Taille du fichier : ~180 Ko
 Temps de chargement : < 1 seconde
 
@@ -286,7 +286,7 @@ Extension navigateur
 
 
 📅 Historique des Versions
-V.04.2.3 (Janvier 2025)
+V.04.2.3 (Octobre 2025)
 
 ➕ Ajout onglet "Retraite Définitive" - Simulateur complet sans période progressive
 📊 Graphique comparatif en barres des quotités (retraite définitive)
@@ -295,20 +295,20 @@ V.04.2.3 (Janvier 2025)
 🎯 Interface à 6 onglets (ajout du nouvel onglet)
 ✨ Projection simple avec quotité fixe jusqu'au départ
 
-V.04.2.2 (Janvier 2025)
+V.04.2.2 (Septembre 2025)
 
 ➕ Ajout option Décret n°82-624 (6/7ème pour 80%, 32/35ème pour 90%)
 🔧 Correction positionnement tooltips (alignement droit)
 📄 Mise à jour documentation et sources réglementaires
 ✨ Affichage explicite de la fraction appliquée dans les résultats
 
-V.04.2.1 (Janvier 2025)
+V.04.2.1 (Septembre 2025)
 
 ➕ Ajout onglet "Analyse Rachat de trimestres"
 📊 Comparaison rachat vs placement alternatif
 🎯 Recommandations personnalisées
 
-V.04.2.0 (Décembre 2024)
+V.04.2.0 (Aout 2025)
 
 ✅ Validation calcul + disclaimer écart SRE
 📈 Analyse actuarielle surcotisation
@@ -326,4 +326,4 @@ Si ce simulateur vous est utile :
 
 
 Disclaimer : Cet outil est un projet indépendant et n'est affilié à aucune administration publique française. Pour toute décision officielle concernant votre retraite, référez-vous aux services officiels (SRE, ENSAP).
-Dernière mise à jour du README : Janvier 2025 - Version V.04.2.3
+Dernière mise à jour du README :Octobre 2025 - Version V.04.2.3
