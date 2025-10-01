@@ -40,7 +40,13 @@
     .tab-content { display: none; min-height: 400px; }
     .tab-content.active { display: block; }
     
-    canvas { max-width:100%; height:320px; margin: 20px 0; }
+    .graphique-container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 0 20px;
+    }
+    
+    canvas { max-width:100%; margin: 20px 0; display: block; }
     .bonif-label { display: flex; align-items: center; gap: 6px; font-size: 0.92rem; }
     .bonif-label input[type="checkbox"] { margin: 0; }
     .tooltip { position: relative; cursor: help; display: inline-flex; align-items: center; font-size: 1rem; }
@@ -76,8 +82,8 @@
   <h1>Simulateur de Retraite Progressive – Fonctionnaire d'État</h1>
   
   <div style="margin:20px 0;padding:12px;background:#f0fdf4;border-left:4px solid #22c55e;border-radius:6px;text-align:center;">
-    <p><strong>Version :</strong> V.04.2.3 - Ajout option Décret n°82-624 – <strong>Réglementation :</strong> Décret n° 2023-799 du 21 août 2023</p>
-    <p style="font-size:0.9rem;color:#166534;margin-top:5px;"><strong>Mise à jour :</strong> Option Décret 1982 (6/7ème et 32/35ème) + Onglet Analyse Rachat + Onglet Retraite Définitive</p>
+    <p><strong>Version :</strong> V.04.2.3 - Ajout Simulateur Retraite Définitive – <strong>Réglementation :</strong> Décret n° 2023-799 du 21 août 2023</p>
+    <p style="font-size:0.9rem;color:#166534;margin-top:5px;"><strong>Mise à jour :</strong> Nouvel onglet Retraite Définitive + Option Décret 1982 (6/7ème et 32/35ème)</p>
   </div>
 
   <div class="tabs-container">
@@ -421,7 +427,7 @@
                   <option value="0.025">2,5 % (Comptes à terme)</option>
                   <option value="0.03" selected>3,0 % (Livret A actuel)</option>
                   <option value="0.035">3,5 % (Fonds euros AV)</option>
-                  <option value="0.04">4,0% (LEP si éligible)</option>
+                  <option value="0.04">4,0 % (LEP si éligible)</option>
                   <option value="0.045">4,5 % (Placements dynamiques)</option>
                   <option value="0.05">5,0 % (Scénario optimiste)</option>
                 </select>
@@ -439,20 +445,23 @@
 
       <div id="resultat-definitive" style="margin-top: 30px;"></div>
       
-      <div style="text-align: center; margin-top: 30px;">
-        <h4>Comparaison des scénarios de quotité</h4>
-        <p class="muted">Impact de la quotité de travail sur la pension définitive</p>
-        <canvas id="graphique-definitive" style="max-width:100%; height:320px;"></canvas>
+      <div class="graphique-container">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <h4>Comparaison des scénarios de quotité</h4>
+          <p class="muted">Impact de la quotité de travail sur la pension définitive</p>
+        </div>
+        <canvas id="graphique-definitive"></canvas>
       </div>
     </div>
-
-    <!-- ONGLET GRAPHIQUE -->
+	<!-- ONGLET GRAPHIQUE -->
     <div id="tab-graphique" class="tab-content">
-      <div style="text-align: center; margin-bottom: 20px;">
-        <h3>Comparaison des revenus selon la quotité de travail</h3>
-        <p class="muted">Ce graphique compare vos revenus totaux selon différentes quotités de travail pendant la retraite progressive.</p>
+      <div class="graphique-container">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <h3>Comparaison des revenus selon la quotité de travail</h3>
+          <p class="muted">Ce graphique compare vos revenus totaux selon différentes quotités de travail pendant la retraite progressive.</p>
+        </div>
+        <canvas id="graphique"></canvas>
       </div>
-      <canvas id="graphique"></canvas>
     </div>
 
     <!-- ONGLET ANALYSE RACHAT -->
@@ -615,7 +624,7 @@
       </div>
       
       <div style="margin-top:20px;padding:12px;background:#f0fdf4;border-left:4px solid #22c55e;border-radius:6px;font-size:0.9rem;">
-        <p><strong>Version du simulateur :</strong> V.04.2.3 – Septembre 2025</p>
+        <p><strong>Version du simulateur :</strong> V.04.2.3 – Janvier 2025</p>
         <p><strong>Dernière mise à jour réglementaire :</strong> Décret n°2023-799 du 21 août 2023</p>
         <p><strong>Valeur du point d'indice :</strong> 4,92278 € (au 1er juillet 2023)</p>
       </div>
@@ -893,7 +902,8 @@
     }
 
     function lireInputs() {
-      const indice = parseFloat(document.getElementById('indice').value) || 0;
+      const indice = parseFloat
+	  (document.getElementById('indice').value) || 0;
       const valeurPoint = parseFloat(document.getElementById('valeurPoint').value) || 0;
       const tauxSurcotisation = parseFloat(document.getElementById('tauxSurcotisation').value) / 100 || 0.162;
       const dateReleve = new Date(document.getElementById('dateReleve').value);
@@ -1350,6 +1360,7 @@
         },
         options: {
           responsive: true,
+          aspectRatio: 3,
           plugins: { legend: { display: true }, tooltip: { mode: 'index', intersect: false } },
           scales: {
             x: { title: { display: true, text: 'Quotité de travail' } },
@@ -1713,7 +1724,7 @@
         
         if (assuranceFinale < TR) {
           const trimestresManquants = TR - assuranceFinale;
-          const tauxDecoteParTrim = inputs.dateNaissance.getFullYear() >= 1964 ? 1.09 : 1.25;
+          const tauxDecoteParTrim = inputs.dateNaissance.getFullYear() >= 1964 ? 1.09 :1.25;
           const decoteTotale = trimestresManquants * tauxDecoteParTrim;
           const tauxApresDecote = Math.max(0, (75 - decoteTotale)) / 100;
           tauxFinal = tauxApresDecote * ratioFin;
@@ -1791,6 +1802,7 @@
         },
         options: {
           responsive: true,
+          aspectRatio: 3,
           plugins: { 
             legend: { display: true },
             tooltip: { 
@@ -2057,7 +2069,7 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'parametres_simulateur_retraite_v04_2_2.json';
+      a.download = 'parametres_simulateur_retraite_v04_2_3.json';
       a.click();
       URL.revokeObjectURL(url);
     }
@@ -2204,7 +2216,8 @@
       mettreAJourTotalEnfants();
       
       const dateNaissance = document.getElementById('dateNaissance').value;
-      if (dateNaissance) {const val = autoRemplirTrimestres(new Date(dateNaissance));
+      if (dateNaissance) {
+        const val = autoRemplirTrimestres(new Date(dateNaissance));
         const trSelect = document.getElementById('trimestresRequis');
         trSelect.innerHTML = val ? '<option value="' + val + '" selected>' + val + '</option>' : '<option value="">-- Non défini --</option>';
       }
@@ -2215,3 +2228,4 @@
   </script>
 </body>
 </html>
+	  
