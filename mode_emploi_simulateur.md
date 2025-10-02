@@ -1,18 +1,13 @@
-📖 Mode d'emploi du Simulateur de Retraite Progressive V.04.2.3
+# 📖 Mode d'emploi du Simulateur de Retraite Progressive V.04.2.4
 
 ## 🎯 Introduction
 
 Ce simulateur vous permet d'estimer votre pension de retraite progressive et définitive en tant que fonctionnaire d'État. Il applique la méthode officielle du Service des Retraites de l'État (SRE) avec une transparence totale sur les calculs.
 
 ---
-## Avant toute installation il vous faut telecharger sur le site Info Retraite votre "Relevé de Carriere"
 
 ## 🚀 Démarrage rapide
 
-### Installation
-1. **Téléchargez** le fichier `simulateur_retraite_Version_V.04.2.3.html`
-2. **Double-cliquez** dessus pour l'ouvrir dans votre navigateur
-3. Aucune installation, aucune connexion internet requise !
 
 ### Premier calcul en 3 étapes
 1. **Onglet "Paramètres"** → Remplissez vos données
@@ -54,8 +49,8 @@ Ce simulateur vous permet d'estimer votre pension de retraite progressive et dé
 
 **Trimestres requis**
 - Calculé automatiquement selon votre année de naissance
-- 1964 et après → 172 trimestres
-- 1963 → 171 trimestres, etc.
+- 1965 et après → 172 trimestres
+- 1964 → 171 trimestres, etc.
 
 **Indice majoré (IM)**
 - Votre indice majoré actuel
@@ -89,7 +84,7 @@ Ce simulateur vous permet d'estimer votre pension de retraite progressive et dé
 
 **☑️ Appliquer le Décret n°82-624**
 - **Coché par défaut** (cas majoritaire)
-- Concerne certains fonctionnaires à temps partiel :
+- Concerne certains fonctionnaires en temps partiel de droit commun :
   - **80%** → rémunération à **6/7ème** (≈85,71%)
   - **90%** → rémunération à **32/35ème** (≈91,43%)
 
@@ -144,6 +139,22 @@ Ce simulateur vous permet d'estimer votre pension de retraite progressive et dé
   - 5 enfants → +20%, etc.
 - Condition : enfants élevés 9 ans avant leurs 16 ans
 
+#### Section "Information pension provisoire" ⭐ NOUVEAU
+
+Un encadré informatif explique le fonctionnement de la pension provisoire :
+
+**Calculée au départ** : basée sur les droits acquis AVANT le départ progressif
+
+**Évolution possible** : si vous changez de quotité pendant la progressive, la part versée s'ajuste automatiquement
+- Exemple : passage de 80% → 70% de travail
+- Pension provisoire passe de 20% → 30% du montant de référence
+
+**Trimestres pendant la progressive** : ne modifient PAS le montant provisoire
+- Les nouveaux trimestres acquis sont comptabilisés
+- Mais le montant de référence reste fixe
+
+**Recalcul à la retraite définitive** : tous les droits acquis pendant la progressive seront pris en compte dans le calcul final
+
 ---
 
 ### 2️⃣ Onglet RÉSULTATS RP (Retraite Progressive)
@@ -160,6 +171,7 @@ Ce simulateur vous permet d'estimer votre pension de retraite progressive et dé
 #### Revenus pendant la retraite progressive
 - **Traitement à la quotité** : votre salaire partiel
 - **Pension provisoire** : (1 - quotité) × pension de référence
+- **Note importante** : une mention indique que si vous changez de quotité, la pension s'ajustera
 - **Total brut mensuel** : traitement + pension
 - Si surcotisation : affichage du coût mensuel et du net après surcotisation
 
@@ -192,7 +204,7 @@ Comparaison détaillée :
 
 ---
 
-### 3️⃣ Onglet RETRAITE DÉFINITIVE ⭐ NOUVEAU
+### 3️⃣ Onglet RETRAITE DÉFINITIVE ⭐
 
 Cet onglet permet de simuler une retraite définitive **sans période de retraite progressive**.
 
@@ -322,6 +334,7 @@ Références réglementaires complètes :
 - Décrets applicables
 - Liens vers sites officiels
 - Méthode de calcul SRE détaillée
+- **Section mise à jour** sur la pension provisoire avec l'explication correcte
 - Avertissement sur la précision du simulateur
 
 ---
@@ -333,7 +346,7 @@ Références réglementaires complètes :
 **Exporter vos paramètres**
 1. Remplissez l'onglet Paramètres
 2. Cliquez sur **"Exporter"**
-3. Un fichier JSON est téléchargé : `parametres_simulateur_retraite_v04_2_3.json`
+3. Un fichier JSON est téléchargé : `parametres_simulateur_retraite_v04_2_4.json`
 4. Conservez ce fichier pour le réutiliser plus tard
 
 **Importer des paramètres**
@@ -397,208 +410,190 @@ Elle est **moins intéressante** si :
 - Vous souhaitez conserver la liquidité des fonds
 - Vous voulez transmettre un capital
 
+### 6. Pension provisoire pendant la retraite progressive ⭐ NOUVEAU
+
+**Important à comprendre :**
+
+**✅ CE QUI EST VRAI :**
+- La pension provisoire est calculée à la date du départ progressif
+- Elle est basée sur les droits acquis AVANT le départ progressif
+- **SI vous changez de quotité**, la part versée s'ajuste automatiquement
+  - Exemple : passage de 80% → 70% de travail
+  - Pension provisoire passe de 20% → 30%
+- Les trimestres acquis pendant la progressive sont comptabilisés pour la retraite définitive
+
+**❌ CE QUI EST FAUX :**
+- La pension provisoire ne se recalcule PAS en fonction des nouveaux trimestres acquis pendant la progressive
+- Le montant de référence de la pension reste celui calculé au départ progressif
+- Seul le **pourcentage** de cette pension peut varier si la quotité change
+
+**Exemple concret :**
+- Départ progressif : 142 trimestres liquidables
+- Pension de référence calculée : 1 457 €
+- Quotité 80% → pension provisoire : 20% × 1 457 € = **291 €**
+- **Si passage à 70%** → pension provisoire : 30% × 1 457 € = **437 €**
+- ✅ Le montant de référence (1 457 €) reste identique
+- ✅ Seul le pourcentage versé change (20% → 30%)
+
 ---
 
 ## 🧮 Comprendre les calculs
 
-### Formule de base de la pension
-Pension = Traitement indiciaire × 75% × (Trimestres liquidables / Trimestres requis)
-
-### Méthode de calcul SRE (base 360 jours/an)
-
-- **1 année = 360 jours**
-- **1 mois = 30 jours**
-- **1 trimestre = 90 jours**
-
-**Exemple** :
-- Période : 1 an, 3 mois, 15 jours
-- Total jours SRE : (1 × 360) + (3 × 30) + 15 = **465 jours**
-- Trimestres complets : 465 ÷ 90 = 5 trimestres + 15 jours
-- **Arrondi final** : 15 jours < 45 → **5 trimestres**
-
-### Impact du temps partiel
-
-**Assurance** : toujours comptée à 100%
-- 1 an à 80% = 4 trimestres d'assurance (pas de prorata)
-
-**Liquidables** : proratisés selon quotité (sauf si surcotisation)
-- 1 an à 80% = 3,2 trimestres liquidables
-- Avec surcotisation : 4 trimestres liquidables
-
-### Décote
-
-Si **assurance < trimestres requis** :
-- Génération ≥ 1964 : **1,09%** par trimestre manquant
-- Génération < 1964 : **1,25%** par trimestre manquant
-- **Maximum** : -25% (soit 20-23 trimestres manquants)
-- **Annulation automatique à 67 ans**
-
-**Exemple** :
-- Génération 1964, trimestres requis : 172
-- Assurance finale : 165 trimestres
-- Manquants : 172 - 165 = 7 trimestres
-- Décote : 7 × 1,09% = **-7,63%**
-
-### Surcotes (3 types cumulables)
-
-#### 1. Surcote classique
-- **Condition** : Assurance ≥ trimestres requis + âge ≥ âge légal
-- **Taux** : 1,25% par trimestre au-delà de l'âge légal
-- **Plafond** : 67 ans
-
-#### 2. Surcote parentale (Décret 2023-799)
-- **Condition** : 
-  - Génération ≥ 1964
-  - Au moins 1 enfant (bonification ou majoration)
-  - L'année précédant l'âge légal
-- **Taux** : 1,25% par trimestre liquidable coté cette année-là
-- **Maximum** : 5% (4 trimestres max)
-- **Impact quotité** : quotité 80% = 3,2 trimestres → 3 retenus
-
-#### 3. Majoration excédentaire
-- **Condition** : Trimestres d'assurance excédentaires restants
-- **Taux** : 1,25% par trimestre
-- **Calcul** : Excédentaires - surcote parentale - surcote classique
-
-### Majoration familiale
-
-- **3 enfants** → +10%
-- **4 enfants** → +15%
-- **5 enfants** → +20%
-- etc.
-
-**Condition** : enfants élevés pendant 9 ans avant leurs 16 ans
-
-**Plafond** : 100% du traitement indiciaire (mais peut être dépassé avec surcote)
-
----
-
-## 🎓 Cas d'usage typiques
-
-### Cas 1 : "Je veux comprendre l'impact de ma quotité"
-
-1. Remplissez l'onglet **Paramètres** avec vos vraies données
-2. Lancez le calcul
-3. Allez dans l'onglet **Graphique**
-4. Comparez visuellement les revenus selon les quotités
-
-### Cas 2 : "Retraite progressive ou définitive directe ?"
-
-1. **Simulation retraite progressive** :
-   - Onglet Paramètres → définissez période progressive
-   - Calculez → onglet Résultats RP
-
-2. **Simulation retraite définitive** :
-   - Onglet Retraite Définitive
-   - Récupérez les données
-   - Date de départ = même date que la fin de la progressive
-   - Quotité = 100%
-   - Calculez
-
-3. **Comparez les deux pensions finales**
-
-### Cas 3 : "La surcotisation est-elle rentable pour moi ?"
-
-1. Onglet Paramètres → cochez "Surcotisation"
-2. Choisissez le taux de placement alternatif
-3. Calculez
-4. Dans les résultats, consultez **l'analyse de rentabilité**
-5. Regardez la recommandation et la durée de rentabilisation
-
-### Cas 4 : "Dois-je racheter des trimestres ?"
-
-1. Onglet **Analyse Rachat**
-2. Récupérez vos données
-3. Simulez le nombre de trimestres à racheter
-4. Choisissez l'option (taux seul ou taux+durée)
-5. Comparez avec un placement alternatif
-6. Décidez selon la recommandation
-
-### Cas 5 : "Comparer plusieurs scénarios"
-
-1. Remplissez vos paramètres
-2. Cliquez sur **Exporter** → sauvegardez `scenario_1.json`
-3. Modifiez les paramètres (ex: quotité différente)
-4. **Exporter** → sauvegardez `scenario_2.json`
-5. Pour revenir à un scénario : **Importer** le fichier correspondant
-
----
-
-## 🐛 Dépannage
-
-### "Vérifiez les dates"
-- La date de relevé doit être < date départ progressif < date départ définitif
-- Vérifiez le format des dates
-
-### "Conditions non remplies"
-- Retraite progressive nécessite :
-  - Âge minimum : 60 ans
-  - Assurance minimum : 150 trimestres
-- Vérifiez votre date de naissance et vos trimestres d'assurance
-
-### "Données incohérentes détectées"
-- Les liquidables ne peuvent pas être supérieurs à l'assurance
-- Revérifiez votre relevé de carrière officiel
-
-### Le graphique ne s'affiche pas
-- Vérifiez que vous avez bien cliqué sur "Calculer la simulation"
-- Actualisez la page (F5)
-- Essayez un autre navigateur (Chrome, Firefox, Edge)
-
-### Les résultats semblent bizarres
-1. Cliquez sur "Valeurs par défaut"
-2. Testez avec l'exemple fourni
-3. Si l'exemple fonctionne, revérifiez vos données personnelles
-
----
-
-## 📞 Besoin d'aide ?
-
-### Pour des questions techniques sur le simulateur
-- Ouvrez une **Issue** sur GitHub
-- Décrivez précisément votre problème
-- Joignez une capture d'écran si possible
-
-### Pour des questions sur votre retraite
-- ⚠️ Ce simulateur n'est pas un service de conseil officiel
-- Consultez :
-  - [ensap.gouv.fr](https://ensap.gouv.fr) - Simulateur officiel
-  - [retraitesdeletat.gouv.fr](https://retraitesdeletat.gouv.fr) - Service des Retraites de l'État
-  - Votre service RH
-  - Un conseiller retraite
-
----
-
-## 📚 Pour aller plus loin
-
-### Documentation officielle
-- [Code des pensions (Légifrance)](https://www.legifrance.gouv.fr/codes/id/LEGITEXT000006070302/)
-- [Service-Public.fr - Retraite progressive](https://www.service-public.fr/particuliers/vosdroits/F37400)
-- [INSEE - Tables de mortalité](https://www.insee.fr/fr/statistiques/8327319)
-
-### Mises à jour du simulateur
-- Vérifiez régulièrement les nouvelles versions sur GitHub
-- Changements réglementaires intégrés dès publication officielle
-- Mise à jour annuelle de la valeur du point d'indice
-
----
-
-## ✅ Checklist avant de partir en retraite
-
-- [ ] Simulation sur ce simulateur ✓
-- [ ] Simulation sur [ensap.gouv.fr](https://ensap.gouv.fr) (obligatoire)
-- [ ] Vérification du relevé de carrière SRE
-- [ ] Validation des bonifications enfants (si applicable)
-- [ ] Décision sur la surcotisation (si temps partiel)
+### Formule de base de la pensiontemps partiel)
 - [ ] Analyse du rachat de trimestres (si pertinent)
 - [ ] Constitution du dossier de demande (6 mois avant)
 - [ ] Validation de l'indice majoré (règle des 6 mois)
 - [ ] Anticipation des impacts fiscaux
 - [ ] Préparation des justificatifs (enfants, études, etc.)
+- [ ] Compréhension du mécanisme de la pension provisoire
+- [ ] Anticipation d'éventuels changements de quotité pendant la progressive
 
 ---
 
-**Version du mode d'emploi :** V.04.2.3 - Octobre 2025
+## 📝 Historique des versions
 
+### V.04.2.4 - Janvier 2025
+- ✅ **Correction majeure** : Documentation sur l'évolution de la pension provisoire
+- ✅ Ajout d'un encadré informatif dans l'onglet Paramètres
+- ✅ Mise à jour de l'onglet Sources avec les explications correctes
+- ✅ Ajout de notes dans les résultats de la retraite progressive
 
-**Dernière mise à jour :** Conforme au Décret n°2023-799 du 21 août 2023
+### V.04.2.3 - Janvier 2025
+- Ajout de l'onglet Retraite Définitive
+- Option Décret 1982 (6/7ème et 32/35ème)
+- Optimisation des graphiques (aspectRatio: 3, max-width: 800px)
+
+### Versions antérieures
+- V.04.2.x : Amélioration de l'interface utilisateur
+- V.04.1.x : Ajout de l'analyse de rachat
+- V.04.0.x : Intégration de la surcote parentale (Décret 2023-799)
+
+---
+
+## ❓ FAQ - Foire Aux Questions
+
+### Q1 : Pourquoi mon résultat diffère-t-il du simulateur ENSAP ?
+**R :** Un écart de 1 à 2 trimestres liquidables (~1-2% de pension) peut exister en raison de règles d'arrondi internes au SRE non documentées publiquement. Ce simulateur applique la méthode officielle documentée. Pour une estimation définitive, consultez toujours ensap.gouv.fr.
+
+### Q2 : Puis-je changer de quotité pendant ma retraite progressive ?
+**R :** Oui ! Et c'est une **correction importante** apportée dans cette version V.04.2.4. Si vous changez de quotité, votre pension provisoire s'ajustera automatiquement (exemple : passer de 80% à 70% augmente la pension de 20% à 30% du montant de référence). Par contre, le montant de référence lui-même ne change pas pendant la progressive.
+
+### Q3 : Le décret 1982 s'applique-t-il à moi ?
+**R :** Consultez votre fiche de paie actuelle si vous êtes déjà à temps partiel 80% ou 90%. Si vous travaillez 4j/5 (80%) et êtes payé plus que 80% de votre traitement plein temps, le décret s'applique. En cas de doute, laissez la case cochée (cas majoritaire).
+
+### Q4 : La surcotisation est-elle toujours rentable ?
+**R :** Non, cela dépend de plusieurs facteurs : votre espérance de vie, les taux de placement alternatifs disponibles, et votre besoin de liquidité. Le simulateur vous fournit une analyse actuarielle détaillée pour vous aider à décider.
+
+### Q5 : Quelle différence entre "trimestres d'assurance" et "trimestres liquidables" ?
+**R :** 
+- **Trimestres d'assurance** : comptent pour éviter la décote (durée de cotisation)
+- **Trimestres liquidables** : déterminent le montant de la pension (prorata)
+- À temps partiel sans surcotisation : assurance = 100%, liquidables = proratisés
+
+### Q6 : Comment fonctionne la surcote parentale ?
+**R :** Pour les générations ≥ 1964, si vous avez au moins 1 enfant et que vous travaillez l'année précédant votre âge légal, vous gagnez 1,25% de surcote par trimestre liquidable cotisé (max 4 trimestres = 5%). Attention : la quotité impacte le nombre de trimestres retenus.
+
+### Q7 : Puis-je exporter mes simulations ?
+**R :** Oui ! Utilisez le bouton "Exporter" pour sauvegarder vos paramètres au format JSON. Vous pouvez ensuite les réimporter avec le bouton "Importer" pour comparer différents scénarios.
+
+### Q8 : Les bonifications enfants sont-elles automatiques ?
+**R :** 
+- **Enfants après 2004** : oui, attribution automatique (2 trimestres d'assurance)
+- **Enfants avant 2004** : non, vous devez remplir les conditions strictes et fournir des justificatifs lors de votre demande de retraite
+
+### Q9 : Que signifie la "règle des six mois" ?
+**R :** Une augmentation d'indice majoré doit avoir au moins 6 mois d'ancienneté avant votre départ en retraite pour être prise en compte dans le calcul de votre pension.
+
+### Q10 : Le simulateur fonctionne-t-il hors ligne ?
+**R :** Oui ! Une fois le fichier HTML téléchargé, vous pouvez l'utiliser sans connexion internet. Toutes les données restent sur votre ordinateur.
+
+### Q11 : Mes données sont-elles sécurisées ?
+**R :** Absolument. Le simulateur fonctionne entièrement en local dans votre navigateur. Aucune donnée n'est envoyée sur internet ou stockée ailleurs que sur votre ordinateur.
+
+### Q12 : Que se passe-t-il si je cumule plusieurs types de surcote ?
+**R :** Les 3 types de surcote SRE sont **cumulables** :
+- Surcote parentale (max 5%)
+- Surcote classique (trimestres au-delà de l'âge légal)
+- Majoration excédentaire (trimestres restants)
+
+Le simulateur calcule automatiquement le cumul selon la méthode SRE.
+
+---
+
+## 🎯 Conseils d'utilisation avancés
+
+### Optimiser votre stratégie de retraite progressive
+
+1. **Testez plusieurs quotités** : utilisez le graphique pour visualiser l'impact
+2. **Évaluez la surcotisation** : selon votre situation fiscale et patrimoniale
+3. **Anticipez les changements** : vous pouvez modifier votre quotité en cours de route
+4. **Planifiez avec la majoration familiale** : 3 enfants = +10% de pension
+5. **Considérez la surcote parentale** : travaillez l'année avant votre âge légal
+
+### Stratégies selon votre profil
+
+**Si vous avez une longue carrière :**
+- Privilégiez un départ plus tôt avec quotité basse
+- La surcotisation est moins intéressante (taux plein déjà atteint)
+
+**Si vous avez une carrière incomplète :**
+- Envisagez le rachat de trimestres pour éviter la décote
+- La surcotisation peut être très rentable
+
+**Si vous avez des enfants :**
+- Vérifiez vos droits aux bonifications
+- Optimisez la surcote parentale en travaillant l'année avant l'âge légal
+
+**Si vous approchez de l'âge légal :**
+- Calculez l'intérêt de poursuivre pour bénéficier de la surcote classique
+- Comparez avec un départ immédiat
+
+---
+
+## 🔗 Liens utiles
+
+### Sites officiels
+- [ensap.gouv.fr](https://ensap.gouv.fr) - Espace numérique sécurisé de l'agent public
+- [retraitesdeletat.gouv.fr](https://retraitesdeletat.gouv.fr) - Service des Retraites de l'État
+- [service-public.fr](https://www.service-public.fr/particuliers/vosdroits/F37400) - Retraite progressive
+- [legifrance.gouv.fr](https://www.legifrance.gouv.fr/codes/id/LEGITEXT000006070302/) - Code des pensions
+
+### Documentation technique
+- [Décret n° 2023-799](https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000047970226) - Surcote parentale
+- [Décret n° 82-624](https://www.legifrance.gouv.fr/loda/id/LEGITEXT000006065164/) - Temps partiel
+- [Loi n° 2023-270](https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000047392200) - Réforme des retraites
+
+### Ressources complémentaires
+- [info-retraite.fr](https://www.info-retraite.fr) - Portail commun des régimes de retraite
+- [INSEE](https://www.insee.fr/fr/statistiques/8327319) - Tables de mortalité
+
+---
+
+## 🙏 Remerciements
+
+Ce simulateur a été développé pour aider les fonctionnaires d'État à mieux comprendre les mécanismes complexes de la retraite progressive. Il s'appuie sur :
+- Les textes réglementaires officiels
+- Les guides du Service des Retraites de l'État
+- Les retours d'expérience des utilisateurs
+- Les corrections apportées suite aux vérifications des sources officielles
+
+**Un merci particulier** aux utilisateurs qui ont signalé les inexactitudes concernant l'évolution de la pension provisoire, permettant ainsi la correction majeure de la V.04.2.4.
+
+---
+
+## 📄 Licence et utilisation
+
+Ce simulateur est fourni à titre **informatif et pédagogique**. Il ne remplace pas une consultation officielle auprès du SRE ou d'ENSAP.
+
+**Utilisation libre** pour un usage personnel. La redistribution ou l'utilisation commerciale nécessite une autorisation.
+
+**Clause de non-responsabilité** : Les résultats fournis sont des estimations. Seuls les calculs officiels du SRE font foi.
+
+---
+
+**Version du mode d'emploi :** V.04.2.4 - Janvier 2025
+
+**Dernière mise à jour :** Correction documentation pension provisoire (conforme sources officielles SRE)
+
+**Prochaine mise à jour prévue :** Mise à jour de la valeur du point d'indice (juillet 2025)
+
