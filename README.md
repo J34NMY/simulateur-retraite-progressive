@@ -1,329 +1,461 @@
-🇫🇷 Simulateur de Retraite Progressive - Fonctionnaire d'État
+# 🧮 Simulateur de Retraite Progressive - Fonctionnaire d'État
 
-![Version](https://img.shields.io/badge/version-V.04.2.3-brightgreen)
-![Licence](https://img.shields.io/badge/licence-MIT-blue)
-![Statut](https://img.shields.io/badge/statut-stable-success)
-![Réglementation](https://img.shields.io/badge/réglementation-Décret%202023--799-informational)
+[![Version](https://img.shields.io/badge/version-4.2.4-green.svg)](https://github.com/votre-repo/simulateur-retraite)
+[![License](https://img.shields.io/badge/license-Informative-blue.svg)](LICENSE)
+[![Réglementation](https://img.shields.io/badge/réglementation-Décret%202023--799-orange.svg)](https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000047970226)
 
-## 📋 Description
-
-Simulateur en ligne **gratuit et open source** permettant aux **fonctionnaires d'État français** (affiliés au SRE - Service des Retraites de l'État) d'estimer leur pension de retraite progressive et définitive selon la réglementation en vigueur.
-
-**🎯 Objectif principal :** Fournir un outil décisionnel transparent et pédagogique pour planifier votre fin de carrière en toute connaissance de cause.
+Un simulateur pédagogique et transparent pour estimer votre retraite progressive et définitive en tant que fonctionnaire d'État, basé sur la méthode officielle du Service des Retraites de l'État (SRE).
 
 ---
 
-## ✨ Fonctionnalités Principales
+## 🎯 Objectif
 
-### 🧮 Calcul de la Pension
-- **Simulation de retraite progressive** avec calcul précis selon la méthode SRE (base 360 jours/an)
-- **⭐ NOUVEAU V.04.2.3 : Simulateur de Retraite Définitive**
-  - Onglet dédié pour simuler une retraite définitive directe (sans période progressive)
-  - Récupération automatique des données depuis l'onglet Paramètres
-  - Projection avec quotité fixe jusqu'au départ en retraite
-  - Graphique comparatif en barres des différentes quotités
-  - Analyse de surcotisation vs placement alternatif intégrée
-- **Formule transparente** :
+Ce simulateur vous aide à :
+- 📊 **Comprendre** les mécanismes de la retraite progressive
+- 💰 **Estimer** votre pension selon différents scénarios
+- 📈 **Comparer** l'impact des quotités de travail
+- 🔍 **Analyser** la rentabilité de la surcotisation et du rachat de trimestres
+- 🎓 **Apprendre** les règles complexes du régime de retraite des fonctionnaires
+
+---
+
+## ⚡ Démarrage rapide
+
+### Installation (aucune installation requise !)
+
+1. **Téléchargez** le fichier `simulateur_retraite_Version_V.04.2.4.html`
+2. **Double-cliquez** pour l'ouvrir dans votre navigateur
+3. **C'est tout !** Aucun serveur, aucune connexion internet nécessaire
+
+### Première utilisation
+
+1. Rendez-vous dans l'onglet **"Paramètres"**
+2. Remplissez vos informations à partir de votre relevé de carrière SRE
+3. Cliquez sur **"Calculer la simulation"**
+4. Consultez vos résultats dans les différents onglets
+
+---
+
+## ✨ Fonctionnalités principales
+
+### 📋 6 onglets complets
+
+| Onglet | Description |
+|--------|-------------|
+| **Paramètres** | Saisie de vos données personnelles et professionnelles |
+| **Résultats RP** | Simulation détaillée de la retraite progressive |
+| **Retraite Définitive** | Projection de votre retraite sans période progressive |
+| **Graphique** | Comparaison visuelle des revenus selon la quotité |
+| **Analyse Rachat** | Évaluation de la rentabilité du rachat de trimestres |
+| **Sources** | Références réglementaires et documentation |
+
+### 🔧 Calculs avancés
+
+- ✅ **Méthode SRE officielle** (base 360 jours/an, arrondi ≥45 jours)
+- ✅ **Décote et surcote** (3 types cumulables : classique, parentale, excédentaire)
+- ✅ **Bonifications enfants** (avant/après 2004)
+- ✅ **Majoration familiale** (10% dès 3 enfants)
+- ✅ **Décret n°82-624** (6/7ème pour 80%, 32/35ème pour 90%)
+- ✅ **Analyse actuarielle** de la surcotisation (vs placements alternatifs)
+- ✅ **Surcote parentale** (Décret 2023-799)
+
+### 📊 Outils d'aide à la décision
+
+- 📈 **Graphiques interactifs** (revenus selon quotité, pensions comparées)
+- 💡 **Analyses de rentabilité** (surcotisation, rachat de trimestres)
+- 💾 **Export/Import** de simulations (format JSON)
+- 🎯 **Recommandations personnalisées** selon votre profil
+
+---
+
+## 🆕 Nouveautés V.04.2.4
+
+### 🔧 Correction majeure
+
+**✅ Documentation corrigée sur la pension provisoire**
+
+Après vérification des sources officielles (Service-Public.fr, SRE, CNRACL), une **correction importante** a été apportée :
+
+#### ❌ Ancienne version (incorrecte)
+> "La pension provisoire est figée à la date du départ progressif et ne bouge plus pendant toute la période"
+
+#### ✅ Nouvelle version (correcte)
+> "La pension provisoire est calculée au départ progressif, MAIS :
+> - Si vous changez de quotité, la part versée s'ajuste automatiquement
+> - Exemple : passage de 80% → 70% de travail, la pension passe de 20% → 30%
+> - Le montant de référence reste fixe
+> - Les nouveaux trimestres acquis ne modifient PAS le montant provisoire
+> - Recalcul complet à la retraite définitive"
+
+### 📝 Améliorations
+
+- 🔵 **Encadré informatif** dans l'onglet Paramètres expliquant l'évolution de la pension
+- 🔵 **Note dans les résultats** rappelant l'ajustement possible
+- 🔵 **Section mise à jour** dans l'onglet Sources avec les explications correctes
+- 🔵 **Mode d'emploi et README** entièrement mis à jour
+
+---
+
+## 📚 Documentation
+
+### Mode d'emploi complet
+Consultez le fichier **[MODE_EMPLOI.md](MODE_EMPLOI.md)** pour :
+- Guide détaillé de chaque onglet
+- Explications des calculs
+- Cas d'usage concrets
+- FAQ complète
+- Conseils stratégiques
+
+### Sources réglementaires
+
+Le simulateur s'appuie sur :
+
+| Texte | Description |
+|-------|-------------|
+| **Code des pensions civiles et militaires** | Articles L11 à L18, L89 bis à L89 ter |
+| **Décret n°2023-799** (21/08/2023) | Surcote parentale (1,25% par trimestre, max 5%) |
+| **Décret n°82-624** (20/07/1982) | Temps partiel (6/7ème et 32/35ème) |
+| **Loi n°2023-270** (14/04/2023) | Réforme des retraites 2023 |
+| **Arrêté du 23/06/2023** | Valeur du point d'indice (4,92278 €) |
+
+**Sources officielles consultées :**
+- [Service des Retraites de l'État](https://retraitesdeletat.gouv.fr)
+- [Service-Public.fr](https://www.service-public.fr/particuliers/vosdroits/F37400)
+- [CNRACL](https://www.cnracl.retraites.fr)
+- [Code des pensions (Légifrance)](https://www.legifrance.gouv.fr/codes/id/LEGITEXT000006070302/)
+
+---
+
+## ⚠️ Avertissements importants
+
+### Non-opposabilité
+
+| ❌ Ce simulateur | ✅ Simulateur officiel SRE/ENSAP |
+|-----------------|----------------------------------|
+| Aide à la décision | **Seul résultat opposable** |
+| Transparence pédagogique | Calcul exact mais opaque |
+| Écart possible 1-2% | Référence légale |
+
+**➡️ Pour une estimation officielle définitive, consultez toujours [ensap.gouv.fr](https://ensap.gouv.fr)**
+
+### Écart connu
+
+Un écart de **1 à 2 trimestres liquidables** (~1-2% de pension) peut exister avec le calcul officiel du SRE, probablement dû à des règles d'arrondi internes non documentées publiquement.
+
+**Le simulateur applique rigoureusement la méthode SRE documentée.**
+
+### Règle des six mois
+
+Une augmentation d'indice majoré doit avoir **≥ 6 mois d'ancienneté** avant le départ en retraite pour être prise en compte.
+
+---
+
+## 🧮 Méthodologie de calcul
+
+### Formule de base
 Pension = Traitement indiciaire × 75% × (Trimestres liquidables / Trimestres requis)
-- **Option Décret n°82-624 (6/7ème et 32/35ème)**
-  - Case à cocher pour appliquer ou non le décret du 20 juillet 1982
-  - Quotité 80% → Rémunération à **6/7ème** (≈85,71%)
-  - Quotité 90% → Rémunération à **32/35ème** (≈91,43%)
-  - Tooltip explicative pour vérifier l'applicabilité sur votre fiche de paie
-  - Option cochée par défaut (cas majoritaire)
-- **Prise en compte automatique** : décote, surcotes cumulables, majorations familiales
-- **Calcul des revenus** durant la période de retraite progressive (traitement + pension provisoire)
 
-### 📊 Analyses Décisionnelles
+### Méthode SRE (base 360 jours/an)
 
-#### 1. **Analyse de Surcotisation**
-- Calcul du coût mensuel et total de la surcotisation
-- Comparaison avec placements alternatifs (Livret A, LEP, placements dynamiques)
-- **Durée pour rentabiliser l'investissement** calculée avec données actuarielles INSEE 2024
-- Recommandation personnalisée (FAVORABLE / NEUTRE / DÉFAVORABLE)
-- **Disponible dans les deux modes** : Retraite Progressive ET Retraite Définitive
+- **1 année = 360 jours**
+- **1 mois = 30 jours**
+- **1 trimestre = 90 jours**
+- **Arrondi final** : ≥45 jours = +1 trimestre
 
-#### 2. **Analyse de Rachat de Trimestres**
-- Simulation du coût selon l'âge et l'option choisie (Taux seul / Taux + Durée)
-- Calcul de l'**économie d'impôt** (déductibilité fiscale)
-- Impact réel sur la pension (évitement décote / augmentation liquidables)
-- Comparaison rachat vs placement alternatif
-- Récupération automatique des données du simulateur principal
+### Pension provisoire (retraite progressive) ⭐ CORRIGÉ V.04.2.4
 
-### 🎨 Interface Utilisateur
+**Au départ progressif :**
+Pension de référence = Traitement × 75% × (Liquidables au départ / Trimestres requis)
+Pension provisoire = Pension de référence × (1 - quotité)
 
-- **6 onglets intuitifs** : Paramètres, Résultats RP, **Retraite Définitive** ⭐, Graphique, Analyse Rachat, Sources
-- **Graphiques comparatifs** :
-  - Graphique en ligne : revenus pendant la retraite progressive
-  - Graphique en barres : pension finale selon différentes quotités (retraite définitive)
-- **Tooltips informatifs** sur chaque paramètre complexe (positionnement optimisé)
-- **Import/Export JSON** pour sauvegarder et partager vos simulations
-- **Design responsive** : fonctionne sur desktop, tablette et mobile
+**Si changement de quotité :**
+Nouvelle pension provisoire = Pension de référence × (1 - nouvelle quotité)
 
-### 📚 Fonctionnalités Avancées
+**Exemple concret :**
+- Liquidables au départ : 142 trimestres
+- Pension de référence : 1 457 €
+- Quotité 80% → pension : 1 457 × 20% = **291 €**
+- **Changement à 70%** → pension : 1 457 × 30% = **437 €**
+- ✅ Le montant de référence (1 457 €) reste identique
+- ✅ Seul le pourcentage versé évolue
 
-- **Bonifications pour enfants** (avant 2004 : 4 trimestres liquidables par enfant)
-- **Majorations de durée d'assurance** (après 2003 : 2 trimestres assurance par enfant)
-- **Trois types de surcotes cumulables** :
-  - Surcote classique : 1,25% par trimestre au-delà de l'âge légal
-  - Surcote parentale : 1,25% par trimestre liquidable l'année précédant l'âge légal (max 5%)
-  - Majoration excédentaire : 1,25% par trimestre excédentaire restant
-- **Majoration familiale** : 10% pour 3 enfants + 5% par enfant supplémentaire
-- **Règle des six mois** : prise en compte des augmentations d'indice
+### Temps partiel
+
+| Type | Comptabilisation |
+|------|------------------|
+| **Assurance** | Toujours 100% |
+| **Liquidables** | Proratisés selon quotité (sauf surcotisation) |
+| **Décret 1982** | 80% → 6/7ème, 90% → 32/35ème (si applicable) |
+
+### Surcotes (3 types cumulables)
+
+1. **Surcote classique** : 1,25% par trimestre au-delà de l'âge légal
+2. **Surcote parentale** : 1,25% par trimestre l'année avant l'âge légal (max 5%)
+3. **Majoration excédentaire** : 1,25% par trimestre excédentaire restant
 
 ---
 
-## ⚖️ Avertissement Important : Non-Opposabilité
+## 🎯 Cas d'usage
 
-### ⚠️ Cet outil n'est PAS OFFICIEL
+### Exemple 1 : Fonctionnaire avec carrière complète
 
-| Aspect | Ce Simulateur | Simulateur Officiel SRE/ENSAP |
-|:-------|:--------------|:------------------------------|
-| **Valeur** | Aide à la décision, pédagogie, vérification | **Référence légale et administrative unique** |
-| **Opposabilité** | **Nulle** - Aucune valeur juridique | **Maximale** - Seul résultat opposable |
-| **Précision** | Écart potentiel de 1-2 trimestres liquidables (~1-2% pension) | Calcul officiel exact |
-| **Transparence** | **Très élevée** - Formules et barèmes explicites | Opaque ("boîte noire") |
+**Profil :**
+- Génération 1964 (171 trimestres requis)
+- 160 trimestres d'assurance au relevé
+- 142 trimestres liquidables au relevé
+- Indice 478
 
-### 📌 Recommandation d'Usage
+**Objectif :** Comprendre l'impact d'une retraite progressive à 80%
 
-1. **Utilisez ce simulateur** pour :
-   - Comprendre les mécanismes de calcul de votre pension
-   - Comparer différents scénarios (quotités, surcotisation, rachat)
-   - **Simuler une retraite définitive sans période progressive** ⭐ Nouveau
-   - Vérifier l'applicabilité du Décret 1982 sur votre situation
-   - Préparer vos décisions de fin de carrière
-   - Vérifier la cohérence des calculs officiels
+**Utilisation du simulateur :**
+1. Saisie des données dans l'onglet Paramètres
+2. Simulation avec quotité 80% pendant 18 mois
+3. Consultation du graphique pour comparer avec d'autres quotités
+4. Analyse de la rentabilité de la surcotisation
 
-2. **Pour une estimation officielle définitive** :
-   - Consultez **[ensap.gouv.fr](https://ensap.gouv.fr)** (simulateur officiel)
-   - Contactez le Service des Retraites de l'État (SRE)
+**Résultat :** Décision éclairée sur la quotité optimale
 
-### 🔍 Écart Connu avec le SRE
+### Exemple 2 : Fonctionnaire avec carrière incomplète
 
-Ce simulateur applique rigoureusement la méthode SRE documentée publiquement. Un écart de **1 à 2 trimestres liquidables** peut exister avec le calcul officiel, probablement dû à des règles d'arrondi intermédiaires non documentées publiquement.
+**Profil :**
+- Génération 1968 (172 trimestres requis)
+- 155 trimestres d'assurance au relevé
+- Décote prévisible
 
-**Impact estimé** : ~1-2% sur le montant final de la pension.
+**Objectif :** Éviter la décote
+
+**Utilisation du simulateur :**
+1. Onglet Analyse Rachat : simulation du rachat de 4 trimestres
+2. Comparaison avec un placement alternatif
+3. Calcul de la rentabilité selon l'espérance de vie
+
+**Résultat :** Décision sur l'opportunité du rachat
+
+### Exemple 3 : Parent de 3 enfants
+
+**Profil :**
+- 3 enfants élevés 9 ans avant leurs 16 ans
+- 2 enfants avant 2004, 1 enfant après 2003
+- Génération 1964
+
+**Objectif :** Maximiser les bonifications et la surcote parentale
+
+**Utilisation du simulateur :**
+1. Activation des bonifications enfants dans Paramètres
+2. Simulation d'un départ l'année avant l'âge légal
+3. Vérification de l'obtention de la surcote parentale (max 5%)
+4. Calcul de la majoration familiale (+10%)
+
+**Résultat :** Optimisation du moment du départ et de la quotité
 
 ---
 
-## 🚀 Utilisation
+## 💻 Aspects techniques
 
-### En ligne (recommandé)
-Fichier HTML autonome, aucune installation requise :
-1. Téléchargez le fichier `simulateur_retraite_Version_V.04.2.3.html`
-2. Ouvrez-le dans votre navigateur web moderne (Chrome, Firefox, Edge, Safari)
-3. Remplissez vos paramètres dans l'onglet "Paramètres"
-4. **Vérifiez l'option Décret n°82-624** selon votre situation
-5. Choisissez votre mode de simulation :
-   - **"Résultats RP"** pour une retraite progressive
-   - **"Retraite Définitive"** ⭐ pour une simulation directe sans retraite progressive
-6. Cliquez sur "Calculer la simulation"
+### Technologies utilisées
 
-### Depuis le code source
-```bash
-# Cloner le dépôt
-git clone https://github.com/votre-username/simulateur-retraite-progressive.git
+- **HTML5** : Structure de l'application
+- **CSS3** : Interface responsive et moderne
+- **JavaScript (Vanilla)** : Logique métier et calculs
+- **Chart.js** : Visualisations graphiques
 
-# Ouvrir le fichier HTML
-cd simulateur-retraite-progressive
-open simulateur_retraite_Version_V.04.2.3.html
+### Compatibilité
 
-📖 Base Réglementaire
-Textes de référence
+| Navigateur | Version minimale | Support |
+|------------|-----------------|---------|
+| Chrome | 90+ | ✅ Complet |
+| Firefox | 88+ | ✅ Complet |
+| Safari | 14+ | ✅ Complet |
+| Edge | 90+ | ✅ Complet |
 
-Code des pensions civiles et militaires de retraite (Articles L9, L11, L12, L12 bis, L13, L14, L15, L18, L89 bis à L89 ter)
-Décret n°82-624 du 20 juillet 1982 (Temps partiel : 6/7ème et 32/35ème)
-Décret n°2003-1306 du 26 décembre 2003 (Bonifications enfants)
-Décret n°2011-620 du 31 mai 2011 (Institution retraite progressive)
-Loi n°2023-270 du 14 avril 2023 (Réforme des retraites)
-Décret n°2023-799 du 21 août 2023 (Surcote parentale)
-Arrêté du 23 juin 2023 (Valeur du point d'indice : 4,92278 €)
+### Performances
 
-Conditions d'accès à la retraite progressive
+- ⚡ **Chargement instantané** (fichier unique ~100 Ko)
+- 🔒 **100% local** (aucune donnée transmise)
+- 💾 **Pas de base de données** requise
+- 📱 **Responsive** (mobile, tablette, desktop)
 
-Âge minimum : 60 ans
-Durée d'assurance minimale : 150 trimestres
-Quotités autorisées : 50%, 60%, 70%, 80%, 90%
-Application optionnelle du Décret 1982 pour les quotités 80% et 90%
+### Architecture
+simulateur.html
+├── Structure HTML
+│   ├── 6 onglets (tabs)
+│   ├── Formulaires de saisie
+│   └── Zones d'affichage des résultats
+├── Styles CSS
+│   ├── Design moderne
+│   ├── Mode responsive
+│   └── Thème vert (fonctionnaire)
+└── Logique JavaScript
+├── Calculs SRE (base 360j/an)
+├── Analyses actuarielles
+├── Génération de graphiques
+└── Export/Import JSON
 
+---
 
-🛠️ Maintenance et Évolution
-Contrôles Périodiques Recommandés
-🗓️ Annuels (chaque janvier)
+## 🔧 Développement
 
-Mettre à jour la valeur du point d'indice
-Vérifier le minimum garanti (MG)
-Actualiser les barèmes de surcotisation
-Mettre à jour les tables de mortalité INSEE (analyse actuarielle)
+### Structure du code
 
-📜 Événementiels
+**Fonctions principales :**
+```javascript
+// Calculs de base
+calculerPeriodesServiceSRE(dateDebut, dateFin)
+arrondirTrimestresLiquidables(totalJours)
+calculerDureeAssurance(totalJours)
 
-Surveiller les publications de nouveaux décrets sur la retraite progressive
-Vérifier les modifications des durées de cotisation requises
-Intégrer les changements de règles de bonification
-Actualiser les barèmes de rachat de trimestres
+// Calculs de pension
+calculer() // Retraite progressive
+calculerRetraiteDefinitive() // Retraite définitive
+calculerSurcoteParentaleSRE(...) // Surcote parentale
 
-Ressources Officielles à Surveiller
+// Analyses
+calculerRentabiliteSurcotisation(...)
+analyserRachat()
 
-Légifrance - Textes législatifs et réglementaires
-retraitesdeletat.gouv.fr - Site du SRE
-INSEE - Données démographiques et actuarielles
-
-
-🔧 Technologies Utilisées
-
-HTML5 - Structure de la page
-CSS3 - Design responsive et moderne
-JavaScript Vanilla - Logique de calcul (aucune dépendance)
-Chart.js - Visualisation graphique (ligne + barres)
-Base de calcul : Méthode SRE (360 jours/an, 30 jours/mois)
-
-Compatibilité Navigateurs
-
-✅ Chrome/Edge (v90+)
-✅ Firefox (v88+)
-✅ Safari (v14+)
-✅ Opera (v76+)
-
-
-📝 Structure du Code
-simulateur_retraite_Version_V.04.2.3.html
-├── <head>
-│   ├── Styles CSS (design responsive)
-│   └── Métadonnées
-├── <body>
-│   ├── Navigation (6 onglets)
-│   ├── Onglet Paramètres (saisie données + option Décret 1982)
-│   ├── Onglet Résultats RP (affichage pension progressive)
-│   ├── Onglet Retraite Définitive ⭐ NOUVEAU
-│   ├── Onglet Graphique (comparaison quotités RP)
-│   ├── Onglet Analyse Rachat
-│   └── Onglet Sources (références légales)
-└── <script>
-    ├── Fonctions de calcul SRE
-    ├── Gestion Décret n°82-624
-    ├── Analyse surcotisation (RP + Définitive)
-    ├── Calcul retraite définitive ⭐ NOUVEAU
-    ├── Analyse rachat trimestres
-    ├── Gestion événements
-    └── Import/Export JSON
-
-🤝 Contribution
-Les contributions sont les bienvenues pour améliorer cet outil !
-Comment contribuer
+// Interface
+switchTab(tabName)
+updateChart(...)
+exporterParametresUtilisateur()
+Contribuer
+Les contributions sont les bienvenues ! Pour contribuer :
 
 Fork le projet
-Créez une branche pour votre fonctionnalité (git checkout -b feature/amelioration)
-Testez soigneusement vos modifications
-Committez vos changements (git commit -m 'Ajout fonctionnalité X')
+Créez une branche (git checkout -b feature/amelioration)
+Committez vos changements (git commit -m 'Ajout fonctionnalité')
 Push vers la branche (git push origin feature/amelioration)
 Ouvrez une Pull Request
 
-Priorités de développement
-
-Intégration calcul RAFP (Retraite Additionnelle de la Fonction Publique)
-Export PDF des résultats
-Historique des simulations (LocalStorage)
-Mode sombre
-Support multilingue (anglais)
-API REST pour intégration externe
-
-
-📄 Licence
-Ce projet est sous licence MIT - voir le fichier LICENSE pour plus de détails.
-Copyright (c) 2025 [Votre Nom]
-Permission est accordée, gratuitement, à toute personne obtenant une copie de ce logiciel et des fichiers de documentation associés, de traiter le logiciel sans restriction, y compris sans limitation les droits d'utiliser, copier, modifier, fusionner, publier, distribuer, sous-licencier et/ou vendre des copies du logiciel.
-
-📞 Support et Contact
-🐛 Signaler un Bug
-Ouvrez une issue GitHub avec :
+Signaler un bug
+Ouvrez une Issue avec :
 
 Description détaillée du problème
-Paramètres de simulation utilisés
-Résultat obtenu vs attendu
-Navigateur et version
-
-💬 Questions et Discussions
-Utilisez la section Discussions GitHub
-⚠️ Avertissement Support
-Ce projet est fourni "tel quel" sans garantie. Pour des conseils personnalisés sur votre situation retraite, consultez un conseiller retraite officiel ou le SRE.
-
-🙏 Remerciements
-
-Service des Retraites de l'État (SRE) pour la documentation publique de la méthode de calcul
-INSEE pour les données démographiques et actuarielles
-Légifrance pour l'accès aux textes réglementaires
-Tous les contributeurs et testeurs du projet
+Étapes pour reproduire
+Captures d'écran si applicable
+Version du navigateur
 
 
-📊 Statistiques du Projet
+📝 Historique des versions
+V.04.2.4 (Janvier 2025) - Actuelle
 
-Première version : Août 2024
-Version actuelle : V.04.2.3
-Lignes de code : ~2300 lignes (HTML + CSS + JS)
-Taille du fichier : ~180 Ko
-Temps de chargement : < 1 seconde
+🔴 CORRECTION MAJEURE : Documentation pension provisoire (évolution quotité)
+✅ Ajout encadré informatif dans Paramètres
+✅ Mise à jour onglet Sources
+✅ Correction MODE_EMPLOI.md et README.md
 
+V.04.2.3 (Janvier 2025)
 
-🗺️ Roadmap
-Version 0.5 (Q2 2025)
+✨ Nouvel onglet "Retraite Définitive"
+✨ Option Décret 1982 (6/7ème et 32/35ème)
+📊 Graphiques optimisés (aspectRatio: 3, max-width: 800px)
 
-Calcul RAFP (Retraite Additionnelle)
-Export PDF des simulations
-Historique des calculs
+V.04.2.x (2024)
 
-Version 1.0 (Q3 2025)
+Amélioration interface utilisateur
+Optimisation des performances
+Corrections de bugs mineurs
 
-Interface multilingue
-Mode hors-ligne (PWA)
-Comparaison avant/après réforme
+V.04.1.x (2024)
 
-À long terme
+Ajout onglet "Analyse Rachat"
+Comparaison avec placements alternatifs
+Barèmes 2024
 
-API REST documentée
-Application mobile native
-Extension navigateur
+V.04.0.x (2023)
 
+Intégration Décret 2023-799 (surcote parentale)
+Refonte complète de l'interface
+Système d'onglets
 
-📅 Historique des Versions
-V.04.2.3 (Octobre 2025)
+Versions antérieures
 
-➕ Ajout onglet "Retraite Définitive" - Simulateur complet sans période progressive
-📊 Graphique comparatif en barres des quotités (retraite définitive)
-🔄 Récupération automatique des données depuis Paramètres
-💰 Analyse surcotisation vs placement dans l'onglet Retraite Définitive
-🎯 Interface à 6 onglets (ajout du nouvel onglet)
-✨ Projection simple avec quotité fixe jusqu'au départ
-
-V.04.2.2 (Septembre 2025)
-
-➕ Ajout option Décret n°82-624 (6/7ème pour 80%, 32/35ème pour 90%)
-🔧 Correction positionnement tooltips (alignement droit)
-📄 Mise à jour documentation et sources réglementaires
-✨ Affichage explicite de la fraction appliquée dans les résultats
-
-V.04.2.1 (Septembre 2025)
-
-➕ Ajout onglet "Analyse Rachat de trimestres"
-📊 Comparaison rachat vs placement alternatif
-🎯 Recommandations personnalisées
-
-V.04.2.0 (Aout 2025)
-
-✅ Validation calcul + disclaimer écart SRE
-📈 Analyse actuarielle surcotisation
-🔄 Amélioration interface utilisateur
+V.03.x : Première version publique
+V.02.x : Beta testing
+V.01.x : Prototype
 
 
-⭐ Soutenir le Projet
-Si ce simulateur vous est utile :
+📋 Roadmap
+Version 4.3.x (Prévue Q1 2025)
 
-⭐ Star le projet sur GitHub
-🐦 Partagez avec vos collègues fonctionnaires
-🐛 Signalez les bugs rencontrés
-💡 Proposez de nouvelles fonctionnalités
-🤝 Contribuez au code
+ Ajout de scenarios "what-if" multiples
+ Export PDF des résultats
+ Mode sombre
+ Comparaison côte à côte de 2 simulations
+
+Version 4.4.x (Prévue Q2 2025)
+
+ Intégration des régimes spéciaux
+ Calculateur de pension de réversion
+ API pour intégration externe
+
+Version 5.0.x (Prévue Q3 2025)
+
+ Application web progressive (PWA)
+ Synchronisation cloud optionnelle
+ Mode collaboratif (conseiller retraite)
 
 
-Disclaimer : Cet outil est un projet indépendant et n'est affilié à aucune administration publique française. Pour toute décision officielle concernant votre retraite, référez-vous aux services officiels (SRE, ENSAP).
-Dernière mise à jour du README :Octobre 2025 - Version V.04.2.3
+🤝 Remerciements
+Ce projet a été rendu possible grâce à :
+
+📚 Documentation officielle du SRE et de Service-Public.fr
+👥 Retours des utilisateurs fonctionnaires d'État
+🐛 Signalements de bugs permettant les corrections
+💡 Suggestions d'amélioration de la communauté
+
+Merci particulier aux utilisateurs qui ont signalé l'inexactitude sur la pension provisoire, permettant la correction de la V.04.2.4.
+
+📄 Licence
+Usage personnel libre - À des fins informatives et pédagogiques uniquement.
+Clause de non-responsabilité :
+
+Ce simulateur est fourni "tel quel" sans garantie
+Les résultats sont des estimations
+Seuls les calculs officiels du SRE font foi
+L'auteur ne peut être tenu responsable des décisions prises sur la base de ces estimations
+
+Utilisation commerciale : Requiert une autorisation écrite.
+
+📞 Support et Contact
+Questions techniques
+
+🐛 Ouvrir une Issue
+💬 Discussions
+
+Questions sur votre retraite
+
+🏛️ Service des Retraites de l'État
+💻 ENSAP - Simulation officielle
+📞 Votre service RH
+
+
+🔗 Liens utiles
+Sites officiels
+
+ensap.gouv.fr - Simulation officielle
+retraitesdeletat.gouv.fr - SRE
+service-public.fr - Retraite progressive
+info-retraite.fr - Portail commun
+
+Documentation technique
+
+Légifrance - Code des pensions
+Décret 2023-799
+INSEE - Tables de mortalité
+
+
+🌟 Donnez une étoile !
+Si ce simulateur vous a été utile, n'hésitez pas à :
+
+⭐ Donner une étoile au projet
+🔄 Partager avec vos collègues
+💬 Laisser un commentaire
+🐛 Signaler des bugs
+💡 Proposer des améliorations
+
+
+<div align="center">
+Made with ❤️ for French civil servants
+Version : V.04.2.4 | Date : Janvier 2025 | Réglementation : Décret n° 2023-799 du 21 août 2023
+</div>
+```
