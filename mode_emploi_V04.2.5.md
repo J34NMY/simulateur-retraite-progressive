@@ -4,16 +4,15 @@
 
 Ce simulateur gratuit vous permet d'estimer votre pension de retraite progressive et définitive en tant que fonctionnaire d'État. Il applique la méthode officielle du Service des Retraites de l'État (SRE) avec une transparence totale sur les calculs.
 
-**🔴 CORRECTION MAJEURE V.04.2.5 :** Les barèmes de rachat de trimestres ont été entièrement corrigés. Les versions précédentes utilisaient par erreur les barèmes du secteur privé, donnant des coûts **2 à 3 fois trop élevés**. Cette version utilise les coefficients corrects de la Fonction Publique d'État.
 
-**✨ NOUVEAU V.04.2.5.1 :** Exports PDF professionnels avec conversion automatique des accents pour une lisibilité universelle.
+**✨ NOUVEAU V.04.2.6 :** Exports PDF professionnels avec conversion automatique des accents pour une lisibilité universelle.
 
----
+---*Vous devez avant toutes choses récupérer votre relevé de cariérre sur le site info retraite*
 
 ## 🚀 Démarrage rapide
 
 ### Installation
-1. **Téléchargez** le fichier `simulateur_retraite_V.04.2.5.1.html`
+1. **Téléchargez** le fichier `simulateur_retraite_V.04.2.6.html`
 2. **Double-cliquez** dessus pour l'ouvrir dans votre navigateur
 3. Aucune installation, aucune connexion internet requise !
 
@@ -1203,6 +1202,7 @@ Ce simulateur gratuit est fourni à titre **informatif et pédagogique**. Il ne 
 **Dernière mise à jour :** Ajout exports PDF + développement avec Claude (Anthropic)
 
 **Prochaine mise à jour prévue :** Mise à jour de la valeur du point d'indice (juillet 2026)
+
 
 
 
