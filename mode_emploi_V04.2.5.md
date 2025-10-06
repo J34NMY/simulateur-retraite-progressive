@@ -1,4 +1,4 @@
-markdown# 📖 Mode d'emploi du Simulateur de Retraite Progressive V.04.2.5
+# 📖 Mode d'emploi du Simulateur de Retraite Progressive V.04.2.5
 
 ## 🎯 Introduction
 
@@ -1203,5 +1203,6 @@ Ce simulateur gratuit est fourni à titre **informatif et pédagogique**. Il ne 
 **Dernière mise à jour :** Ajout exports PDF + développement avec Claude (Anthropic)
 
 **Prochaine mise à jour prévue :** Mise à jour de la valeur du point d'indice (juillet 2026)
+
 
 
