@@ -1,628 +1,26 @@
-# 📖 Mode d'emploi du Simulateur de Retraite Progressive V.04.2.5
-
-## 🎯 Introduction
-
-Ce simulateur vous permet d'estimer votre pension de retraite progressive et définitive en tant que fonctionnaire d'État. Il applique la méthode officielle du Service des Retraites de l'État (SRE) avec une transparence totale sur les calculs.
-
-**🔴 CORRECTION MAJEURE V.04.2.5 :** Les barèmes de rachat de trimestres ont été entièrement corrigés. Les versions précédentes utilisaient par erreur les barèmes du secteur privé, donnant des coûts **2 à 3 fois trop élevés**. Cette version utilise les coefficients corrects de la Fonction Publique d'État.
-
----
-
-## 🚀 Démarrage rapide
-
-### Installation
-1. **Téléchargez** le fichier `simulateur_retraite_Version_V.04.2.5.html`
-2. **Double-cliquez** dessus pour l'ouvrir dans votre navigateur
-3. Aucune installation, aucune connexion internet requise !
-
-### Premier calcul en 3 étapes
-1. **Onglet "Paramètres"** → Remplissez vos données
-2. Cliquez sur **"Calculer la simulation"**
-3. **Onglet "Résultats RP"** → Consultez vos résultats
-
----
-
-## 📊 Guide des onglets
-
-### 1️⃣ Onglet PARAMÈTRES
-
-#### Section "Données du relevé de carrière"
-
-**Date du relevé**
-- Date de votre dernier relevé de carrière officiel SRE
-- Format : JJ/MM/AAAA
-- Exemple : 31/12/2024
-
-**Trimestres d'assurance au relevé**
-- Nombre total de trimestres d'assurance selon votre relevé SRE
-- Exemple : 160 trimestres + 84 jours
-- 💡 *Les trimestres d'assurance comptent pour la durée de cotisation (évitent la décote)*
-
-**Trimestres liquidables au relevé**
-- Nombre de trimestres de services effectifs selon votre relevé SRE
-- Exemple : 142 trimestres + 86 jours
-- 💡 *Les trimestres liquidables déterminent le montant de la pension (prorata)*
-
-#### Section "Informations personnelles"
-
-**Date de naissance**
-- Obligatoire pour calculer l'âge légal et les trimestres requis
-- Détermine automatiquement votre génération (1964 → 171 trimestres requis)
-
-**Sexe**
-- Utilisé uniquement pour l'analyse actuarielle de rentabilité
-- Basé sur les tables de mortalité INSEE 2024
-
-**Trimestres requis**
-- Calculé automatiquement selon votre année de naissance
-- 1965 et après → 172 trimestres
-- 1964 → 171 trimestres, etc.
-
-**Indice majoré (IM)**
-- Votre indice majoré actuel
-- Exemple : 478
-- 💡 *Attention à la règle des six mois : une augmentation d'indice doit avoir au moins 6 mois d'ancienneté avant le départ*
-
-**Valeur du point**
-- Valeur officielle : **4,92278 €** (depuis le 1er juillet 2023)
-- Mise à jour annuelle en général
-
-#### Section "Planning de retraite progressive"
-
-**Date de départ retraite progressive**
-- Date de début de votre retraite progressive
-- ⚠️ Conditions : minimum 60 ans + 150 trimestres d'assurance
-
-**Date de départ retraite définitive**
-- Date de fin de la période progressive
-- Entre cette date et le départ progressif, vous cumulez traitement partiel + pension provisoire
-
-**Quotité entre relevé et départ progressif**
-- Votre quotité de travail ACTUELLE (avant la retraite progressive)
-- 100% = temps plein
-- 80% = 4 jours/semaine
-- 💡 *Cette quotité impacte l'accumulation de trimestres liquidables*
-
-**Quotité pendant la retraite progressive**
-- Votre quotité pendant la période progressive
-- Choix : 50%, 60%, 70%, 80%, 90%
-- ⚠️ Attention : cette quotité impacte la surcote parentale
-
-**☑️ Appliquer le Décret n°82-624**
-- **Coché par défaut** (cas majoritaire)
-- Concerne certains fonctionnaires en temps partiel de droit commun :
-  - **80%** → rémunération à **6/7ème** (≈85,71%)
-  - **90%** → rémunération à **32/35ème** (≈91,43%)
-
-**Comment vérifier si cela vous concerne ?**
-1. Consultez votre fiche de paie actuelle si vous êtes déjà à temps partiel 80% ou 90%
-2. Regardez la ligne "Traitement Brut"
-3. Si vous travaillez 4j/5 (80%) et êtes payé plus de 80%, le décret s'applique
-4. Si incertain, laissez coché (cas par défaut)
-
-#### Section "Options de surcotisation"
-
-**☑️ Surcotisation pendant la progressive**
-- Si coché : vos trimestres liquidables comptent à 100% (même à temps partiel)
-- Coût supplémentaire selon barème 2024 (ex: 16,2% pour 80%)
-- Une analyse de rentabilité complète sera affichée
-
-**Taux de surcotisation**
-- Calculé automatiquement selon votre quotité
-- Barème 2024 :
-  - 50% → 23,85%
-  - 60% → 21,30%
-  - 70% → 18,75%
-  - 80% → 16,20%
-  - 90% → 13,65%
-
-**Taux de placement alternatif**
-- Pour comparer la surcotisation avec un placement financier
-- Options : Livret A (3%), LEP (4%), placements dynamiques (4,5-5%)
-
-#### Section "Droits liés aux enfants"
-
-**Bonification enfants nés/adoptés avant 2004**
-- **Conditions strictes** :
-  - Enfant né ou adopté avant le 1er janvier 2004
-  - Interruption ou réduction d'activité ≥ 2 mois consécutifs
-  - Enfant élevé pendant ≥ 9 ans avant ses 16 ans
-- **Gain** : 4 trimestres liquidables + 4 trimestres assurance PAR ENFANT
-- Validation lors de la demande de retraite avec justificatifs
-
-**Majoration enfants nés/adoptés à partir de 2004**
-- **Conditions** :
-  - Enfant né ou adopté à partir du 1er janvier 2004
-  - Après recrutement dans la fonction publique
-- **Gain** : 2 trimestres d'assurance PAR ENFANT (pas de liquidables)
-- Attribution automatique
-
-**Total enfants (majoration familiale)**
-- Calculé automatiquement
-- **Majoration de pension** :
-  - 3 enfants → +10%
-  - 4 enfants → +15%
-  - 5 enfants → +20%, etc.
-- Condition : enfants élevés 9 ans avant leurs 16 ans
-
-#### Section "Information pension provisoire"
-
-Un encadré informatif explique le fonctionnement de la pension provisoire :
-
-**Calculée au départ** : basée sur les droits acquis AVANT le départ progressif
-
-**Évolution possible** : si vous changez de quotité pendant la progressive, la part versée s'ajuste automatiquement
-- Exemple : passage de 80% → 70% de travail
-- Pension provisoire passe de 20% → 30% du montant de référence
-
-**Trimestres pendant la progressive** : ne modifient PAS le montant provisoire
-- Les nouveaux trimestres acquis sont comptabilisés
-- Mais le montant de référence reste fixe
-
-**Recalcul à la retraite définitive** : tous les droits acquis pendant la progressive seront pris en compte dans le calcul final
-
----
-
-### 2️⃣ Onglet RÉSULTATS RP (Retraite Progressive)
-
-#### Durées et trimestres
-- Affiche les périodes calculées avec la méthode SRE (base 360 jours/an)
-- Décomposition : années, mois, jours
-
-#### Compteurs au départ progressif
-- État de vos compteurs à la date de départ en retraite progressive
-- Assurance vs Liquidables
-- Bonifications prises en compte
-
-#### Revenus pendant la retraite progressive
-- **Traitement à la quotité** : votre salaire partiel
-- **Pension provisoire** : (1 - quotité) × pension de référence
-- **Note importante** : une mention indique que si vous changez de quotité, la pension s'ajustera
-- **Total brut mensuel** : traitement + pension
-- Si surcotisation : affichage du coût mensuel et du net après surcotisation
-
-#### Analyse de surcotisation (si activée)
-Comparaison détaillée :
-- **Coût total** de la surcotisation
-- **Gain mensuel** de pension (surcotisation vs sans)
-- **Durée de rentabilisation** (combien d'années de retraite pour récupérer l'investissement)
-- **Alternative placement** :
-  - Capital après période progressive
-  - Rente mensuelle générée
-  - Capital préservé et transmissible
-- **Recommandation** : FAVORABLE / NEUTRE / DÉFAVORABLE
-
-#### Situation en fin de période
-- Assurance et liquidables finaux
-- Taux de liquidation estimé
-- Traitement de référence
-
-#### 🎯 Pension définitive estimée
-- **Montant principal** en gros caractères verts
-- **Avec majoration familiale** si applicable
-
-#### Détails décote/surcote
-- **Si décote** : trimestres manquants, taux appliqué, date du taux plein
-- **Si surcote** : détail des 3 types de majorations SRE
-  - Surcote parentale (max 5%)
-  - Surcote classique (après âge légal)
-  - Majoration excédentaire (trimestres restants)
-
----
-
-### 3️⃣ Onglet RETRAITE DÉFINITIVE
-
-Cet onglet permet de simuler une retraite définitive **sans période de retraite progressive**.
-
-#### Mode d'emploi
-
-1. **Cliquez sur "Récupérer les données"**
-   - Importe automatiquement vos paramètres depuis l'onglet Paramètres
-   - Affiche votre situation actuelle
-
-2. **Définissez votre projection**
-   - **Date de départ en retraite** : quand souhaitez-vous partir ?
-   - **Quotité envisagée** : à quel temps travaillerez-vous jusqu'au départ ?
-     - 100% = temps plein jusqu'à la retraite
-     - 80% = 4j/5 jusqu'à la retraite
-     - etc.
-
-3. **Options**
-   - ☑️ **Décret n°82-624** : même principe que l'onglet Paramètres
-   - ☑️ **Surcotisation** : si temps partiel, option de surcotiser pour compter les liquidables à 100%
-
-4. **Cliquez sur "Calculer la simulation"**
-
-#### Résultats affichés
-
-**Projection de carrière**
-- Période entre aujourd'hui et le départ
-- Trimestres acquis pendant cette période
-- Impact de la quotité choisie
-
-**Trimestres au départ**
-- Assurance totale / Liquidables totaux
-- Bonifications enfants prises en compte
-- Âge au départ
-
-**Analyse de surcotisation** (si activée)
-- Même analyse que pour la retraite progressive
-- Coût sur toute la période jusqu'au départ
-- Comparaison avec placement alternatif
-
-**Pension définitive**
-- Montant estimé selon le scénario choisi
-- Avec/sans majoration familiale
-
-**Graphique comparatif en barres**
-- Compare automatiquement 6 scénarios de quotité (50%, 60%, 70%, 80%, 90%, 100%)
-- La barre rouge = votre quotité sélectionnée
-- Permet de visualiser l'impact d'un changement de quotité
-
----
-
-### 4️⃣ Onglet GRAPHIQUE
-
-**Graphique en ligne** : Revenus pendant la retraite progressive
-
-- Compare vos **revenus totaux bruts** selon différentes quotités (50% à 90%)
-- Le point rouge indique votre quotité sélectionnée
-- Permet de voir rapidement l'impact financier d'un changement de quotité
-
-**Comment l'interpréter ?**
-- Plus la quotité est basse → plus le revenu total est faible (logique)
-- Mais le gain en temps libre peut compenser
-- À utiliser pour trouver votre équilibre vie/revenus
-
----
-
-### 5️⃣ Onglet ANALYSE RACHAT ⭐ CORRIGÉ V.04.2.5
-
-Cet onglet analyse la **rentabilité du rachat de trimestres** avec les **coefficients corrects de la Fonction Publique d'État**.
-
-#### 🔴 CHANGEMENT MAJEUR V.04.2.5
-
-**Ancienne version (V.04.2.4 et antérieures) :**
-- ❌ Utilisait les barèmes du secteur privé
-- ❌ Coûts 2 à 3 fois trop élevés
-- ❌ Exemple : 4 trim. à 40 ans = 15 200 € (FAUX)
-
-**Nouvelle version (V.04.2.5) :**
-- ✅ Utilise les coefficients Fonction Publique d'État
-- ✅ Calcul basé sur votre traitement indiciaire
-- ✅ Exemple : 4 trim. à 40 ans = 5 836 € (CORRECT)
-
-#### Mode d'emploi
-
-1. **Cliquez sur "Récupérer les données"**
-   - Importe votre situation depuis l'onglet Paramètres
-
-2. **Paramétrez votre rachat**
-   - **Nombre de trimestres** : entre 1 et 12
-   - **Type de rachat** :
-     - Années d'études supérieures
-     - Années civiles incomplètes
-   - **Option de rachat** :
-     - **Option 1 - Taux seul** : moins cher, évite la décote uniquement
-     - **Option 2 - Taux + Durée** : plus cher, augmente aussi la pension
-   - **Âge au rachat** : votre âge actuel ou prévu
-   - **TMI** : votre tranche marginale d'imposition (pour calculer l'économie fiscale)
-
-3. **Taux de placement alternatif**
-   - Pour comparer avec un placement financier
-   - Ex: Livret A 3%, LEP 4%, placements dynamiques 5%
-
-4. **Cliquez sur "Analyser la rentabilité"**
-
-#### Résultats affichés
-
-**Coût du rachat**
-- **Coefficient appliqué** : pourcentage de votre traitement (NOUVEAU)
-- Coût par trimestre (basé sur votre traitement indiciaire)
-- Coût nominal (brut)
-- Économie d'impôt (le rachat est déductible)
-- **Coût réel** après déduction fiscale
-
-**Impact sur la pension**
-- Gain mensuel de pension
-- Gain annuel
-- **Durée de rentabilisation** : combien d'années de retraite pour récupérer l'investissement
-
-**Comparaison avec placement**
-- **Rachat** : gain viager, non transmissible
-- **Placement** : capital préservé, transmissible, rente mensuelle
-
-**Recommandation**
-- FAVORABLE : le rachat est rentable
-- NEUTRE : les deux se valent
-- DÉFAVORABLE : le placement est préférable
-
-**Points d'attention**
-- Espérance de vie
-- Liquidité des fonds
-- Transmission patrimoniale
-- Protection contre l'inflation
-
-⚠️ **Important** : Les coefficients affichés sont indicatifs (basés sur 2024, catégorie sédentaire). Demandez toujours un devis officiel au SRE via [ensap.gouv.fr](https://ensap.gouv.fr).
-
-#### Comprendre les coefficients Fonction Publique
-
-**Formule de calcul :**
-Coût par trimestre = Traitement indiciaire × Coefficient d'âge
-
-**Coefficients indicatifs (base 2024) :**
-
-| Âge | Option 1 (Taux seul) | Option 2 (Taux + Durée) |
-|-----|---------------------|------------------------|
-| 30 ans | ~28% | ~50% |
-| 40 ans | ~35% | ~62% |
-| 50 ans | ~48% | ~85% |
-| 60 ans | ~85% | ~150% |
-
-**Exemple concret :**
-- Vous avez 42 ans
-- Traitement indiciaire : 2 353 €
-- Option 2 (Taux + Durée)
-- Coefficient interpolé : ~64%
-
-**Calcul :**
-- Coût par trimestre : 2 353 × 0,64 = **1 506 €**
-- Pour 4 trimestres : 1 506 × 4 = **6 024 €**
-- Économie d'impôt (TMI 30%) : 6 024 × 0,30 = 1 807 €
-- **Coût réel** : 6 024 - 1 807 = **4 217 €**
-
-**Comparaison V.04.2.4 vs V.04.2.5 :**
-- V.04.2.4 (FAUX) : 15 200 € → 10 640 € après impôt
-- V.04.2.5 (CORRECT) : 6 024 € → 4 217 € après impôt
-- **Économie : 6 423 €** (division par 2,5)
-
----
-
-### 6️⃣ Onglet SOURCES
-
-Références réglementaires complètes :
-- Code des pensions civiles et militaires
-- Décrets applicables (dont Décret 2007-262 sur le rachat)
-- Liens vers sites officiels
-- Méthode de calcul SRE détaillée
-- **Tableau des coefficients rachat Fonction Publique** (NOUVEAU)
-- **Section mise à jour** sur la pension provisoire avec l'explication correcte
-- Avertissement sur la précision du simulateur
-
----
-
-## 🔧 Fonctionnalités avancées
-
-### Import/Export de simulations
-
-**Exporter vos paramètres**
-1. Remplissez l'onglet Paramètres
-2. Cliquez sur **"Exporter"**
-3. Un fichier JSON est téléchargé : `parametres_simulateur_retraite_v04_2_5.json`
-4. Conservez ce fichier pour le réutiliser plus tard
-
-**Importer des paramètres**
-1. Cliquez sur **"Importer"**
-2. Sélectionnez un fichier JSON précédemment exporté
-3. Tous les champs sont automatiquement remplis
-
-💡 *Utile pour comparer plusieurs scénarios ou partager avec un conseiller*
-
-### Bouton "Valeurs par défaut"
-- Réinitialise tous les champs avec l'exemple par défaut
-- Utile pour tester le simulateur ou repartir de zéro
-
----
-
-## ⚠️ Points d'attention importants
-
-### 1. Non-opposabilité des résultats
-
-| Ce simulateur | Simulateur officiel SRE |
-|:--------------|:------------------------|
-| Aide à la décision | **Référence légale** |
-| Transparence totale | Calcul exact mais opaque |
-| Écart possible 1-2% | **Seul résultat opposable** |
-
-**➡️ Pour une estimation officielle définitive, consultez toujours [ensap.gouv.fr](https://ensap.gouv.fr)**
-
-### 2. Écart connu avec le SRE
-
-- Écart estimé : **1 à 2 trimestres liquidables** (~1-2% de pension)
-- Cause probable : règles d'arrondi internes non documentées publiquement
-- Ce simulateur applique rigoureusement la méthode SRE documentée
-
-### 3. Rachat de trimestres - Coefficients indicatifs ⭐ NOUVEAU
-
-**Important V.04.2.5 :**
-- Les coefficients utilisés sont indicatifs (base 2024, catégorie sédentaire)
-- Le coût exact dépend de nombreux paramètres :
-  - Votre traitement indiciaire au moment du rachat
-  - Votre catégorie (sédentaire, actif, insalubre)
-  - Les barèmes en vigueur à la date du rachat
-  
-**Pour un devis personnalisé et opposable, contactez toujours le SRE via [ensap.gouv.fr](https://ensap.gouv.fr)**
-
-### 4. Règle des six mois
-
-Une augmentation d'indice majoré doit avoir au moins **6 mois d'ancienneté** avant le départ en retraite pour être prise en compte.
-
-**Exemple** :
-- Départ prévu : 1er décembre 2025
-- Nouvelle augmentation d'indice : 1er novembre 2025
-- ❌ Cette augmentation ne compte PAS (seulement 1 mois)
-
-### 5. Décret n°82-624
-
-Ce décret s'applique à **certains** fonctionnaires en temps partiel de droit commun :
-- Pas applicable aux temps partiels thérapeutiques
-- Pas applicable à tous les statuts
-- Vérifiez sur votre fiche de paie actuelle
-
-**En cas de doute** : laissez la case cochée (cas majoritaire)
-
-### 6. Surcotisation
-
-La surcotisation est **rentable** si :
-- Vous partez longtemps en retraite (espérance de vie élevée)
-- Le taux de placement alternatif est faible
-- Vous valorisez la sécurité viagère
-
-Elle est **moins intéressante** si :
-- Vous avez une épargne bien rémunérée
-- Vous souhaitez conserver la liquidité des fonds
-- Vous voulez transmettre un capital
-
-### 7. Pension provisoire pendant la retraite progressive
-
-**Important à comprendre :**
-
-**✅ CE QUI EST VRAI :**
-- La pension provisoire est calculée à la date du départ progressif
-- Elle est basée sur les droits acquis AVANT le départ progressif
-- **SI vous changez de quotité**, la part versée s'ajuste automatiquement
-  - Exemple : passage de 80% → 70% de travail
-  - Pension provisoire passe de 20% → 30%
-- Les trimestres acquis pendant la progressive sont comptabilisés pour la retraite définitive
-
-**❌ CE QUI EST FAUX :**
-- La pension provisoire ne se recalcule PAS en fonction des nouveaux trimestres acquis pendant la progressive
-- Le montant de référence de la pension reste celui calculé au départ progressif
-- Seul le **pourcentage** de cette pension peut varier si la quotité change
-
-**Exemple concret :**
-- Départ progressif : 142 trimestres liquidables
-- Pension de référence calculée : 1 457 €
-- Quotité 80% → pension provisoire : 20% × 1 457 € = **291 €**
-- **Si passage à 70%** → pension provisoire : 30% × 1 457 € = **437 €**
-- ✅ Le montant de référence (1 457 €) reste identique
-- ✅ Seul le pourcentage versé change (20% → 30%)
-
----
-
-## 🧮 Comprendre les calculs
-
-### Formule de base de la pension
-Pension = Traitement indiciaire × 75% × (Trimestres liquidables / Trimestres requis)
-
-### Méthode de calcul SRE (base 360 jours/an)
-
-- **1 année = 360 jours**
-- **1 mois = 30 jours**
-- **1 trimestre = 90 jours**
-
-**Exemple** :
-- Période : 1 an, 3 mois, 15 jours
-- Total jours SRE : (1 × 360) + (3 × 30) + 15 = **465 jours**
-- Trimestres complets : 465 ÷ 90 = 5 trimestres + 15 jours
-- **Arrondi final** : 15 jours < 45 → **5 trimestres**
-
-### Rachat de trimestres (Fonction Publique) ⭐ CORRIGÉ V.04.2.5
-
-**Formule officielle :**
-Coût par trimestre = Traitement indiciaire × Coefficient d'âge
-Coût total = Coût par trimestre × Nombre de trimestres
-
-**Coefficients indicatifs (catégorie sédentaire, base 2024) :**
-
-| Tranche d'âge | Option 1 (Taux seul) | Option 2 (Taux + Durée) |
-|---------------|---------------------|------------------------|
-| 20-29 ans | 25-28% du traitement | 45-50% du traitement |
-| 30-39 ans | 28-35% du traitement | 50-62% du traitement |
-| 40-49 ans | 35-48% du traitement | 62-85% du traitement |
-| 50-54 ans | 48-65% du traitement | 85-115% du traitement |
-| 55-59 ans | 65-85% du traitement | 115-150% du traitement |
-| 60+ ans | 85-90% du traitement | 150-160% du traitement |
-
-**Interpolation :**
-Le simulateur calcule le coefficient exact pour votre âge par interpolation linéaire.
-
-**Exemple détaillé :**
-- Âge : 42 ans
-- Traitement indiciaire : 2 353 € (indice 478 × 4,92278 €)
-- Option 2 (Taux + Durée)
-
-**Étape 1** : Interpolation du coefficient
-- 40 ans → 62%
-- 45 ans → 74%
-- 42 ans → 62% + (2/5) × (74% - 62%) = 62% + 4,8% = **66,8%**
-
-**Étape 2** : Calcul du coût
-- Coût par trimestre : 2 353 × 0,668 = **1 572 €**
-- Pour 4 trimestres : 1 572 × 4 = **6 288 €**
-
-**Étape 3** : Déduction fiscale
-- TMI 30% : 6 288 × 0,30 = 1 886 €
-- **Coût réel** : 6 288 - 1 886 = **4 402 €**
-
-**Comparaison avec V.04.2.4 (FAUX) :**
-- V.04.2.4 : 15 200 € brut → 10 640 € net
-- V.04.2.5 : 6 288 € brut → 4 402 € net
-- **Économie : 6 238 €** ✅
-
-### Impact du temps partiel
-
-**Assurance** : toujours comptée à 100%
-- 1 an à 80% = 4 trimestres d'assurance (pas de prorata)
-
-**Liquidables** : proratisés selon quotité (sauf si surcotisation)
-- 1 an à 80% = 3,2 trimestres liquidables
-- Avec surcotisation : 4 trimestres liquidables
-
-### Pension provisoire (retraite progressive)
-
-**Calcul initial (au départ progressif) :**
-Pension de référence = Traitement × 75% × (Liquidables au départ / Trimestres requis)
-Pension provisoire = Pension de référence × (1 - quotité)
-
-**Si changement de quotité pendant la progressive :**
-Nouvelle pension provisoire = Pension de référence × (1 - nouvelle quotité)
-
 **Exemple :**
 - Pension de référence : 1 457 €
 - Quotité initiale 80% → pension provisoire : 1 457 × 20% = 291 €
 - Changement à 70% → nouvelle pension provisoire : 1 457 × 30% = 437 €
-- ✅ La pension de référence (1 457 €) ne change pas
-- ✅ Seul le pourcentage versé évolue
+- La pension de référence (1 457 €) ne change pas
+- Seul le pourcentage versé évolue
 
 **À la retraite définitive :**
 - Recalcul complet avec TOUS les droits acquis (y compris pendant la progressive)
-- La pension définitive ne peut pas être inférieure à la pension provisoire
 
-### Décote
+### Temps partiel
 
-Si **assurance < trimestres requis** :
-- Génération ≥ 1964 : **1,09%** par trimestre manquant
-- Génération < 1964 : **1,25%** par trimestre manquant
-- **Maximum** : -25% (soit 20-23 trimestres manquants)
-- **Annulation automatique à 67 ans**
-
-**Exemple** :
-- Génération 1964, trimestres requis : 172
-- Assurance finale : 165 trimestres
-- Manquants : 172 - 165 = 7 trimestres
-- Décote : 7 × 1,09% = **-7,63%**
+| Type | Comptabilisation |
+|------|------------------|
+| **Assurance** | Toujours 100% |
+| **Liquidables** | Proratisés selon quotité (sauf surcotisation) |
+| **Décret 1982** | 80% → 6/7ème, 90% → 32/35ème (si applicable) |
 
 ### Surcotes (3 types cumulables)
 
-#### 1. Surcote classique
-- **Condition** : Assurance ≥ trimestres requis + âge ≥ âge légal
-- **Taux** : 1,25% par trimestre au-delà de l'âge légal
-- **Plafond** : 67 ans
-
-#### 2. Surcote parentale (Décret 2023-799)
-- **Condition** : 
-  - Génération ≥ 1964
-  - Au moins 1 enfant (bonification ou majoration)
-  - L'année précédant l'âge légal
-- **Taux** : 1,25% par trimestre liquidable coté cette année-là
-- **Maximum** : 5% (4 trimestres max)
-- **Impact quotité** : quotité 80% = 3,2 trimestres → 3 retenus
-
-#### 3. Majoration excédentaire
-- **Condition** : Trimestres d'assurance excédentaires restants
-- **Taux** : 1,25% par trimestre
-- **Calcul** : Excédentaires - surcote parentale - surcote classique
+1. **Surcote classique** : 1,25% par trimestre au-delà de l'âge légal
+2. **Surcote parentale** : 1,25% par trimestre l'année avant l'âge légal (max 5%)
+3. **Majoration excédentaire** : 1,25% par trimestre excédentaire restant
 
 ### Majoration familiale
 
@@ -645,21 +43,23 @@ Si **assurance < trimestres requis** :
 2. Lancez le calcul
 3. Allez dans l'onglet **Graphique**
 4. Comparez visuellement les revenus selon les quotités
+5. Exportez les résultats en PDF pour les conserver
 
 ### Cas 2 : "Retraite progressive ou définitive directe ?"
 
 1. **Simulation retraite progressive** :
    - Onglet Paramètres → définissez période progressive
    - Calculez → onglet Résultats RP
+   - Exportez en PDF
 
 2. **Simulation retraite définitive** :
    - Onglet Retraite Définitive
    - Récupérez les données
    - Date de départ = même date que la fin de la progressive
    - Quotité = 100%
-   - Calculez
+   - Calculez et exportez en PDF
 
-3. **Comparez les deux pensions finales**
+3. **Comparez les deux pensions finales** avec vos PDFs
 
 ### Cas 3 : "La surcotisation est-elle rentable pour moi ?"
 
@@ -668,8 +68,9 @@ Si **assurance < trimestres requis** :
 3. Calculez
 4. Dans les résultats, consultez **l'analyse de rentabilité**
 5. Regardez la recommandation et la durée de rentabilisation
+6. Exportez l'analyse en PDF pour la conserver
 
-### Cas 4 : "Dois-je racheter des trimestres ?" ⭐ NOUVEAU V.04.2.5
+### Cas 4 : "Dois-je racheter des trimestres ?" - NOUVEAU V.04.2.5
 
 **Contexte :** Avec la correction des barèmes, le rachat est devenu beaucoup plus accessible !
 
@@ -685,7 +86,7 @@ Si **assurance < trimestres requis** :
 3. **Résultat** : 10 640 € après impôt
 4. Gain : +125 €/mois
 5. Rentabilisation : 15 ans
-6. ❌ **Conclusion** : "Trop cher, je préfère épargner"
+6. **Conclusion** : "Trop cher, je préfère épargner"
 
 **Simulation V.04.2.5 (NOUVEAU - CORRECT) :**
 1. Onglet Analyse Rachat
@@ -693,7 +94,8 @@ Si **assurance < trimestres requis** :
 3. **Résultat** : 4 402 € après impôt
 4. Gain : +125 €/mois
 5. Rentabilisation : 7,7 ans
-6. ✅ **Conclusion** : "Rentable si je vis 8+ ans en retraite"
+6. **Conclusion** : "Rentable si je vis 8+ ans en retraite"
+7. Exportez l'analyse en PDF
 
 **Impact de la correction :**
 - **Division du coût par 2,4**
@@ -704,23 +106,16 @@ Si **assurance < trimestres requis** :
 
 1. Remplissez vos paramètres
 2. Cliquez sur **Exporter** → sauvegardez `scenario_1.json`
-3. Modifiez les paramètres (ex: quotité différente)
-4. **Exporter** → sauvegardez `scenario_2.json`
-5. Pour revenir à un scénario : **Importer** le fichier correspondant
-
-### Cas 6 : "Que se passe-t-il si je change de quotité pendant ma retraite progressive ?"
-
-1. Remplissez vos paramètres avec une quotité (ex: 80%)
-2. Calculez et notez votre pension provisoire
-3. **Important à comprendre** :
-   - Si vous passez de 80% → 70%, votre pension provisoire augmentera
-   - Elle passera de 20% → 30% du montant de référence
-   - Mais le montant de référence lui-même ne changera pas
-4. La pension définitive, elle, sera recalculée avec tous vos droits
+3. Calculez et exportez le résultat en PDF
+4. Modifiez les paramètres (ex: quotité différente)
+5. **Exporter** → sauvegardez `scenario_2.json`
+6. Calculez et exportez en PDF
+7. Comparez vos PDFs côte à côte
+8. Pour revenir à un scénario : **Importer** le fichier JSON correspondant
 
 ---
 
-## 🐛 Dépannage
+## 🛠 Dépannage
 
 ### "Vérifiez les dates"
 - La date de relevé doit être < date départ progressif < date départ définitif
@@ -746,32 +141,26 @@ Si **assurance < trimestres requis** :
 2. Testez avec l'exemple fourni
 3. Si l'exemple fonctionne, revérifiez vos données personnelles
 
-### Les coûts de rachat me semblent trop élevés ⭐ NOUVEAU
+### Les coûts de rachat me semblent trop élevés - NOUVEAU
 
 **Si vous utilisez une version antérieure à V.04.2.5 :**
-- ❌ Les barèmes étaient ceux du secteur privé (2-3× trop cher)
-- ✅ Téléchargez la version V.04.2.5 avec les coefficients corrects
+- Les barèmes étaient ceux du secteur privé (2-3× trop cher)
+- Téléchargez la version V.04.2.5 avec les coefficients corrects
 
 **Si vous utilisez V.04.2.5 :**
 - Les coefficients sont indicatifs (base 2024, catégorie sédentaire)
 - Pour un devis précis, contactez le SRE via [ensap.gouv.fr](https://ensap.gouv.fr)
 
----
+### Le PDF ne se génère pas
+- Vérifiez que vous avez calculé une simulation avant d'exporter
+- Essayez un autre navigateur
+- Vérifiez que les pop-ups ne sont pas bloquées
+- Actualisez la page et recommencez
 
-## 📞 Besoin d'aide ?
-
-### Pour des questions techniques sur le simulateur
-- Ouvrez une **Issue** sur GitHub
-- Décrivez précisément votre problème
-- Joignez une capture d'écran si possible
-
-### Pour des questions sur votre retraite
-- ⚠️ Ce simulateur n'est pas un service de conseil officiel
-- Consultez :
-  - [ensap.gouv.fr](https://ensap.gouv.fr) - Simulateur officiel
-  - [retraitesdeletat.gouv.fr](https://retraitesdeletat.gouv.fr) - Service des Retraites de l'État
-  - Votre service RH
-  - Un conseiller retraite
+### Le PDF contient des caractères étranges
+- Ce problème a été corrigé en V.04.2.5.1
+- Téléchargez la dernière version
+- La fonction `nettoyerPourPDF()` convertit automatiquement tous les accents
 
 ---
 
@@ -789,51 +178,67 @@ Si **assurance < trimestres requis** :
 - Vérifiez régulièrement les nouvelles versions sur GitHub
 - Changements réglementaires intégrés dès publication officielle
 - Mise à jour annuelle de la valeur du point d'indice
-- **V.04.2.5** : Correction majeure des barèmes rachat
+- **V.04.2.5.1** : Exports PDF + mentions légales complètes
 
 ---
 
 ## ✅ Checklist avant de partir en retraite
 
-- [ ] Simulation sur ce simulateur ✓
-- [ ] Simulation sur [ensap.gouv.fr](https://ensap.gouv.fr) (obligatoire)
-- [ ] Vérification du relevé de carrière SRE
-- [ ] Validation des bonifications enfants (si applicable)
-- [ ] Décision sur la surcotisation (si temps partiel)
-- [ ] Analyse du rachat de trimestres (si pertinent) ⭐ avec V.04.2.5
-- [ ] Demande de devis officiel rachat au SRE (si intéressé)
-- [ ] Constitution du dossier de demande (6 mois avant)
-- [ ] Validation de l'indice majoré (règle des 6 mois)
-- [ ] Anticipation des impacts fiscaux
-- [ ] Préparation des justificatifs (enfants, études, etc.)
-- [ ] Compréhension du mécanisme de la pension provisoire
-- [ ] Anticipation d'éventuels changements de quotité pendant la progressive
+- Simulation sur ce simulateur
+- Simulation sur [ensap.gouv.fr](https://ensap.gouv.fr) (obligatoire)
+- Vérification du relevé de carrière SRE
+- Validation des bonifications enfants (si applicable)
+- Décision sur la surcotisation (si temps partiel)
+- Analyse du rachat de trimestres (si pertinent) avec V.04.2.5
+- Demande de devis officiel rachat au SRE (si intéressé)
+- Constitution du dossier de demande (6 mois avant)
+- Validation de l'indice majoré (règle des 6 mois)
+- Anticipation des impacts fiscaux
+- Préparation des justificatifs (enfants, études, etc.)
+- Compréhension du mécanisme de la pension provisoire
+- Anticipation d'éventuels changements de quotité pendant la progressive
+- **Conservation des PDFs** de toutes vos simulations
 
 ---
 
 ## 📝 Historique des versions
 
-### V.04.2.5 - Janvier 2025 ⭐ ACTUELLE
-- 🔴 **CORRECTION MAJEURE** : Remplacement barèmes secteur privé → coefficients Fonction Publique d'État
-- ✅ Calcul rachat : Traitement × Coefficient × Nb trimestres
-- ✅ Interpolation linéaire des coefficients selon âge précis
-- ✅ Division des coûts par ~2,5 (exemple : 15 200 € → 5 836 €)
-- ✅ Tableau des coefficients dans onglet Sources
-- ✅ Avertissements renforcés sur caractère indicatif
+### V.04.2.5.1 (Octobre 2025) - ACTUELLE
 
-### V.04.2.4 - Janvier 2025
-- ✅ **CORRECTION MAJEURE** : Documentation pension provisoire (évolution quotité)
-- ✅ Ajout encadré informatif dans Paramètres
-- ✅ Mise à jour onglet Sources
-- ✅ Correction MODE_EMPLOI.md et README.md
-- ❌ **Erreur corrigée en V.04.2.5** : Barèmes rachat secteur privé
+- Ajout exports PDF avec conversion automatique des accents
+- 3 types d'exports : Résultats RP, Retraite Définitive, Analyse Rachat
+- Fonction `nettoyerPourPDF()` pour compatibilité universelle
+- Nouvel onglet "Mentions Légales" complet
+- Bannière de consentement utilisateur
+- Documentation développement avec Claude (Anthropic)
+- Correction toutes les dates : Octobre 2025
+- Modèle 100% gratuit confirmé
 
-### V.04.2.3 - Janvier 2025
-- ✨ Nouvel onglet "Retraite Définitive"
-- ✨ Option Décret 1982 (6/7ème et 32/35ème)
-- 📊 Graphiques optimisés (aspectRatio: 3, max-width: 800px)
+### V.04.2.5 (Janvier 2025)
+
+- CORRECTION MAJEURE : Remplacement barèmes secteur privé → coefficients Fonction Publique d'État
+- Calcul rachat : Traitement × Coefficient × Nb trimestres
+- Interpolation linéaire des coefficients selon âge précis
+- Division des coûts par ~2,5 (exemple : 15 200 € → 5 836 €)
+- Tableau des coefficients dans onglet Sources
+- Avertissements renforcés sur caractère indicatif
+
+### V.04.2.4 (Janvier 2025)
+
+- **CORRECTION MAJEURE** : Documentation pension provisoire (évolution quotité)
+- Ajout encadré informatif dans Paramètres
+- Mise à jour onglet Sources
+- Correction MODE_EMPLOI.md et README.md
+- Erreur corrigée en V.04.2.5 : Barèmes rachat secteur privé
+
+### V.04.2.3 (Janvier 2025)
+
+- Nouvel onglet "Retraite Définitive"
+- Option Décret 1982 (6/7ème et 32/35ème)
+- Graphiques optimisés (aspectRatio: 3, max-width: 800px)
 
 ### Versions antérieures
+
 - V.04.2.x : Amélioration de l'interface utilisateur
 - V.04.1.x : Ajout de l'analyse de rachat (avec barèmes erronés)
 - V.04.0.x : Intégration de la surcote parentale (Décret 2023-799)
@@ -864,7 +269,9 @@ Si **assurance < trimestres requis** :
 **R :** Pour les générations ≥ 1964, si vous avez au moins 1 enfant et que vous travaillez l'année précédant votre âge légal, vous gagnez 1,25% de surcote par trimestre liquidable cotisé (max 4 trimestres = 5%). Attention : la quotité impacte le nombre de trimestres retenus.
 
 ### Q7 : Puis-je exporter mes simulations ?
-**R :** Oui ! Utilisez le bouton "Exporter" pour sauvegarder vos paramètres au format JSON. Vous pouvez ensuite les réimporter avec le bouton "Importer" pour comparer différents scénarios.
+**R :** Oui ! Deux types d'exports :
+- **Format JSON** (bouton "Exporter") : pour sauvegarder et réimporter vos paramètres
+- **Format PDF** (bouton dans chaque onglet de résultats) : pour conserver, imprimer ou partager vos résultats
 
 ### Q8 : Les bonifications enfants sont-elles automatiques ?
 **R :** 
@@ -878,7 +285,7 @@ Si **assurance < trimestres requis** :
 **R :** Oui ! Une fois le fichier HTML téléchargé, vous pouvez l'utiliser sans connexion internet. Toutes les données restent sur votre ordinateur.
 
 ### Q11 : Mes données sont-elles sécurisées ?
-**R :** Absolument. Le simulateur fonctionne entièrement en local dans votre navigateur. Aucune donnée n'est envoyée sur internet ou stockée ailleurs que sur votre ordinateur.
+**R :** Absolument. Le simulateur fonctionne entièrement en local dans votre navigateur. Aucune donnée n'est envoyée sur internet ou stockée ailleurs que sur votre ordinateur. Même les PDFs sont générés localement.
 
 ### Q12 : Que se passe-t-il si je cumule plusieurs types de surcote ?
 **R :** Les 3 types de surcote SRE sont **cumulables** :
@@ -888,7 +295,7 @@ Si **assurance < trimestres requis** :
 
 Le simulateur calcule automatiquement le cumul selon la méthode SRE.
 
-### Q13 : Pourquoi les coûts de rachat sont-ils différents de la V.04.2.4 ? ⭐ NOUVEAU
+### Q13 : Pourquoi les coûts de rachat sont-ils différents de la V.04.2.4 ? - NOUVEAU
 **R :** La V.04.2.5 corrige une **erreur majeure** : les versions précédentes utilisaient les barèmes du secteur privé, donnant des coûts 2 à 3 fois trop élevés. La V.04.2.5 utilise les coefficients corrects de la Fonction Publique d'État, basés sur votre traitement indiciaire.
 
 **Exemple :**
@@ -906,6 +313,16 @@ Le simulateur calcule automatiquement le cumul selon la méthode SRE.
 - TMI 30% : économie de 1 800 €
 - **Coût réel : 4 200 €**
 
+### Q16 : Comment utiliser les exports PDF ? - NOUVEAU
+**R :** Les exports PDF sont parfaits pour :
+- Conserver vos simulations dans le temps
+- Comparer plusieurs scénarios côte à côte
+- Partager avec un conseiller retraite ou votre service RH
+- Imprimer pour consultation papier
+- Documenter votre réflexion et vos choix
+
+Les PDFs sont générés avec conversion automatique des accents pour être lisibles partout.
+
 ---
 
 ## 🎯 Conseils d'utilisation avancés
@@ -917,7 +334,8 @@ Le simulateur calcule automatiquement le cumul selon la méthode SRE.
 3. **Anticipez les changements** : vous pouvez modifier votre quotité en cours de route
 4. **Planifiez avec la majoration familiale** : 3 enfants = +10% de pension
 5. **Considérez la surcote parentale** : travaillez l'année avant votre âge légal
-6. **Analysez le rachat** : avec V.04.2.5, les coûts corrects le rendent plus attractif ⭐
+6. **Analysez le rachat** : avec V.04.2.5, les coûts corrects le rendent plus attractif
+7. **Exportez régulièrement** : conservez vos simulations en PDF pour comparaison
 
 ### Stratégies selon votre profil
 
@@ -925,24 +343,29 @@ Le simulateur calcule automatiquement le cumul selon la méthode SRE.
 - Privilégiez un départ plus tôt avec quotité basse
 - La surcotisation est moins intéressante (taux plein déjà atteint)
 - Le rachat est probablement inutile
+- Exportez plusieurs scénarios de quotité en PDF
 
 **Si vous avez une carrière incomplète :**
-- Envisagez le rachat de trimestres pour éviter la décote ⭐
+- Envisagez le rachat de trimestres pour éviter la décote
 - La surcotisation peut être très rentable
 - Utilisez V.04.2.5 pour calculer le vrai coût du rachat
+- Exportez l'analyse rachat en PDF avant de décider
 
 **Si vous avez des enfants :**
 - Vérifiez vos droits aux bonifications
 - Optimisez la surcote parentale en travaillant l'année avant l'âge légal
+- Simulez avec et sans bonifications pour voir l'impact
 
 **Si vous approchez de l'âge légal :**
 - Calculez l'intérêt de poursuivre pour bénéficier de la surcote classique
 - Comparez avec un départ immédiat
+- Exportez les deux scénarios en PDF
 
-**Si vous envisagez le rachat :** ⭐ NOUVEAU
+**Si vous envisagez le rachat :** - NOUVEAU
 - Utilisez **impérativement V.04.2.5** (barèmes corrects)
 - Simulez différentes options (taux seul vs taux+durée)
 - Comparez avec l'épargne selon votre TMI
+- Exportez l'analyse en PDF
 - Demandez un devis officiel au SRE
 - Considérez l'avantage fiscal (déductibilité)
 
@@ -960,7 +383,7 @@ Le simulateur calcule automatiquement le cumul selon la méthode SRE.
 ### Documentation technique
 - [Décret n° 2023-799](https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000047970226) - Surcote parentale
 - [Décret n° 82-624](https://www.legifrance.gouv.fr/loda/id/LEGITEXT000006065164/) - Temps partiel
-- [Décret n° 2007-262](https://www.legifrance.gouv.fr/loda/id/JORFTEXT000000465931/) - Rachat trimestres FP ⭐
+- [Décret n° 2007-262](https://www.legifrance.gouv.fr/loda/id/JORFTEXT000000465931/) - Rachat trimestres FP
 - [Loi n° 2023-270](https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000047392200) - Réforme des retraites
 
 ### Ressources complémentaires
@@ -971,15 +394,17 @@ Le simulateur calcule automatiquement le cumul selon la méthode SRE.
 
 ## 🙏 Remerciements
 
-Ce simulateur a été développé pour aider les fonctionnaires d'État à mieux comprendre les mécanismes complexes de la retraite progressive et du rachat de trimestres. Il s'appuie sur :
+Ce simulateur gratuit a été développé pour aider les fonctionnaires d'État à mieux comprendre les mécanismes complexes de la retraite progressive et du rachat de trimestres. Il s'appuie sur :
 - Les textes réglementaires officiels
 - Les guides du Service des Retraites de l'État
 - Les retours d'expérience des utilisateurs
 - Les corrections apportées suite aux vérifications des sources officielles
+- La collaboration technique avec Claude (Anthropic)
 
 **Un merci particulier** :
 - Aux utilisateurs qui ont signalé les inexactitudes concernant l'évolution de la pension provisoire (V.04.2.4)
 - À l'utilisateur qui a remarqué que les coûts de rachat étaient "très chers", permettant la découverte et la correction de l'erreur majeure sur les barèmes (V.04.2.5)
+- À Claude (Anthropic) pour l'assistance technique, algorithmique et réglementaire
 
 **Ces retours ont permis des améliorations majeures qui changent significativement les résultats et les décisions !**
 
@@ -987,7 +412,7 @@ Ce simulateur a été développé pour aider les fonctionnaires d'État à mieux
 
 ## 📄 Licence et utilisation
 
-Ce simulateur est fourni à titre **informatif et pédagogique**. Il ne remplace pas une consultation officielle auprès du SRE ou d'ENSAP.
+Ce simulateur gratuit est fourni à titre **informatif et pédagogique**. Il ne remplace pas une consultation officielle auprès du SRE ou d'ENSAP.
 
 **Utilisation libre** pour un usage personnel. La redistribution ou l'utilisation commerciale nécessite une autorisation.
 
@@ -995,8 +420,15 @@ Ce simulateur est fourni à titre **informatif et pédagogique**. Il ne remplace
 
 ---
 
+**Version du mode d'emploi :** V.04.2.5.1 - Octobre 2025
+
+**Dernière mise à jour :** Ajout exports PDF + développement avec Claude (Anthropic)
+
+**Prochaine mise à jour prévue :** Mise à jour de la valeur du point d'indice (juillet 2026)
+
 **Version du mode d'emploi :** V.04.2.5 - Janvier 2025
 
 **Dernière mise à jour :** Correction barèmes rachat Fonction Publique d'État (division coûts par ~2,5)
 
 **Prochaine mise à jour prévue :** Mise à jour de la valeur du point d'indice (juillet 2025)
+
