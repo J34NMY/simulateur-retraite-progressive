@@ -1,6 +1,6 @@
 # 🧮 Simulateur de Retraite Progressive - Fonctionnaire d'État
 
-[![Version](https://img.shields.io/badge/version-4.2.5-green.svg)](https://github.com/votre-repo/simulateur-retraite)
+[![Version](https://img.shields.io/badge/version-4.2.6-green.svg)](https://github.com/votre-repo/simulateur-retraite)
 [![License](https://img.shields.io/badge/license-Gratuit%20%C3%A9ducatif-blue.svg)](LICENSE)
 [![Réglementation](https://img.shields.io/badge/r%C3%A9glementation-D%C3%A9cret%202023--799-orange.svg)](https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000047970226)
 
@@ -16,7 +16,7 @@ Ce simulateur vous aide à :
 - 📊 **Comprendre** les mécanismes de la retraite progressive
 - 💰 **Estimer** votre pension selon différents scénarios
 - 📈 **Comparer** l'impact des quotités de travail
-- 🔍 **Analyser** la rentabilité de la surcotisation et du rachat de trimestres
+- 📉 **Analyser** la rentabilité de la surcotisation et du rachat de trimestres
 - 🎓 **Apprendre** les règles complexes du régime de retraite des fonctionnaires
 
 ---
@@ -25,7 +25,7 @@ Ce simulateur vous aide à :
 
 ### Installation (aucune installation requise !)
 
-1. **Téléchargez** le fichier `simulateur_retraite_V.04.2.5.1.html`
+1. **Téléchargez** le fichier `simulateur_retraite_V.04.2.6.html`
 2. **Double-cliquez** pour l'ouvrir dans votre navigateur
 3. **C'est tout !** Aucun serveur, aucune connexion internet nécessaire
 
@@ -89,7 +89,7 @@ Ce simulateur vous aide à :
    - Recommandation personnalisée
 
 **Caractéristiques techniques :**
-- Conversion automatique des accents en ASCII pour lisibilité universelle
+- Support natif des accents français par jsPDF 2.5.1
 - Format A4 optimisé pour l'impression
 - En-têtes et pieds de page professionnels
 - Pagination automatique
@@ -105,171 +105,265 @@ Ce simulateur vous aide à :
 
 ---
 
-## 🆕 Nouveautés V.04.2.5.1
+## 🆕 Nouveautés V.04.2.6
 
-### 📄 Exports PDF professionnels (NOUVEAU)
+### 📄 Exports PDF natifs (AMÉLIORATION MAJEURE)
 
-**Fonction de conversion des accents :**
-```javascript
-function nettoyerPourPDF(texte) {
-  // Convertit tous les caractères accentués en ASCII
-  // Gère : é→e, è→e, à→a, ç→c, €→EUR, etc.
-  // Supprime les émojis pour compatibilité universelle
-}
-Intégration :
+**Support natif des accents français :**
+- jsPDF 2.5.1 gère nativement tous les caractères accentués
+- Plus besoin de fonction de conversion
+- PDFs parfaitement lisibles avec accents préservés
+- Compatible tous systèmes (Windows, Mac, Linux, mobile)
 
-3 boutons d'export dans les onglets Résultats, Retraite Définitive et Analyse Rachat
-Génération automatique avec jsPDF 2.5.1
-PDFs lisibles sur tous les systèmes (Windows, Mac, Linux, mobile)
+**Intégration :**
+- 3 boutons d'export dans les onglets Résultats, Retraite Définitive et Analyse Rachat
+- Génération automatique avec jsPDF 2.5.1
+- Avertissements renforcés en première page de chaque PDF
 
-🔴 CORRECTION MAJEURE - Rachat de trimestres (V.04.2.5)
-✅ Remplacement complet des barèmes de rachat
+### 🛡️ Protection juridique renforcée
+
+**Avertissements présents partout :**
+- ✅ Bannière de consentement avec encadré rouge
+- ✅ "Ne remplace pas les outils officiels" explicite
+- ✅ Mention ensap.gouv.fr répétée minimum 2× par page
+- ✅ Première page de chaque export PDF
+- ✅ Footer du site
+- ✅ Onglet Mentions Légales complet
+
+**Stratégie adoptée :**
+- Transparence maximale = protection juridique
+- Toujours rediriger vers les sites officiels
+- Documenter l'écart 1-2 trimestres partout
+- Déclaration claire de responsabilité limitée
+
+### 🧪 Phase de validation en cours
+
+**Approche beta test :**
+- Recrutement de 10-15 fonctionnaires testeurs
+- Comparaison systématique avec ENSAP
+- Documentation des écarts observés
+- Amélioration continue basée sur les retours
+
+**Mention correcte :**
+- "Phase de validation en cours" (véridique)
+- Au lieu de "testé par X fonctionnaires" (prématuré)
+
+---
+
+## 🔴 CORRECTION MAJEURE - Rachat de trimestres (V.04.2.5)
+
+### ✅ Remplacement complet des barèmes de rachat
+
 Les barèmes utilisés dans les versions précédentes étaient ceux du régime général (secteur privé), ce qui donnait des coûts 2 à 3 fois trop élevés pour les fonctionnaires d'État !
-❌ Ancienne méthode (V.04.2.4 et antérieures)
-Barèmes fixes secteur privé :
-40 ans, Option 2 : 7 600 € par trimestre
-50 ans, Option 2 : 11 200 € par trimestre
-Exemple : 4 trimestres à 40 ans = 15 200 € (FAUX)
-✅ Nouvelle méthode (V.04.2.5)
-Coefficient Fonction Publique × Traitement indiciaire :
-40 ans, Option 2 : ~62% du traitement
-Traitement 2 353 € × 0,62 = 1 459 € par trimestre
-Exemple : 4 trimestres à 40 ans = 5 836 € (CORRECT)
-📊 Comparaison des résultats
-CritèreV.04.2.4 (FAUX)V.04.2.5 (CORRECT)DifférenceCoût 4 trim. (40 ans, Opt. 2)15 200 €5 836 €-9 364 € (-62%)Coût réel (TMI 30%)10 640 €4 085 €-6 555 € (-62%)Durée rentabilisation15-20 ans7-10 ans÷2
 
-🤝 Développement et validation
-Collaboration avec Claude (Anthropic)
+### ❌ Ancienne méthode (V.04.2.4 et antérieures)
+
+Barèmes fixes secteur privé :
+- 40 ans, Option 2 : 7 600 € par trimestre
+- 50 ans, Option 2 : 11 200 € par trimestre
+- Exemple : 4 trimestres à 40 ans = **15 200 €** (FAUX)
+
+### ✅ Nouvelle méthode (V.04.2.5+)
+
+Coefficient Fonction Publique × Traitement indiciaire :
+- 40 ans, Option 2 : ~62% du traitement
+- Traitement 2 353 € × 0,62 = 1 459 € par trimestre
+- Exemple : 4 trimestres à 40 ans = **5 836 €** (CORRECT)
+
+### 📊 Comparaison des résultats
+
+| Critère | V.04.2.4 (FAUX) | V.04.2.5+ (CORRECT) | Différence |
+|---------|-----------------|---------------------|------------|
+| Coût 4 trim. (40 ans, Opt. 2) | 15 200 € | 5 836 € | **-9 364 € (-62%)** |
+| Coût réel (TMI 30%) | 10 640 € | 4 085 € | **-6 555 € (-62%)** |
+| Durée rentabilisation | 15-20 ans | 7-10 ans | **÷ 2** |
+
+---
+
+## 🤝 Développement et validation
+
+### Collaboration avec Claude (Anthropic)
+
 Ce simulateur a été développé en collaboration avec Claude, l'assistant IA d'Anthropic, pour les aspects :
 
-Algorithmiques : Implémentation rigoureuse des calculs SRE conformes aux textes réglementaires
-Techniques : Architecture du code, gestion des exports PDF, conversion des accents
-Réglementaires : Interprétation et application des décrets et du Code des pensions
-Légaux : Rédaction des mentions légales, CGU, disclaimers adaptés au modèle gratuit
-Documentaires : Rédaction du mode d'emploi et de la documentation technique
+- **Algorithmiques** : Implémentation rigoureuse des calculs SRE conformes aux textes réglementaires
+- **Techniques** : Architecture du code, gestion des exports PDF, optimisation
+- **Réglementaires** : Interprétation et application des décrets et du Code des pensions
+- **Légaux** : Rédaction des mentions légales, CGU, disclaimers adaptés au modèle gratuit
+- **Documentaires** : Rédaction du mode d'emploi et de la documentation technique
 
 L'éditeur assume l'entière responsabilité du contenu, de l'exactitude des calculs et de la conformité réglementaire.
-Approche de validation
-Modèle gratuit et éducatif :
 
-Outil mis à disposition gratuitement sans aucune contrepartie
-Vocation pédagogique : comprendre les mécanismes, pas remplacer les outils officiels
-Transparence totale sur les calculs et les limitations
+### Approche de validation
 
-Validation par beta testeurs :
+**Modèle gratuit et éducatif :**
+- Outil mis à disposition gratuitement sans aucune contrepartie
+- Vocation pédagogique : comprendre les mécanismes, pas remplacer les outils officiels
+- Transparence totale sur les calculs et les limitations
 
-10-15 fonctionnaires testant leurs cas réels
-Comparaison systématique avec simulations ENSAP officielles
-Documentation des écarts et amélioration continue
+**Validation par beta testeurs :**
+- 10-15 fonctionnaires testant leurs cas réels
+- Comparaison systématique avec simulations ENSAP officielles
+- Documentation des écarts et amélioration continue
 
-Écart documenté avec le SRE :
+**Écart documenté avec le SRE :**
+- Écart connu de 1-2 trimestres liquidables (~1-2% de pension)
+- Cause probable : règles d'arrondi internes non documentées publiquement
+- Le simulateur applique rigoureusement la méthode SRE documentée
+- Pour une estimation officielle définitive : toujours consulter ensap.gouv.fr
 
-Écart connu de 1-2 trimestres liquidables (~1-2% de pension)
-Cause probable : règles d'arrondi internes non documentées publiquement
-Le simulateur applique rigoureusement la méthode SRE documentée
-Pour une estimation officielle définitive : toujours consulter ensap.gouv.fr
+### Démarche qualité
 
-Démarche qualité
-✅ Application stricte des textes réglementaires
-✅ Corrections rapides suite aux retours utilisateurs
-✅ Documentation exhaustive des sources
-✅ Transparence sur les limitations
-✅ Disclaimers clairs et visibles
-✅ Aucune collecte de données personnelles
+- ✅ Application stricte des textes réglementaires
+- ✅ Corrections rapides suite aux retours utilisateurs
+- ✅ Documentation exhaustive des sources
+- ✅ Transparence sur les limitations
+- ✅ Disclaimers clairs et visibles
+- ✅ Aucune collecte de données personnelles
 
-📚 Documentation
-Mode d'emploi complet
+---
+
+## 📚 Documentation
+
+### Mode d'emploi complet
+
 Consultez le fichier MODE_EMPLOI.md pour :
+- Guide détaillé de chaque onglet
+- Explications des calculs
+- Guide des exports PDF
+- Cas d'usage concrets
+- FAQ complète
+- Conseils stratégiques
 
-Guide détaillé de chaque onglet
-Explications des calculs
-Guide des exports PDF
-Cas d'usage concrets
-FAQ complète
-Conseils stratégiques
+### Sources réglementaires
 
-Sources réglementaires
 Le simulateur s'appuie sur :
-TexteDescriptionCode des pensions civiles et militairesArticles L11 à L18, L89 bis à L89 ter, L9Décret n°2023-799 (21/08/2023)Surcote parentale (1,25% par trimestre, max 5%)Décret n°82-624 (20/07/1982)Temps partiel (6/7ème et 32/35ème)Décret n°2007-262 (27/02/2007)Rachat de trimestres fonction publiqueLoi n°2023-270 (14/04/2023)Réforme des retraites 2023Arrêté du 23/06/2023Valeur du point d'indice (4,92278 €)
+
+| Texte | Description |
+|-------|-------------|
+| Code des pensions civiles et militaires | Articles L11 à L18, L89 bis à L89 ter, L9 |
+| Décret n°2023-799 (21/08/2023) | Surcote parentale (1,25% par trimestre, max 5%) |
+| Décret n°82-624 (20/07/1982) | Temps partiel (6/7ème et 32/35ème) |
+| Décret n°2007-262 (27/02/2007) | Rachat de trimestres fonction publique |
+| Loi n°2023-270 (14/04/2023) | Réforme des retraites 2023 |
+| Arrêté du 23/06/2023 | Valeur du point d'indice (4,92278 €) |
+
 Sources officielles consultées :
+- [Service des Retraites de l'État](https://retraitesdeletat.gouv.fr)
+- [Service-Public.fr - Retraite progressive](https://www.service-public.fr/particuliers/vosdroits/F37400)
+- [Service-Public.fr - Rachat](https://www.service-public.fr/particuliers/vosdroits/F13243)
+- [CNRACL](https://www.cnracl.retraites.fr)
+- [Code des pensions (Légifrance)](https://www.legifrance.gouv.fr/codes/id/LEGITEXT000006070302/)
 
-Service des Retraites de l'État
-Service-Public.fr
-Service-Public.fr - Rachat
-CNRACL
-Code des pensions (Légifrance)
+---
 
+## ⚠️ Avertissements importants
 
-⚠️ Avertissements importants
-Non-opposabilité
-❌ Ce simulateur✅ Simulateur officiel SRE/ENSAPAide à la décisionSeul résultat opposableTransparence pédagogiqueCalcul exact mais opaqueÉcart possible 1-2%Référence légale
-➡️ Pour une estimation officielle définitive, consultez toujours ensap.gouv.fr
-Écart connu - Calcul de la pension
-Un écart de 1 à 2 trimestres liquidables (~1-2% de pension) peut exister avec le calcul officiel du SRE, probablement dû à des règles d'arrondi internes non documentées publiquement.
+### Non-opposabilité
+
+| ❌ Ce simulateur | ✅ Simulateur officiel SRE/ENSAP |
+|------------------|----------------------------------|
+| Aide à la décision | **Seul résultat opposable** |
+| Transparence pédagogique | **Calcul exact mais opaque** |
+| Écart possible 1-2% | **Référence légale** |
+
+➡️ **Pour une estimation officielle définitive, consultez toujours ensap.gouv.fr**
+
+### Écart connu - Calcul de la pension
+
+Un écart de **1 à 2 trimestres liquidables** (~1-2% de pension) peut exister avec le calcul officiel du SRE, probablement dû à des règles d'arrondi internes non documentées publiquement.
+
 Le simulateur applique rigoureusement la méthode SRE documentée.
-Rachat de trimestres - Coefficients indicatifs
-Important : Les coefficients utilisés pour le rachat sont indicatifs (base 2024, catégorie sédentaire). Le coût exact dépend de nombreux paramètres :
 
-Votre traitement indiciaire au moment du rachat
-Votre catégorie (sédentaire, actif, insalubre)
-Les barèmes en vigueur à la date du rachat
+### Rachat de trimestres - Coefficients indicatifs
 
-Pour un devis personnalisé et opposable, contactez toujours le SRE via ensap.gouv.fr
-Règle des six mois
+**Important** : Les coefficients utilisés pour le rachat sont indicatifs (base 2024, catégorie sédentaire). Le coût exact dépend de nombreux paramètres :
+- Votre traitement indiciaire au moment du rachat
+- Votre catégorie (sédentaire, actif, insalubre)
+- Les barèmes en vigueur à la date du rachat
+
+**Pour un devis personnalisé et opposable, contactez toujours le SRE via ensap.gouv.fr**
+
+### Règle des six mois
+
 Une augmentation d'indice majoré doit avoir ≥ 6 mois d'ancienneté avant le départ en retraite pour être prise en compte.
 
-🧮 Méthodologie de calcul
-Formule de base de la pension
+---
+
+## 🧮 Méthodologie de calcul
+
+### Formule de base de la pension
 Pension = Traitement indiciaire × 75% × (Trimestres liquidables / Trimestres requis)
-Méthode SRE (base 360 jours/an)
 
-1 année = 360 jours
-1 mois = 30 jours
-1 trimestre = 90 jours
-Arrondi final : ≥45 jours = +1 trimestre
+### Méthode SRE (base 360 jours/an)
 
-Rachat de trimestres (Fonction Publique) ⭐ CORRIGÉ V.04.2.5
-Formule :
+- 1 année = 360 jours
+- 1 mois = 30 jours
+- 1 trimestre = 90 jours
+- Arrondi final : ≥45 jours = +1 trimestre
+
+### Rachat de trimestres (Fonction Publique) ⭐ CORRIGÉ V.04.2.5
+
+**Formule :**
 Coût = Traitement indiciaire × Coefficient d'âge × Nombre de trimestres
-Coefficients indicatifs (base 2024) :
-ÂgeOption 1 (Taux seul)Option 2 (Taux + Durée)20-29 ans25-28%45-50%30-39 ans28-35%50-62%40-49 ans35-48%62-85%50-54 ans48-65%85-115%55-59 ans65-85%115-150%60+ ans85-90%150-160%
-Exemple concret :
 
-Âge : 42 ans
-Traitement indiciaire : 2 353 €
-Option 2 (Taux + Durée)
-Coefficient interpolé : ~64%
-Coût par trimestre : 2 353 × 0,64 = 1 506 €
-Coût 4 trimestres : 1 506 × 4 = 6 024 €
-Coût réel (TMI 30%) : 6 024 × 0,70 = 4 217 €
+**Coefficients indicatifs (base 2024) :**
 
-Exports PDF - Conversion des accents
-Pour garantir la lisibilité des PDFs sur tous les systèmes, une fonction de conversion convertit automatiquement :
+| Âge | Option 1 (Taux seul) | Option 2 (Taux + Durée) |
+|-----|---------------------|------------------------|
+| 20-29 ans | 25-28% | 45-50% |
+| 30-39 ans | 28-35% | 50-62% |
+| 40-49 ans | 35-48% | 62-85% |
+| 50-54 ans | 48-65% | 85-115% |
+| 55-59 ans | 65-85% | 115-150% |
+| 60+ ans | 85-90% | 150-160% |
 
-Accents français : é→e, è→e, à→a, ç→c, etc.
-Caractères spéciaux : €→EUR, °→degres, →→->, etc.
-Émojis : supprimés pour compatibilité universelle
+**Exemple concret :**
+- Âge : 42 ans
+- Traitement indiciaire : 2 353 €
+- Option 2 (Taux + Durée)
+- Coefficient interpolé : ~64%
+- Coût par trimestre : 2 353 × 0,64 = **1 506 €**
+- Coût 4 trimestres : 1 506 × 4 = **6 024 €**
+- Coût réel (TMI 30%) : 6 024 × 0,70 = **4 217 €**
 
+### Exports PDF - Support natif des accents
 
-💻 Aspects techniques
-Technologies utilisées
+**V.04.2.6 - Amélioration majeure :**
+- jsPDF 2.5.1 supporte nativement tous les accents français
+- Plus besoin de conversion ou fonction spéciale
+- Accents parfaitement préservés dans les PDFs
+- Compatible tous systèmes
 
-HTML5 : Structure de l'application
-CSS3 : Interface responsive et moderne
-JavaScript (Vanilla) : Logique métier et calculs
-Chart.js 4.4.1 : Visualisations graphiques
-jsPDF 2.5.1 : Génération des exports PDF
+---
 
-Compatibilité
-NavigateurVersion minimaleSupportChrome90+✅ CompletFirefox88+✅ CompletSafari14+✅ CompletEdge90+✅ Complet
-Performances
+## 💻 Aspects techniques
 
-⚡ Chargement instantané (fichier unique ~115 Ko)
-🔒 100% local (aucune donnée transmise)
-💾 Pas de base de données requise
-📱 Responsive (mobile, tablette, desktop)
+### Technologies utilisées
 
-Architecture
+- **HTML5** : Structure de l'application
+- **CSS3** : Interface responsive et moderne
+- **JavaScript (Vanilla)** : Logique métier et calculs
+- **Chart.js 4.4.1** : Visualisations graphiques
+- **jsPDF 2.5.1** : Génération des exports PDF
+
+### Compatibilité
+
+| Navigateur | Version minimale | Support |
+|------------|------------------|---------|
+| Chrome | 90+ | ✅ Complet |
+| Firefox | 88+ | ✅ Complet |
+| Safari | 14+ | ✅ Complet |
+| Edge | 90+ | ✅ Complet |
+
+### Performances
+
+- ⚡ Chargement instantané (fichier unique ~120 Ko)
+- 🔒 100% local (aucune donnée transmise)
+- 💾 Pas de base de données requise
+- 📱 Responsive (mobile, tablette, desktop)
+
+### Architecture
 simulateur.html
 ├── Structure HTML
 │   ├── 7 onglets (tabs)
@@ -280,17 +374,22 @@ simulateur.html
 │   ├── Mode responsive
 │   └── Thème vert (fonctionnaire)
 └── Logique JavaScript
-    ├── Calculs SRE (base 360j/an)
-    ├── Analyses actuarielles
-    ├── Coefficients rachat FP (CORRIGÉ)
-    ├── Génération de graphiques
-    ├── Exports PDF avec conversion accents
-    └── Export/Import JSON
+├── Calculs SRE (base 360j/an)
+├── Analyses actuarielles
+├── Coefficients rachat FP (CORRIGÉ)
+├── Génération de graphiques
+├── Exports PDF natifs (V.04.2.6)
+└── Export/Import JSON
 
-🔧 Développement
-Structure du code
-Fonctions principales :
-javascript// Calculs de base
+---
+
+## 🔧 Développement
+
+### Structure du code
+
+**Fonctions principales :**
+```javascript
+// Calculs de base
 calculerPeriodesServiceSRE(dateDebut, dateFin)
 arrondirTrimestresLiquidables(totalJours)
 calculerDureeAssurance(totalJours)
@@ -308,8 +407,7 @@ getCoutRachatParTrimestre(age, option, traitement) // Coût FP
 calculerRentabiliteSurcotisation(...)
 analyserRachat()
 
-// Exports PDF (NOUVEAU V.04.2.5.1)
-nettoyerPourPDF(texte) // Conversion accents
+// Exports PDF (V.04.2.6 - Support natif)
 exporterResultatsPDF()
 exporterRetraiteDefinitivePDF()
 exporterAnalyseRachatPDF()
@@ -337,13 +435,13 @@ Version du navigateur
 
 
 📝 Historique des versions
-V.04.2.5.1 (Octobre 2025) - Actuelle ⭐
+V.04.2.6 (Octobre 2025) - Actuelle ⭐
 
-✅ Ajout exports PDF avec conversion automatique des accents
-✅ 3 types d'exports : Résultats RP, Retraite Définitive, Analyse Rachat
-✅ Nouvel onglet "Mentions Légales" complet
-✅ Bannière de consentement utilisateur
-✅ Documentation collaborative avec Claude (Anthropic)
+✅ Support natif des accents par jsPDF 2.5.1 (plus de conversion nécessaire)
+✅ Avertissements renforcés partout (bannière rouge, PDF, footer)
+✅ Phase de validation en cours documentée correctement
+✅ Mentions légales complètes avec développement Claude (Anthropic)
+✅ Protection juridique maximale (ensap.gouv.fr répété, disclaimers clairs)
 ✅ Correction toutes les dates : Octobre 2025
 ✅ Modèle 100% gratuit confirmé
 
@@ -379,19 +477,19 @@ V.04.0.x (2023) : Intégration Décret 2023-799 (surcote parentale)
 📋 Roadmap
 Version 4.3.x (Prévue Q1 2026)
 
- Ajout de scenarios "what-if" multiples
- Mode sombre
- Comparaison côte à côte de 2 simulations
- Amélioration exports PDF (graphiques inclus)
+☐ Ajout de scenarios "what-if" multiples
+☐ Mode sombre
+☐ Comparaison côte à côte de 2 simulations
+☐ Amélioration exports PDF (graphiques inclus)
 
 Version 4.4.x (Prévue Q2 2026)
 
- Intégration des régimes spéciaux
- Calculateur de pension de réversion
- Mise à jour automatique des barèmes rachat
+☐ Intégration des régimes spéciaux
+☐ Calculateur de pension de réversion
+☐ Mise à jour automatique des barèmes rachat
 
 
-🤝 Remerciements
+🤗 Remerciements
 Ce projet a été rendu possible grâce à :
 
 📚 Documentation officielle du SRE, Service-Public.fr et Légifrance
@@ -457,9 +555,18 @@ Si ce simulateur vous a été utile, n'hésitez pas à :
 🐛 Signaler des bugs
 💡 Proposer des améliorations
 
-⭐ Donner une étoile au projet
-🔄 Partager avec vos collègues
-💬 Laisser un commentaire
-🐛 Signaler des bugs
-💡 Proposer des améliorations
+
+<p align="center">
+  <strong>Simulateur de Retraite Progressive V.04.2.6</strong><br>
+  Développé avec Claude (Anthropic)<br>
+  Dernière mise à jour : Octobre 2025
+</p>
+<p align="center">
+  <em>Ce simulateur ne remplace pas les outils officiels de l'État</em><br>
+  <strong>Pour une estimation officielle : <a href="https://ensap.gouv.fr">ensap.gouv.fr</a></strong>
+</p>
+```
+
+
+FIN DU README.md V.04.2.6
 
