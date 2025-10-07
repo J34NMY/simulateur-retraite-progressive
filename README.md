@@ -537,6 +537,22 @@ Version 4.4.x (Prévue Q2 2026)
 ☐ Calculateur de pension de réversion
 ☐ Mise à jour automatique des barèmes rachat
 
+## 🗂️ Structure documentaire
+
+Ce dépôt contient plusieurs fichiers complémentaires, chacun avec un rôle précis :
+
+| Fichier          | Rôle principal                                                  | Public cible               |
+|------------------|------------------------------------------------------------------|----------------------------|
+| `README.md`       | Présentation générale, guide rapide, changelog pédagogique      | Utilisateurs               |
+| `COMMITS.md`      | Journal technique structuré des commits par version             | Développeurs, auditeurs    |
+| `MODE_EMPLOI.md`  | Guide détaillé de chaque onglet, calculs et exports             | Utilisateurs avancés       |
+| `LICENCE.txt`     | Texte officiel de la licence Creative Commons BY-NC-SA 4.0      | Tous publics               |
+| `simulateur_retraite_V.04.2.6.html` | Version actuelle du simulateur, en usage local ou web | Utilisateurs               |
+
+🔹 Pour comprendre les évolutions du simulateur, consultez le changelog pédagogique dans le README.  
+🔹 Pour une traçabilité technique complète, voir [`COMMITS.md`](COMMITS.md).  
+🔹 Pour les calculs et paramètres détaillés, voir [`MODE_EMPLOI.md`](MODE_EMPLOI.md).
+
 
 🤗 Remerciements
 Ce projet a été rendu possible grâce à :
