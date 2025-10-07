@@ -22,7 +22,7 @@
 - [🆕 Nouveautés V.04.2.6](#-nouveautés-v0426)
 - [🛡️ Protection juridique renforcée](#-protection-juridique-renforcée)
 - [🧪 Phase de validation en cours](#-phase-de-validation-en-cours)
-- [🔴 Correction majeure - Rachat de trimestres](#-correction-majeure---rachat-de-trimestres-v0425)
+- [🔴 Correction majeure _Rachat de trimestres](#-correction-majeure---rachat-de-trimestres-v0425)
 - [🤝 Développement et validation](#-développement-et-validation)
 - [🧠 Origine du code](#-origine-du-code)
 - [📘 Changelog pédagogique](#-changelog-pédagogique)
