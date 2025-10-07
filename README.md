@@ -5,8 +5,6 @@
 📌 **Informations clés**
 
 - 🔢 Version actuelle : V.04.2.6 (Octobre 2025)
-- 📄 Licence : [Creative Commons BY-NC-SA 4.0](LICENCE.txt)
-
 - 📚 Réglementation : Décrets 2023-799, 82-624, 2007-262 + Code des pensions
 
 ---
