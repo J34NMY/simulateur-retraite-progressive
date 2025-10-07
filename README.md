@@ -11,6 +11,31 @@
 [![Version](https://img.shields.io/badge/version-V.04.2.6-blue)](COMMITS.md)
 [![Licence](https://img.shields.io/badge/licence-CC--BY--NC--SA%204.0-lightgrey)](LICENCE.txt)
 
+## 📑 Sommaire
+
+- [🎯 Objectif](#-objectif)
+- [⚡ Démarrage rapide](#-démarrage-rapide)
+- [✨ Fonctionnalités principales](#-fonctionnalités-principales)
+- [🔧 Calculs avancés](#-calculs-avancés)
+- [📄 Exports PDF professionnels](#-exports-pdf-professionnels)
+- [📊 Outils d'aide à la décision](#-outils-daide-à-la-décision)
+- [🆕 Nouveautés V.04.2.6](#-nouveautés-v0426)
+- [🛡️ Protection juridique renforcée](#-protection-juridique-renforcée)
+- [🧪 Phase de validation en cours](#-phase-de-validation-en-cours)
+- [🔴 Correction majeure - Rachat de trimestres](#-correction-majeure---rachat-de-trimestres-v0425)
+- [🤝 Développement et validation](#-développement-et-validation)
+- [🧠 Origine du code](#-origine-du-code)
+- [📘 Changelog pédagogique](#-changelog-pédagogique)
+- [🗂️ Structure documentaire](#-structure-documentaire)
+- [📚 Documentation](#-documentation)
+- [⚠️ Avertissements importants](#-avertissements-importants)
+- [🧮 Méthodologie de calcul](#-méthodologie-de-calcul)
+- [💻 Aspects techniques](#-aspects-techniques)
+- [🔧 Développement](#-développement)
+- [🤗 Remerciements](#-remerciements)
+- [📄 Licence](#-licence)
+- [📞 Support et Contact](#-support-et-contact)
+- [🔗 Liens utiles](#-liens-utiles)
 
 
 Un simulateur pédagogique gratuit et transparent pour estimer votre retraite progressive et définitive en tant que fonctionnaire d'État, basé sur la méthode officielle du Service des Retraites de l'État (SRE).
