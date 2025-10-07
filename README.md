@@ -206,6 +206,28 @@ L'éditeur assume l'entière responsabilité du contenu, de l'exactitude des cal
 - Comparaison systématique avec simulations ENSAP officielles
 - Documentation des écarts et amélioration continue
 
+🧠 Origine du code
+
+Ce simulateur a été conçu par Jean-Michel, avec l’assistance de l’intelligence artificielle Claude (Anthropic) pour la génération du code source. Toutes les directives, validations, structures, calculs et contenus réglementaires ont été définis par l’auteur humain, qui assume l’entière responsabilité du projet.
+
+📄 Licence
+
+Ce simulateur est mis à disposition sous la licence Creative Commons BY-NC-SA 4.0.
+
+Vous êtes libre de :
+- Partager — copier, distribuer et transmettre l’œuvre
+- Adapter — remixer, transformer et créer à partir de l’œuvre
+
+Sous les conditions suivantes :
+- Attribution — vous devez créditer l’auteur (Jean-Michel), fournir un lien vers la licence, et indiquer si des modifications ont été effectuées.
+- Pas d’utilisation commerciale — vous ne pouvez pas utiliser cette œuvre à des fins commerciales sans autorisation écrite.
+- Partage dans les mêmes conditions — si vous modifiez l’œuvre, vous devez la distribuer sous la même licence.
+
+🔗 [Texte officiel de la licence](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr)
+
+[![Licence CC BY-NC-SA 4.0](https://licensebuttons.net/l/by-nc-sa/4.0/88x31.png)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+
+
 **Écart documenté avec le SRE :**
 - Écart connu de 1-2 trimestres liquidables (~1-2% de pension)
 - Cause probable : règles d'arrondi internes non documentées publiquement
