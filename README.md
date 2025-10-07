@@ -6,11 +6,13 @@
 
 - 🔢 Version actuelle : V.04.2.6 (Octobre 2025)
 - 📄 Licence : [Creative Commons BY-NC-SA 4.0](LICENSE.txt)
+
 - 📚 Réglementation : Décrets 2023-799, 82-624, 2007-262 + Code des pensions
 
 ---
 [![Version](https://img.shields.io/badge/version-V.04.2.6-blue)](COMMITS.md)
 [![Licence](https://img.shields.io/badge/licence-CC--BY--NC--SA%204.0-lightgrey)](LICENSE.txt)
+
 
 
 Un simulateur pédagogique gratuit et transparent pour estimer votre retraite progressive et définitive en tant que fonctionnaire d'État, basé sur la méthode officielle du Service des Retraites de l'État (SRE).
