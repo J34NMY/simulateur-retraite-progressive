@@ -228,6 +228,16 @@ Sous les conditions suivantes :
 🔗 [Texte officiel de la licence](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr)
 
 [![Licence CC BY-NC-SA 4.0](https://licensebuttons.net/l/by-nc-sa/4.0/88x31.png)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+---
+
+📘 **Historique des versions**
+
+Ce simulateur évolue régulièrement pour intégrer les dernières règles et améliorer la lisibilité.
+
+🔹 Consultez le fichier [`COMMITS.md`](COMMITS.md) pour découvrir les ajouts, corrections et évolutions par version.
+
+---
+[![Historique des versions](https://img.shields.io/badge/COMMITS.md-Historique%20structur%C3%A9-blue)](COMMITS.md)
 
 
 **Écart documenté avec le SRE :**
