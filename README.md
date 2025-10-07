@@ -1,8 +1,17 @@
 # 🧮 Simulateur de Retraite Progressive - Fonctionnaire d'État
 
-[![Version](https://img.shields.io/badge/version-4.2.6-green.svg)](https://github.com/votre-repo/simulateur-retraite)
-[![License](https://img.shields.io/badge/license-Gratuit%20%C3%A9ducatif-blue.svg)](LICENSE)
-[![Réglementation](https://img.shields.io/badge/r%C3%A9glementation-D%C3%A9cret%202023--799-orange.svg)](https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000047970226)
+---
+
+📌 **Informations clés**
+
+- 🔢 Version actuelle : V.04.2.6 (Octobre 2025)
+- 📄 Licence : [Creative Commons BY-NC-SA 4.0](LICENSE.txt)
+- 📚 Réglementation : Décrets 2023-799, 82-624, 2007-262 + Code des pensions
+
+---
+[![Version](https://img.shields.io/badge/version-V.04.2.6-blue)](COMMITS.md)
+[![Licence](https://img.shields.io/badge/licence-CC--BY--NC--SA%204.0-lightgrey)](LICENSE.txt)
+
 
 Un simulateur pédagogique gratuit et transparent pour estimer votre retraite progressive et définitive en tant que fonctionnaire d'État, basé sur la méthode officielle du Service des Retraites de l'État (SRE).
 
@@ -230,6 +239,12 @@ Sous les conditions suivantes :
 [![Licence CC BY-NC-SA 4.0](https://licensebuttons.net/l/by-nc-sa/4.0/88x31.png)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 ---
 
+📌 **Informations clés**
+
+- 🔢 Version actuelle : V.04.2.6 (Octobre 2025)
+- 📄 Licence : [Creative Commons BY-NC-SA 4.0](LICENSE.txt)
+- 📚 Réglementation : Décrets 2023-799, 82-624, 2007-262 + Code des pensions
+
 📘 **Historique des versions**
 
 Ce simulateur évolue régulièrement pour intégrer les dernières règles et améliorer la lisibilité.
@@ -237,6 +252,7 @@ Ce simulateur évolue régulièrement pour intégrer les dernières règles et a
 🔹 Consultez le fichier [`COMMITS.md`](COMMITS.md) pour découvrir les ajouts, corrections et évolutions par version.
 
 ---
+
 [![Historique des versions](https://img.shields.io/badge/COMMITS.md-Historique%20structur%C3%A9-blue)](COMMITS.md)
 
 
