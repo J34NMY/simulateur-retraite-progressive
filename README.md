@@ -247,7 +247,7 @@ Sous les conditions suivantes :
 - 📄 Licence : [Creative Commons BY-NC-SA 4.0](LICENSE.txt)
 - 📚 Réglementation : Décrets 2023-799, 82-624, 2007-262 + Code des pensions
 
-📘 **Historique des versions**
+📘 **Journal technique des versions**
 
 Ce simulateur évolue régulièrement pour intégrer les dernières règles et améliorer la lisibilité.
 
@@ -255,7 +255,7 @@ Ce simulateur évolue régulièrement pour intégrer les dernières règles et a
 
 ---
 
-[![Historique des versions](https://img.shields.io/badge/COMMITS.md-Historique%20structur%C3%A9-blue)](COMMITS.md)
+[![Journal technique des versions](https://img.shields.io/badge/COMMITS.md-Historique%20structur%C3%A9-blue)](COMMITS.md)
 
 
 **Écart documenté avec le SRE :**
@@ -486,7 +486,10 @@ Captures d'écran si applicable
 Version du navigateur
 
 
-📝 Historique des versions
+## 📘 Changelog pédagogique
+
+Ce changelog résume les évolutions majeures du simulateur par version. Pour le journal technique complet, voir [`COMMITS.md`](COMMITS.md).
+
 V.04.2.6 (Octobre 2025) - Actuelle ⭐
 
 ✅ Support natif des accents par jsPDF 2.5.1 (plus de conversion nécessaire)
