@@ -241,12 +241,6 @@ Sous les conditions suivantes :
 [![Licence CC BY-NC-SA 4.0](https://licensebuttons.net/l/by-nc-sa/4.0/88x31.png)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 ---
 
-📌 **Informations clés**
-
-- 🔢 Version actuelle : V.04.2.6 (Octobre 2025)
-- 📄 Licence : [Creative Commons BY-NC-SA 4.0](LICENSE.txt)
-- 📚 Réglementation : Décrets 2023-799, 82-624, 2007-262 + Code des pensions
-
 📘 **Journal technique des versions**
 
 Ce simulateur évolue régulièrement pour intégrer les dernières règles et améliorer la lisibilité.
