@@ -212,6 +212,8 @@ Ce simulateur a été conçu par Jean-Michel, avec l’assistance de l’intelli
 
 📄 Licence
 
+🔹 **Résumé rapide** : usage libre à des fins pédagogiques, attribution requise, usage commercial interdit sans autorisation.
+
 Ce simulateur est mis à disposition sous la licence Creative Commons BY-NC-SA 4.0.
 
 Vous êtes libre de :
