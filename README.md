@@ -290,6 +290,20 @@ Ce simulateur évolue régulièrement pour intégrer les dernières règles et a
 - ✅ Disclaimers clairs et visibles
 - ✅ Aucune collecte de données personnelles
 
+### Contexte de développement
+
+Ce simulateur est développé et maintenu **bénévolement** par une seule personne sur son temps libre, en collaboration technique avec Claude (Anthropic).
+
+**Contraintes et engagement :**
+- ⏰ Temps disponible : limité (<10h/mois)
+- 🔴 Priorité haute : corrections de bugs critiques (sous 1-2 semaines)
+- 🟠 Priorité haute : mises à jour réglementaires (dès publication officielle)
+- 🟢 Nouvelles fonctionnalités : selon disponibilité et retours utilisateurs
+
+**Transparence :**
+Les priorités sont données à la **fiabilité** et à la **conformité réglementaire** plutôt qu'aux nouvelles fonctionnalités. Chaque retour utilisateur est précieux et sera traité dès que possible.
+
+**Merci de votre patience et de votre compréhension !**
 ---
 
 ## 📚 Documentation
@@ -486,21 +500,43 @@ switchTab(tabName)
 updateChart(...)
 exporterParametresUtilisateur()
 Contribuer
-Les contributions sont les bienvenues ! Pour contribuer :
+## 📢 Retours et suggestions
 
-Fork le projet
-Créez une branche (git checkout -b feature/amelioration)
-Committez vos changements (git commit -m 'Ajout fonctionnalité')
-Push vers la branche (git push origin feature/amelioration)
-Ouvrez une Pull Request
+Vos retours sont essentiels pour améliorer ce simulateur gratuit et corriger d'éventuelles inexactitudes.
 
-Signaler un bug
-Ouvrez une Issue avec :
+### Comment contribuer
 
-Description détaillée du problème
-Étapes pour reproduire
-Captures d'écran si applicable
-Version du navigateur
+Pour toute suggestion, correction ou signalement :
+📧 **maviclearn@gmail.com**
+
+**Merci d'inclure dans votre email :**
+- Description détaillée du problème ou de la suggestion
+- Étapes pour reproduire (si bug)
+- Captures d'écran si applicable
+- Version du navigateur utilisé
+- Version du simulateur (V.04.2.6)
+
+### Types de contributions particulièrement utiles
+
+✅ **Signalements d'inexactitudes** dans les calculs (comme pour la V.04.2.4 et V.04.2.5)
+✅ **Comparaisons avec ENSAP** (écarts supérieurs à 1-2 trimestres)
+✅ **Corrections de bugs** ou comportements inattendus
+✅ **Suggestions d'améliorations** de l'interface ou des fonctionnalités
+✅ **Mises à jour réglementaires** (changements légaux, nouveaux décrets)
+✅ **Retours d'expérience** sur l'utilisation du simulateur
+
+### Engagement qualité
+
+Toutes les contributions par email sont :
+- Étudiées attentivement
+- Intégrées si pertinentes et conformes à la réglementation
+- Créditées dans les remerciements (si accord de l'auteur)
+
+**Les retours utilisateurs ont déjà permis des améliorations majeures** :
+- V.04.2.4 : Correction pension provisoire (évolution quotité)
+- V.04.2.5 : Correction barèmes rachat (division coûts par 2,5)
+
+**Votre contribution peut faire la différence !**
 
 
 ## 📘 Changelog pédagogique
@@ -517,7 +553,7 @@ V.04.2.6 (Octobre 2025) - Actuelle ⭐
 ✅ Correction toutes les dates : Octobre 2025
 ✅ Modèle 100% gratuit confirmé
 
-V.04.2.5 (Janvier 2025)
+V.04.2.5 (Juillet 2025)
 
 🔴 CORRECTION MAJEURE : Remplacement barèmes secteur privé → coefficients Fonction Publique d'État
 ✅ Calcul rachat basé sur traitement indiciaire × coefficient d'âge
@@ -526,14 +562,14 @@ V.04.2.5 (Janvier 2025)
 ✅ Tableau des coefficients dans l'onglet Sources
 ✅ Avertissements renforcés sur le caractère indicatif
 
-V.04.2.4 (Janvier 2025)
+V.04.2.4 (juin 2025)
 
 ✅ CORRECTION MAJEURE : Documentation pension provisoire (évolution quotité)
 ✅ Ajout encadré informatif dans Paramètres
 ✅ Mise à jour onglet Sources
 ❌ Erreur corrigée en V.04.2.5 : Barèmes rachat incorrects
 
-V.04.2.3 (Janvier 2025)
+V.04.2.3 (Juin 2025)
 
 ✨ Nouvel onglet "Retraite Définitive"
 ✨ Option Décret 1982 (6/7ème et 32/35ème)
@@ -547,18 +583,74 @@ V.04.0.x (2023) : Intégration Décret 2023-799 (surcote parentale)
 
 
 📋 Roadmap
-Version 4.3.x (Prévue Q1 2026)
+## 📋 Évolutions envisagées
 
-☐ Ajout de scenarios "what-if" multiples
-☐ Mode sombre
-☐ Comparaison côte à côte de 2 simulations
-☐ Amélioration exports PDF (graphiques inclus)
+Les améliorations suivantes sont envisagées selon les retours utilisateurs, les contraintes réglementaires et le temps disponible pour le développement.
 
-Version 4.4.x (Prévue Q2 2026)
+⚠️ **Note :** Aucun calendrier n'est garanti. Les priorités évoluent selon les besoins des utilisateurs et les changements réglementaires.
 
-☐ Intégration des régimes spéciaux
-☐ Calculateur de pension de réversion
-☐ Mise à jour automatique des barèmes rachat
+### 🔧 Améliorations du simulateur actuel
+
+**Fiabilité et précision**
+- ☐ Validation améliorée des données saisies
+- ☐ Messages d'erreur plus explicites
+- ☐ Tests de non-régression automatisés
+- ☐ Réduction de l'écart avec ENSAP (objectif < 1 trimestre)
+
+**Interface et ergonomie**
+- ☐ Mode sombre / clair
+- ☐ Aide contextuelle renforcée
+- ☐ Amélioration de l'accessibilité (RGAA)
+- ☐ Optimisation mobile
+
+**Documentation**
+- ☐ Tutoriels vidéo courts (5-10 min)
+- ☐ Glossaire interactif
+- ☐ Exemple de calcul complet pas à pas
+- ☐ FAQ étendue selon retours utilisateurs
+
+### ✨ Nouvelles fonctionnalités
+
+**Comparaisons et scénarios**
+- ☐ Scénarios "what-if" multiples
+- ☐ Comparaison côte à côte de 2 simulations
+- ☐ Graphiques comparatifs améliorés
+- ☐ Export Excel des résultats
+
+**Calculs avancés**
+- ☐ Intégration régimes spéciaux (CNRACL, etc.)
+- ☐ Mise à jour automatique des barèmes rachat
+- ☐ Projection avec inflation
+
+**Exports**
+- ☐ Inclusion des graphiques dans les PDFs
+- ☐ Export Word/ODT
+- ☐ Rapport comparatif multi-scénarios
+
+### 🎯 Définition des priorités
+
+Les priorités sont établies selon :
+
+1. **Corrections de bugs** 🔴 - Priorité maximale
+2. **Mises à jour réglementaires** 🟠 - Obligatoire si changement légal
+3. **Demandes utilisateurs fréquentes** 🟡 - Selon nombre de demandes
+4. **Améliorations UX/UI** 🟢 - Si temps disponible
+5. **Nouvelles fonctionnalités** 🔵 - Si ressources suffisantes
+
+### 💬 Influencez les priorités
+
+Vos retours déterminent les prochaines évolutions !
+
+**Vous avez besoin d'une fonctionnalité en particulier ?**
+**Une amélioration vous semble prioritaire ?**
+
+📧 Contactez-moi : **maviclearn@gmail.com**
+
+Plus une fonctionnalité est demandée, plus elle devient prioritaire dans la roadmap.
+
+---
+
+**Dernière mise à jour de la roadmap :** Octobre 2025
 
 ## 🗂️ Structure documentaire
 
