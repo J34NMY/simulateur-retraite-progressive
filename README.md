@@ -2,7 +2,7 @@
 
 [![Version](https://img.shields.io/badge/version-4.2.7-green.svg)](https://github.com/TON_USERNAME/TON_REPO/blob/main/simulateur_retraite_V.04.2.7.html)
 [![License](https://img.shields.io/badge/license-Gratuit%20%C3%A9ducatif-blue.svg)](https://github.com/TON_USERNAME/TON_REPO/blob/main/LICENSE)
-[![Réglementation](https://img.shields.io/badge/réglementation-Décret%202023--799-orange.svg)](https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000047970226)
+
 
 Un simulateur pédagogique gratuit et transparent pour estimer votre retraite progressive et définitive en tant que fonctionnaire d'État, basé sur la méthode officielle du Service des Retraites de l'État (SRE).
 
