@@ -1,42 +1,8 @@
 # 🧮 Simulateur de Retraite Progressive - Fonctionnaire d'État
 
----
-
-📌 **Informations clés**
-
-- 🔢 Version actuelle : V.04.2.6 (Octobre 2025)
-- 📚 Réglementation : Décrets 2023-799, 82-624, 2007-262 + Code des pensions
-
----
-[![Version](https://img.shields.io/badge/version-V.04.2.6-blue)](COMMITS.md)
-[![Licence](https://img.shields.io/badge/licence-CC--BY--NC--SA%204.0-lightgrey)](LICENCE.txt)
-
-## 📑 Sommaire
-
-- [🎯 Objectif](#-objectif)
-- [⚡ Démarrage rapide](#-démarrage-rapide)
-- [✨ Fonctionnalités principales](#-fonctionnalités-principales)
-- [🔧 Calculs avancés](#-calculs-avancés)
-- [📄 Exports PDF professionnels](#-exports-pdf-professionnels)
-- [📊 Outils d'aide à la décision](#-outils-daide-à-la-décision)
-- [🆕 Nouveautés V.04.2.6](#-nouveautés-v0426)
-- [🛡️ Protection juridique renforcée](#-protection-juridique-renforcée)
-- [🧪 Phase de validation en cours](#-phase-de-validation-en-cours)
-- [🔴 Correction majeure _Rachat de trimestres](#-correction-majeure---rachat-de-trimestres-v0425)
-- [🤝 Développement et validation](#-développement-et-validation)
-- [🧠 Origine du code](#-origine-du-code)
-- [📘 Changelog pédagogique](#-changelog-pédagogique)
-- [🗂️ Structure documentaire](#-structure-documentaire)
-- [📚 Documentation](#-documentation)
-- [⚠️ Avertissements importants](#-avertissements-importants)
-- [🧮 Méthodologie de calcul](#-méthodologie-de-calcul)
-- [💻 Aspects techniques](#-aspects-techniques)
-- [🔧 Développement](#-développement)
-- [🤗 Remerciements](#-remerciements)
-- [📄 Licence](#-licence)
-- [📞 Support et Contact](#-support-et-contact)
-- [🔗 Liens utiles](#-liens-utiles)
-
+[![Version](https://img.shields.io/badge/version-4.2.7-green.svg)](https://github.com/votre-repo/simulateur-retraite)
+[![License](https://img.shields.io/badge/license-Gratuit%20%C3%A9ducatif-blue.svg)](LICENSE)
+[![Réglementation](https://img.shields.io/badge/r%C3%A9glementation-D%C3%A9cret%202023--799-orange.svg)](https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000047970226)
 
 Un simulateur pédagogique gratuit et transparent pour estimer votre retraite progressive et définitive en tant que fonctionnaire d'État, basé sur la méthode officielle du Service des Retraites de l'État (SRE).
 
@@ -52,6 +18,7 @@ Ce simulateur vous aide à :
 - 📈 **Comparer** l'impact des quotités de travail
 - 📉 **Analyser** la rentabilité de la surcotisation et du rachat de trimestres
 - 🎓 **Apprendre** les règles complexes du régime de retraite des fonctionnaires
+- ✅ **Valider** vos données avec 31 contrôles de cohérence
 
 ---
 
@@ -59,7 +26,7 @@ Ce simulateur vous aide à :
 
 ### Installation (aucune installation requise !)
 
-1. **Téléchargez** le fichier `simulateur_retraite_V.04.2.6.html`
+1. **Téléchargez** le fichier `simulateur_retraite_V.04.2.7.html`
 2. **Double-cliquez** pour l'ouvrir dans votre navigateur
 3. **C'est tout !** Aucun serveur, aucune connexion internet nécessaire
 
@@ -80,7 +47,7 @@ Ce simulateur vous aide à :
 
 | Onglet | Description |
 |--------|-------------|
-| **Paramètres** | Saisie de vos données personnelles et professionnelles |
+| **Paramètres** | Saisie de vos données personnelles et professionnelles + **31 validations** |
 | **Résultats RP** | Simulation détaillée de la retraite progressive + **Export PDF** |
 | **Retraite Définitive** | Projection de votre retraite sans période progressive + **Export PDF** |
 | **Graphique** | Comparaison visuelle des revenus selon la quotité |
@@ -139,171 +106,84 @@ Ce simulateur vous aide à :
 
 ---
 
-## 🆕 Nouveautés V.04.2.6
+## 🆕 Nouveautés V.04.2.7
 
-### 📄 Exports PDF natifs (AMÉLIORATION MAJEURE)
+### ✅ Validation exhaustive des données (AMÉLIORATION MAJEURE)
 
-**Support natif des accents français :**
-- jsPDF 2.5.1 gère nativement tous les caractères accentués
-- Plus besoin de fonction de conversion
-- PDFs parfaitement lisibles avec accents préservés
-- Compatible tous systèmes (Windows, Mac, Linux, mobile)
+**31 validations de cohérence implémentées :**
 
-**Intégration :**
-- 3 boutons d'export dans les onglets Résultats, Retraite Définitive et Analyse Rachat
-- Génération automatique avec jsPDF 2.5.1
-- Avertissements renforcés en première page de chaque PDF
+**Onglet Paramètres (22 validations) :**
+1. **Dates (9 validations)** :
+   - Messages d'erreur avec basculement automatique vers l'onglet Résultats
+   - Date relevé > date départ progressif
+   - Date départ progressif > date départ définitif
+   - Date naissance avant 1900 (irréaliste)
+   - Dates dans futur lointain (2080+)
+   - Âge actuel > 80 ans (inhabituel)
+   - Âge actuel < 40 ans (trop jeune pour retraite progressive)
+   - Âge départ progressif > 80 ans (irréaliste)
+   - Départ après 67-70 ans (prolongation/limite)
 
-### 🛡️ Protection juridique renforcée
+2. **Trimestres/Jours (4 validations)** :
+   - Trimestres incohérents vs années de carrière (ex: 160 trim pour 12 ans)
+   - Jours négatifs (assurance + liquidables)
+   - Jours >= 90 (90 jours = 1 trimestre)
+   - Total jours liquidables > total jours assurance
 
-**Avertissements présents partout :**
-- ✅ Bannière de consentement avec encadré rouge
-- ✅ "Ne remplace pas les outils officiels" explicite
-- ✅ Mention ensap.gouv.fr répétée minimum 2× par page
-- ✅ Première page de chaque export PDF
-- ✅ Footer du site
-- ✅ Onglet Mentions Légales complet
+3. **Indices/Valeurs (3 validations)** :
+   - Indice hors plage réaliste (350-900 pour FP État)
+   - Valeur point incorrecte (4.5-5.5€, officiel : 4.92278€)
+   - Trimestres requis aberrants (150-180)
 
-**Stratégie adoptée :**
-- Transparence maximale = protection juridique
-- Toujours rediriger vers les sites officiels
-- Documenter l'écart 1-2 trimestres partout
-- Déclaration claire de responsabilité limitée
+4. **Enfants (4 validations + UX améliorée)** :
+   - Case cochée + 0 enfants saisis
+   - Enfants saisis sans case cochée
+   - Total ≠ somme (avant 2004 + après 2003)
+   - Champs grisés automatiquement si case non cochée
 
-### 🧪 Phase de validation en cours
+5. **Durée période progressive (2 validations)** :
+   - Période < 1 mois (warning)
+   - Période > 5 ans (warning)
 
-**Approche beta test :**
-- Recrutement de 10-15 fonctionnaires testeurs
-- Comparaison systématique avec ENSAP
-- Documentation des écarts observés
-- Amélioration continue basée sur les retours
+**Onglet Retraite Définitive (9 validations) :**
+- ✅ Données récupérées du simulateur
+- ✅ Date départ obligatoire
+- ✅ Date départ > date relevé
+- ✅ Date pas dans le passé (> 1 mois)
+- ✅ Date pas dans futur lointain (< 20 ans)
+- ✅ Âge au départ (60-80 ans + warnings 67-70)
+- ✅ Quotité valide (0-1)
+- ✅ Surcotisation + 100% interdit (basé sur textes officiels)
+- ✅ Durée période projection cohérente
 
-**Mention correcte :**
-- "Phase de validation en cours" (véridique)
-- Au lieu de "testé par X fonctionnaires" (prématuré)
+### 🎨 Améliorations UX
 
----
+**Messages d'erreur pédagogiques :**
+- Affichage clair avec icônes (❌ ⚠️ ℹ️)
+- Citations réglementaires quand pertinent
+- Basculement automatique vers l'onglet Résultats lors d'erreurs
+- Suggestions d'actions correctives
 
-## 🔴 CORRECTION MAJEURE - Rachat de trimestres (V.04.2.5)
+**Message informatif intelligent :**
+- Si liquidables < assurance dans Retraite Définitive
+- Suggère automatiquement l'onglet "Analyse Rachat"
+- Calcule l'écart et informe l'utilisateur
 
-### ✅ Remplacement complet des barèmes de rachat
+### 🔧 Corrections techniques
 
-Les barèmes utilisés dans les versions précédentes étaient ceux du régime général (secteur privé), ce qui donnait des coûts 2 à 3 fois trop élevés pour les fonctionnaires d'État !
+**Validation quotité progressive :**
+- AVANT : Erreur si quotité pendant >= quotité avant (trop restrictif)
+- APRÈS : Validation supprimée (augmentation autorisée selon FAQ DGAFP)
 
-### ❌ Ancienne méthode (V.04.2.4 et antérieures)
+**Bug syntaxe enfants :**
+- Problème : Double accolade `});}); `empêchait l'initialisation
+- Correction : Une seule accolade `});`
 
-Barèmes fixes secteur privé :
-- 40 ans, Option 2 : 7 600 € par trimestre
-- 50 ans, Option 2 : 11 200 € par trimestre
-- Exemple : 4 trimestres à 40 ans = **15 200 €** (FAUX)
+**Surcotisation à 100% :**
+- Recherche réglementaire faite (Code des pensions, SRE, CNRACL)
+- Validation ajoutée avec message pédagogique
+- Distinction claire : Surcotisation = PENDANT temps partiel / Rachat = APRÈS
 
-### ✅ Nouvelle méthode (V.04.2.5+)
-
-Coefficient Fonction Publique × Traitement indiciaire :
-- 40 ans, Option 2 : ~62% du traitement
-- Traitement 2 353 € × 0,62 = 1 459 € par trimestre
-- Exemple : 4 trimestres à 40 ans = **5 836 €** (CORRECT)
-
-### 📊 Comparaison des résultats
-
-| Critère | V.04.2.4 (FAUX) | V.04.2.5+ (CORRECT) | Différence |
-|---------|-----------------|---------------------|------------|
-| Coût 4 trim. (40 ans, Opt. 2) | 15 200 € | 5 836 € | **-9 364 € (-62%)** |
-| Coût réel (TMI 30%) | 10 640 € | 4 085 € | **-6 555 € (-62%)** |
-| Durée rentabilisation | 15-20 ans | 7-10 ans | **÷ 2** |
-
----
-
-## 🤝 Développement et validation
-
-### Collaboration avec Claude (Anthropic)
-
-Ce simulateur a été développé en collaboration avec Claude, l'assistant IA d'Anthropic, pour les aspects :
-
-- **Algorithmiques** : Implémentation rigoureuse des calculs SRE conformes aux textes réglementaires
-- **Techniques** : Architecture du code, gestion des exports PDF, optimisation
-- **Réglementaires** : Interprétation et application des décrets et du Code des pensions
-- **Légaux** : Rédaction des mentions légales, CGU, disclaimers adaptés au modèle gratuit
-- **Documentaires** : Rédaction du mode d'emploi et de la documentation technique
-
-L'éditeur assume l'entière responsabilité du contenu, de l'exactitude des calculs et de la conformité réglementaire.
-
-### Approche de validation
-
-**Modèle gratuit et éducatif :**
-- Outil mis à disposition gratuitement sans aucune contrepartie
-- Vocation pédagogique : comprendre les mécanismes, pas remplacer les outils officiels
-- Transparence totale sur les calculs et les limitations
-
-**Validation par beta testeurs :**
-- 10-15 fonctionnaires testant leurs cas réels
-- Comparaison systématique avec simulations ENSAP officielles
-- Documentation des écarts et amélioration continue
-
-🧠 Origine du code
-
-Ce simulateur a été conçu par Jean-Michel, avec l’assistance de l’intelligence artificielle Claude (Anthropic) pour la génération du code source. Toutes les directives, validations, structures, calculs et contenus réglementaires ont été définis par l’auteur humain, qui assume l’entière responsabilité du projet.
-
-📄 Licence
-
-🔹 **Résumé rapide** : usage libre à des fins pédagogiques, attribution requise, usage commercial interdit sans autorisation.
-
-Ce simulateur est mis à disposition sous la licence Creative Commons BY-NC-SA 4.0.
-
-Vous êtes libre de :
-- Partager — copier, distribuer et transmettre l’œuvre
-- Adapter — remixer, transformer et créer à partir de l’œuvre
-
-Sous les conditions suivantes :
-- Attribution — vous devez créditer l’auteur (Jean-Michel), fournir un lien vers la licence, et indiquer si des modifications ont été effectuées.
-- Pas d’utilisation commerciale — vous ne pouvez pas utiliser cette œuvre à des fins commerciales sans autorisation écrite.
-- Partage dans les mêmes conditions — si vous modifiez l’œuvre, vous devez la distribuer sous la même licence.
-
-🔗 [Texte officiel de la licence](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr)
-
-[![Licence CC BY-NC-SA 4.0](https://licensebuttons.net/l/by-nc-sa/4.0/88x31.png)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
----
-
-📘 **Journal technique des versions**
-
-Ce simulateur évolue régulièrement pour intégrer les dernières règles et améliorer la lisibilité.
-
-🔹 Consultez le fichier [`COMMITS.md`](COMMITS.md) pour découvrir les ajouts, corrections et évolutions par version.
-
----
-
-[![Journal technique des versions](https://img.shields.io/badge/COMMITS.md-Historique%20structur%C3%A9-blue)](COMMITS.md)
-
-
-**Écart documenté avec le SRE :**
-- Écart connu de 1-2 trimestres liquidables (~1-2% de pension)
-- Cause probable : règles d'arrondi internes non documentées publiquement
-- Le simulateur applique rigoureusement la méthode SRE documentée
-- Pour une estimation officielle définitive : toujours consulter ensap.gouv.fr
-
-### Démarche qualité
-
-- ✅ Application stricte des textes réglementaires
-- ✅ Corrections rapides suite aux retours utilisateurs
-- ✅ Documentation exhaustive des sources
-- ✅ Transparence sur les limitations
-- ✅ Disclaimers clairs et visibles
-- ✅ Aucune collecte de données personnelles
-
-### Contexte de développement
-
-Ce simulateur est développé et maintenu **bénévolement** par une seule personne sur son temps libre, en collaboration technique avec Claude (Anthropic).
-
-**Contraintes et engagement :**
-- ⏰ Temps disponible : limité (<10h/mois)
-- 🔴 Priorité haute : corrections de bugs critiques (sous 1-2 semaines)
-- 🟠 Priorité haute : mises à jour réglementaires (dès publication officielle)
-- 🟢 Nouvelles fonctionnalités : selon disponibilité et retours utilisateurs
-
-**Transparence :**
-Les priorités sont données à la **fiabilité** et à la **conformité réglementaire** plutôt qu'aux nouvelles fonctionnalités. Chaque retour utilisateur est précieux et sera traité dès que possible.
-
-**Merci de votre patience et de votre compréhension !**
 ---
 
 ## 📚 Documentation
@@ -412,7 +292,7 @@ Coût = Traitement indiciaire × Coefficient d'âge × Nombre de trimestres
 
 ### Exports PDF - Support natif des accents
 
-**V.04.2.6 - Amélioration majeure :**
+**V.04.2.6+ - Amélioration majeure :**
 - jsPDF 2.5.1 supporte nativement tous les accents français
 - Plus besoin de conversion ou fonction spéciale
 - Accents parfaitement préservés dans les PDFs
@@ -441,7 +321,7 @@ Coût = Traitement indiciaire × Coefficient d'âge × Nombre de trimestres
 
 ### Performances
 
-- ⚡ Chargement instantané (fichier unique ~120 Ko)
+- ⚡ Chargement instantané (fichier unique ~130 Ko)
 - 🔒 100% local (aucune donnée transmise)
 - 💾 Pas de base de données requise
 - 📱 Responsive (mobile, tablette, desktop)
@@ -462,7 +342,8 @@ simulateur.html
 ├── Coefficients rachat FP (CORRIGÉ)
 ├── Génération de graphiques
 ├── Exports PDF natifs (V.04.2.6)
-└── Export/Import JSON
+├── Export/Import JSON
+└── Validations exhaustives (V.04.2.7) ⭐ NOUVEAU
 
 ---
 
@@ -490,6 +371,10 @@ getCoutRachatParTrimestre(age, option, traitement) // Coût FP
 calculerRentabiliteSurcotisation(...)
 analyserRachat()
 
+// Validations (NOUVEAU V.04.2.7) ⭐
+validerParametres() // 22 validations onglet Paramètres
+validerParametresDefinitive() // 9 validations onglet Retraite Définitive
+
 // Exports PDF (V.04.2.6 - Support natif)
 exporterResultatsPDF()
 exporterRetraiteDefinitivePDF()
@@ -500,50 +385,43 @@ switchTab(tabName)
 updateChart(...)
 exporterParametresUtilisateur()
 Contribuer
-## 📢 Retours et suggestions
+Les contributions sont les bienvenues ! Pour contribuer :
 
-Vos retours sont essentiels pour améliorer ce simulateur gratuit et corriger d'éventuelles inexactitudes.
+Fork le projet
+Créez une branche (git checkout -b feature/amelioration)
+Committez vos changements (git commit -m 'Ajout fonctionnalité')
+Push vers la branche (git push origin feature/amelioration)
+Ouvrez une Pull Request
 
-### Comment contribuer
+Signaler un bug
+Ouvrez une Issue avec :
 
-Pour toute suggestion, correction ou signalement :
-📧 **maviclearn@gmail.com**
-
-**Merci d'inclure dans votre email :**
-- Description détaillée du problème ou de la suggestion
-- Étapes pour reproduire (si bug)
-- Captures d'écran si applicable
-- Version du navigateur utilisé
-- Version du simulateur (V.04.2.6)
-
-### Types de contributions particulièrement utiles
-
-✅ **Signalements d'inexactitudes** dans les calculs (comme pour la V.04.2.4 et V.04.2.5)
-✅ **Comparaisons avec ENSAP** (écarts supérieurs à 1-2 trimestres)
-✅ **Corrections de bugs** ou comportements inattendus
-✅ **Suggestions d'améliorations** de l'interface ou des fonctionnalités
-✅ **Mises à jour réglementaires** (changements légaux, nouveaux décrets)
-✅ **Retours d'expérience** sur l'utilisation du simulateur
-
-### Engagement qualité
-
-Toutes les contributions par email sont :
-- Étudiées attentivement
-- Intégrées si pertinentes et conformes à la réglementation
-- Créditées dans les remerciements (si accord de l'auteur)
-
-**Les retours utilisateurs ont déjà permis des améliorations majeures** :
-- V.04.2.4 : Correction pension provisoire (évolution quotité)
-- V.04.2.5 : Correction barèmes rachat (division coûts par 2,5)
-
-**Votre contribution peut faire la différence !**
+Description détaillée du problème
+Étapes pour reproduire
+Captures d'écran si applicable
+Version du navigateur
 
 
-## 📘 Changelog pédagogique
+📜 Historique des versions
+V.04.2.7 (Octobre 2025) - Actuelle ⭐
+Améliorations majeures :
 
-Ce changelog résume les évolutions majeures du simulateur par version. Pour le journal technique complet, voir [`COMMITS.md`](COMMITS.md).
+✅ 31 validations de cohérence implémentées (22 Paramètres + 9 Retraite Définitive)
+✅ Messages d'erreur pédagogiques avec basculement automatique
+✅ Validation dates, trimestres, indices, enfants, quotités
+✅ Message informatif si liquidables < assurance (suggère onglet Rachat)
+✅ Bug syntaxe enfants corrigé
+✅ Validation surcotisation + 100% ajoutée
+✅ UX améliorée : champs grisés automatiquement
 
-V.04.2.6 (Octobre 2025) - Actuelle ⭐
+Corrections techniques :
+
+Validation quotité progressive supprimée (trop restrictive)
+Double accolade });});  corrigée en });
+Distinction claire surcotisation vs rachat
+
+V.04.2.6 (Octobre 2025)
+Améliorations majeures :
 
 ✅ Support natif des accents par jsPDF 2.5.1 (plus de conversion nécessaire)
 ✅ Avertissements renforcés partout (bannière rouge, PDF, footer)
@@ -553,7 +431,7 @@ V.04.2.6 (Octobre 2025) - Actuelle ⭐
 ✅ Correction toutes les dates : Octobre 2025
 ✅ Modèle 100% gratuit confirmé
 
-V.04.2.5 (Juillet 2025)
+V.04.2.5 (Janvier 2025)
 
 🔴 CORRECTION MAJEURE : Remplacement barèmes secteur privé → coefficients Fonction Publique d'État
 ✅ Calcul rachat basé sur traitement indiciaire × coefficient d'âge
@@ -562,14 +440,14 @@ V.04.2.5 (Juillet 2025)
 ✅ Tableau des coefficients dans l'onglet Sources
 ✅ Avertissements renforcés sur le caractère indicatif
 
-V.04.2.4 (juin 2025)
+V.04.2.4 (Janvier 2025)
 
 ✅ CORRECTION MAJEURE : Documentation pension provisoire (évolution quotité)
 ✅ Ajout encadré informatif dans Paramètres
 ✅ Mise à jour onglet Sources
 ❌ Erreur corrigée en V.04.2.5 : Barèmes rachat incorrects
 
-V.04.2.3 (Juin 2025)
+V.04.2.3 (Janvier 2025)
 
 ✨ Nouvel onglet "Retraite Définitive"
 ✨ Option Décret 1982 (6/7ème et 32/35ème)
@@ -583,90 +461,24 @@ V.04.0.x (2023) : Intégration Décret 2023-799 (surcote parentale)
 
 
 📋 Roadmap
-## 📋 Évolutions envisagées
+Version 4.2.8 (Prévue Q4 2025)
 
-Les améliorations suivantes sont envisagées selon les retours utilisateurs, les contraintes réglementaires et le temps disponible pour le développement.
+☐ Validation onglet Graphique
+☐ Tests finaux de tous les onglets
+☐ Documentation complète des cas limites
 
-⚠️ **Note :** Aucun calendrier n'est garanti. Les priorités évoluent selon les besoins des utilisateurs et les changements réglementaires.
+Version 4.3.x (Prévue Q1 2026)
 
-### 🔧 Améliorations du simulateur actuel
+☐ Ajout de scenarios "what-if" multiples
+☐ Mode sombre
+☐ Comparaison côte à côte de 2 simulations
+☐ Amélioration exports PDF (graphiques inclus)
 
-**Fiabilité et précision**
-- ☐ Validation améliorée des données saisies
-- ☐ Messages d'erreur plus explicites
-- ☐ Tests de non-régression automatisés
-- ☐ Réduction de l'écart avec ENSAP (objectif < 1 trimestre)
+Version 4.4.x (Prévue Q2 2026)
 
-**Interface et ergonomie**
-- ☐ Mode sombre / clair
-- ☐ Aide contextuelle renforcée
-- ☐ Amélioration de l'accessibilité (RGAA)
-- ☐ Optimisation mobile
-
-**Documentation**
-- ☐ Tutoriels vidéo courts (5-10 min)
-- ☐ Glossaire interactif
-- ☐ Exemple de calcul complet pas à pas
-- ☐ FAQ étendue selon retours utilisateurs
-
-### ✨ Nouvelles fonctionnalités
-
-**Comparaisons et scénarios**
-- ☐ Scénarios "what-if" multiples
-- ☐ Comparaison côte à côte de 2 simulations
-- ☐ Graphiques comparatifs améliorés
-- ☐ Export Excel des résultats
-
-**Calculs avancés**
-- ☐ Intégration régimes spéciaux (CNRACL, etc.)
-- ☐ Mise à jour automatique des barèmes rachat
-- ☐ Projection avec inflation
-
-**Exports**
-- ☐ Inclusion des graphiques dans les PDFs
-- ☐ Export Word/ODT
-- ☐ Rapport comparatif multi-scénarios
-
-### 🎯 Définition des priorités
-
-Les priorités sont établies selon :
-
-1. **Corrections de bugs** 🔴 - Priorité maximale
-2. **Mises à jour réglementaires** 🟠 - Obligatoire si changement légal
-3. **Demandes utilisateurs fréquentes** 🟡 - Selon nombre de demandes
-4. **Améliorations UX/UI** 🟢 - Si temps disponible
-5. **Nouvelles fonctionnalités** 🔵 - Si ressources suffisantes
-
-### 💬 Influencez les priorités
-
-Vos retours déterminent les prochaines évolutions !
-
-**Vous avez besoin d'une fonctionnalité en particulier ?**
-**Une amélioration vous semble prioritaire ?**
-
-📧 Contactez-moi : **maviclearn@gmail.com**
-
-Plus une fonctionnalité est demandée, plus elle devient prioritaire dans la roadmap.
-
----
-
-**Dernière mise à jour de la roadmap :** Octobre 2025
-
-## 🗂️ Structure documentaire
-
-Ce dépôt contient plusieurs fichiers complémentaires, chacun avec un rôle précis :
-
-| Fichier          | Rôle principal                                                  | Public cible               |
-|------------------|------------------------------------------------------------------|----------------------------|
-| `README.md`       | Présentation générale, guide rapide, changelog pédagogique      | Utilisateurs               |
-| `COMMITS.md`      | Journal technique structuré des commits par version             | Développeurs, auditeurs    |
-| `MODE_EMPLOI.md`  | Guide détaillé de chaque onglet, calculs et exports             | Utilisateurs avancés       |
-| `LICENCE.txt`     | Texte officiel de la licence Creative Commons BY-NC-SA 4.0      | Tous publics               |
-| `simulateur_retraite_V.04.2.6.html` | Version actuelle du simulateur, en usage local ou web | Utilisateurs               |
-
-🔹 Pour comprendre les évolutions du simulateur, consultez le changelog pédagogique dans le README.  
-🔹 Pour une traçabilité technique complète, voir [`COMMITS.md`](COMMITS.md).  
-🔹 Pour les calculs et paramètres détaillés, voir [`MODE_EMPLOI.md`](MODE_EMPLOI.md).
+☐ Intégration des régimes spéciaux
+☐ Calculateur de pension de réversion
+☐ Mise à jour automatique des barèmes rachat
 
 
 🤗 Remerciements
@@ -682,8 +494,9 @@ Merci particulier :
 
 Aux utilisateurs qui ont signalé l'inexactitude sur la pension provisoire (V.04.2.4)
 À l'utilisateur qui a remarqué que les coûts de rachat étaient "très chers" (V.04.2.5)
+Aux beta-testeurs qui ont identifié les incohérences de saisie (V.04.2.7)
 
-Ces retours ont permis des corrections majeures qui améliorent significativement la précision du simulateur !
+Ces retours ont permis des corrections majeures qui améliorent significativement la précision et la robustesse du simulateur !
 
 📄 Licence
 Usage gratuit à des fins informatives et pédagogiques.
@@ -737,7 +550,7 @@ Si ce simulateur vous a été utile, n'hésitez pas à :
 
 
 <p align="center">
-  <strong>Simulateur de Retraite Progressive V.04.2.6</strong><br>
+  <strong>Simulateur de Retraite Progressive V.04.2.7</strong><br>
   Développé avec Claude (Anthropic)<br>
   Dernière mise à jour : Octobre 2025
 </p>
@@ -746,7 +559,4 @@ Si ce simulateur vous a été utile, n'hésitez pas à :
   <strong>Pour une estimation officielle : <a href="https://ensap.gouv.fr">ensap.gouv.fr</a></strong>
 </p>
 ```
-
-
-FIN DU README.md V.04.2.6
 
