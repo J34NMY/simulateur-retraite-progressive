@@ -1,6 +1,7 @@
 📖 Mode d'emploi du Simulateur de Retraite Progressive V.04.2.8
 
 🎯 Introduction
+
 Ce simulateur gratuit vous permet d'estimer votre pension de retraite progressive et définitive en tant que fonctionnaire d'État. Il applique la méthode officielle du Service des Retraites de l'État (SRE) avec une transparence totale sur les calculs.
 ✨ NOUVEAU V.04.2.8 : Corrections critiques des validations de cohérence - messages d'erreur optimisés, hiérarchisés et plus pédagogiques.
 
@@ -1087,3 +1088,4 @@ Prochaine mise à jour prévue : Tests approfondis et documentation des cas limi
 Développé par Jean-Michel DI PACO avec l'assistance de Claude (Anthropic)
 
 Contact : maviclearn@gmail.com
+
