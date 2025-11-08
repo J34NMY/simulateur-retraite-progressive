@@ -1,332 +1,219 @@
-# 🧮 Simulateur de Retraite Progressive - Fonctionnaire d'État
 
-[![Version](https://img.shields.io/badge/version-4.2.7-green.svg)](https://github.com/J34NMY/simulateur-retraite-progressive/blob/main/simulateur_retraite_V.04.2.7.html)
+README.md mis à jour pour V.04.2.8
+🧮 Simulateur de Retraite Progressive - Fonctionnaire d'État
+[![Version](https://img.shields.io/badge/version-4.2.8-green.svg)](https://github.com/J34NMY/simulateur-retraite-progressive/blob/main/simulateur_retraite_V.04.2.8.html)
 [![License](https://img.shields.io/badge/license-Gratuit%20%C3%A9ducatif-blue.svg)](https://github.com/J34NMY/simulateur-retraite-progressive/blob/main/LICENSE)
-
-
 Un simulateur pédagogique gratuit et transparent pour estimer votre retraite progressive et définitive en tant que fonctionnaire d'État, basé sur la méthode officielle du Service des Retraites de l'État (SRE).
+🎓 Outil éducatif gratuit - Aucune inscription, aucun paiement, aucune donnée collectée.
 
-**🎓 Outil éducatif gratuit** - Aucune inscription, aucun paiement, aucune donnée collectée.
-
----
-
-## 🎯 Objectif
-
+🎯 Objectif
 Ce simulateur vous aide à :
-- 📊 **Comprendre** les mécanismes de la retraite progressive
-- 💰 **Estimer** votre pension selon différents scénarios
-- 📈 **Comparer** l'impact des quotités de travail
-- 📉 **Analyser** la rentabilité de la surcotisation et du rachat de trimestres
-- 🎓 **Apprendre** les règles complexes du régime de retraite des fonctionnaires
-- ✅ **Valider** vos données avec 31 contrôles de cohérence
 
----
+📊 Comprendre les mécanismes de la retraite progressive
+💰 Estimer votre pension selon différents scénarios
+📈 Comparer l'impact des quotités de travail
+📉 Analyser la rentabilité de la surcotisation et du rachat de trimestres
+🎓 Apprendre les règles complexes du régime de retraite des fonctionnaires
+✅ Valider vos données avec 31 contrôles de cohérence renforcés
 
-## ⚡ Démarrage rapide
 
-### Installation (aucune installation requise !)
+⚡ Démarrage rapide
+Installation (aucune installation requise !)
 
-1. **Téléchargez** le fichier `simulateur_retraite_V.04.2.7.html`
-2. **Double-cliquez** pour l'ouvrir dans votre navigateur
-3. **C'est tout !** Aucun serveur, aucune connexion internet nécessaire
+Téléchargez le fichier simulateur_retraite_V.04.2.8.html
+Double-cliquez pour l'ouvrir dans votre navigateur
+C'est tout ! Aucun serveur, aucune connexion internet nécessaire
 
-### Première utilisation
+Première utilisation
 
-1. Acceptez les conditions d'utilisation
-2. Rendez-vous dans l'onglet **"Paramètres"**
-3. Remplissez vos informations à partir de votre relevé de carrière SRE
-4. Cliquez sur **"Calculer la simulation"**
-5. Consultez vos résultats dans les différents onglets
-6. Exportez vos résultats en PDF si souhaité
+Acceptez les conditions d'utilisation
+Rendez-vous dans l'onglet "Paramètres"
+Remplissez vos informations à partir de votre relevé de carrière SRE
+Cliquez sur "Calculer la simulation"
+Consultez vos résultats dans les différents onglets
+Exportez vos résultats en PDF si souhaité
 
----
 
-## ✨ Fonctionnalités principales
+✨ Fonctionnalités principales
+📋 7 onglets complets
+OngletDescriptionParamètresSaisie de vos données personnelles et professionnelles + 31 validations renforcéesRésultats RPSimulation détaillée de la retraite progressive + Export PDFRetraite DéfinitiveProjection de votre retraite sans période progressive + Export PDFGraphiqueComparaison visuelle des revenus selon la quotitéAnalyse RachatÉvaluation de la rentabilité du rachat de trimestres + Export PDFSourcesRéférences réglementaires et documentationMentions LégalesConditions d'utilisation, confidentialité, crédits
+🔧 Calculs avancés
 
-### 📋 7 onglets complets
+✅ Méthode SRE officielle (base 360 jours/an, arrondi ≥45 jours)
+✅ Décote et surcote (3 types cumulables : classique, parentale, excédentaire)
+✅ Bonifications enfants (avant/après 2004)
+✅ Majoration familiale (10% dès 3 enfants)
+✅ Décret n°82-624 (6/7ème pour 80%, 32/35ème pour 90%)
+✅ Analyse actuarielle de la surcotisation (vs placements alternatifs)
+✅ Surcote parentale (Décret 2023-799)
+✅ Rachat de trimestres avec coefficients Fonction Publique d'État
 
-| Onglet | Description |
-|--------|-------------|
-| **Paramètres** | Saisie de vos données personnelles et professionnelles + **31 validations** |
-| **Résultats RP** | Simulation détaillée de la retraite progressive + **Export PDF** |
-| **Retraite Définitive** | Projection de votre retraite sans période progressive + **Export PDF** |
-| **Graphique** | Comparaison visuelle des revenus selon la quotité |
-| **Analyse Rachat** | Évaluation de la rentabilité du rachat de trimestres + **Export PDF** |
-| **Sources** | Références réglementaires et documentation |
-| **Mentions Légales** | Conditions d'utilisation, confidentialité, crédits |
+📄 Exports PDF professionnels
+3 types d'exports disponibles :
 
-### 🔧 Calculs avancés
+Export Résultats Retraite Progressive
 
-- ✅ **Méthode SRE officielle** (base 360 jours/an, arrondi ≥45 jours)
-- ✅ **Décote et surcote** (3 types cumulables : classique, parentale, excédentaire)
-- ✅ **Bonifications enfants** (avant/après 2004)
-- ✅ **Majoration familiale** (10% dès 3 enfants)
-- ✅ **Décret n°82-624** (6/7ème pour 80%, 32/35ème pour 90%)
-- ✅ **Analyse actuarielle** de la surcotisation (vs placements alternatifs)
-- ✅ **Surcote parentale** (Décret 2023-799)
-- ✅ **Rachat de trimestres** avec coefficients Fonction Publique d'État
+Paramètres de simulation complets
+Durées et trimestres détaillés
+Revenus pendant la progressive
+Pension définitive estimée
+Analyses de surcotisation et décote/surcote
 
-### 📄 Exports PDF professionnels
 
-**3 types d'exports disponibles :**
+Export Retraite Définitive
 
-1. **Export Résultats Retraite Progressive**
-   - Paramètres de simulation complets
-   - Durées et trimestres détaillés
-   - Revenus pendant la progressive
-   - Pension définitive estimée
-   - Analyses de surcotisation et décote/surcote
+Projection jusqu'au départ
+Impact de la quotité choisie
+Trimestres au départ
+Pension définitive selon scénario
 
-2. **Export Retraite Définitive**
-   - Projection jusqu'au départ
-   - Impact de la quotité choisie
-   - Trimestres au départ
-   - Pension définitive selon scénario
 
-3. **Export Analyse Rachat**
-   - Coût du rachat détaillé
-   - Impact sur la pension
-   - Comparaison avec placement
-   - Recommandation personnalisée
+Export Analyse Rachat
 
-**Caractéristiques techniques :**
-- Support natif des accents français par jsPDF 2.5.1
-- Format A4 optimisé pour l'impression
-- En-têtes et pieds de page professionnels
-- Pagination automatique
-- Disclaimers et avertissements inclus
+Coût du rachat détaillé
+Impact sur la pension
+Comparaison avec placement
+Recommandation personnalisée
 
-### 📊 Outils d'aide à la décision
 
-- 📈 **Graphiques interactifs** (revenus selon quotité, pensions comparées)
-- 💡 **Analyses de rentabilité** (surcotisation, rachat de trimestres)
-- 💾 **Export/Import** de simulations (format JSON)
-- 📄 **Exports PDF** des résultats
-- 🎯 **Recommandations personnalisées** selon votre profil
 
----
+Caractéristiques techniques :
 
-## 🆕 Nouveautés V.04.2.7
+Support natif des accents français par jsPDF 2.5.1
+Format A4 optimisé pour l'impression
+En-têtes et pieds de page professionnels
+Pagination automatique
+Disclaimers et avertissements inclus
 
-### ✅ Validation exhaustive des données (AMÉLIORATION MAJEURE)
+📊 Outils d'aide à la décision
 
-**31 validations de cohérence implémentées :**
+📈 Graphiques interactifs (revenus selon quotité, pensions comparées)
+💡 Analyses de rentabilité (surcotisation, rachat de trimestres)
+💾 Export/Import de simulations (format JSON)
+📄 Exports PDF des résultats
+🎯 Recommandations personnalisées selon votre profil
 
-**Onglet Paramètres (22 validations) :**
-1. **Dates (9 validations)** :
-   - Messages d'erreur avec basculement automatique vers l'onglet Résultats
-   - Date relevé > date départ progressif
-   - Date départ progressif > date départ définitif
-   - Date naissance avant 1900 (irréaliste)
-   - Dates dans futur lointain (2080+)
-   - Âge actuel > 80 ans (inhabituel)
-   - Âge actuel < 40 ans (trop jeune pour retraite progressive)
-   - Âge départ progressif > 80 ans (irréaliste)
-   - Départ après 67-70 ans (prolongation/limite)
 
-2. **Trimestres/Jours (4 validations)** :
-   - Trimestres incohérents vs années de carrière (ex: 160 trim pour 12 ans)
-   - Jours négatifs (assurance + liquidables)
-   - Jours >= 90 (90 jours = 1 trimestre)
-   - Total jours liquidables > total jours assurance
+🆕 Nouveautés V.04.2.8
+✅ Améliorations de la validation des données (CORRECTIONS CRITIQUES)
+Corrections majeures apportées :
 
-3. **Indices/Valeurs (3 validations)** :
-   - Indice hors plage réaliste (350-900 pour FP État)
-   - Valeur point incorrecte (4.5-5.5€, officiel : 4.92278€)
-   - Trimestres requis aberrants (150-180)
+Validation date de naissance optimisée :
 
-4. **Enfants (4 validations + UX améliorée)** :
-   - Case cochée + 0 enfants saisis
-   - Enfants saisis sans case cochée
-   - Total ≠ somme (avant 2004 + après 2003)
-   - Champs grisés automatiquement si case non cochée
+✅ Messages d'erreur plus clairs et hiérarchisés
+✅ Distinction entre erreurs critiques et warnings
+✅ Détection des dates irréalistes (avant 1900, après 2080)
+✅ Validation âge actuel (18-80 ans avec messages adaptés)
+✅ Meilleure détection des erreurs de saisie
 
-5. **Durée période progressive (2 validations)** :
-   - Période < 1 mois (warning)
-   - Période > 5 ans (warning)
 
-**Onglet Retraite Définitive (9 validations) :**
-- ✅ Données récupérées du simulateur
-- ✅ Date départ obligatoire
-- ✅ Date départ > date relevé
-- ✅ Date pas dans le passé (> 1 mois)
-- ✅ Date pas dans futur lointain (< 20 ans)
-- ✅ Âge au départ (60-80 ans + warnings 67-70)
-- ✅ Quotité valide (0-1)
-- ✅ Surcotisation + 100% interdit (basé sur textes officiels)
-- ✅ Durée période projection cohérente
+Validation dates de départ améliorée :
 
-### 🎨 Améliorations UX
+✅ Priorisation des messages d'erreur (dates irréalistes avant âges)
+✅ Messages plus précis pour départs après 67-70 ans
+✅ Détection des erreurs de saisie (dates futures lointaines)
+✅ Validation cohérence temporelle renforcée
 
-**Messages d'erreur pédagogiques :**
-- Affichage clair avec icônes (❌ ⚠️ ℹ️)
-- Citations réglementaires quand pertinent
-- Basculement automatique vers l'onglet Résultats lors d'erreurs
-- Suggestions d'actions correctives
 
-**Message informatif intelligent :**
-- Si liquidables < assurance dans Retraite Définitive
-- Suggère automatiquement l'onglet "Analyse Rachat"
-- Calcule l'écart et informe l'utilisateur
+Validation trimestres et jours :
 
-### 🔧 Corrections techniques
+✅ Contrôle des valeurs négatives
+✅ Vérification jours < 90 (règle SRE)
+✅ Cohérence liquidables ≤ assurance
+✅ Messages d'erreur plus explicites
 
-**Validation quotité progressive :**
-- AVANT : Erreur si quotité pendant >= quotité avant (trop restrictif)
-- APRÈS : Validation supprimée (augmentation autorisée selon FAQ DGAFP)
 
-**Bug syntaxe enfants :**
-- Problème : Double accolade `});}); `empêchait l'initialisation
-- Correction : Une seule accolade `});`
+Validation indices et valeurs :
 
-**Surcotisation à 100% :**
-- Recherche réglementaire faite (Code des pensions, SRE, CNRACL)
-- Validation ajoutée avec message pédagogique
-- Distinction claire : Surcotisation = PENDANT temps partiel / Rachat = APRÈS
+✅ Plages réalistes pour indice majoré (350-900)
+✅ Plage réaliste pour valeur du point (4.5-5.5€)
+✅ Validation trimestres requis (150-180)
 
----
 
-## 📚 Documentation
+Validation enfants renforcée :
 
-### Mode d'emploi complet
+✅ Détection incohérence case cochée / nombre saisi
+✅ Validation somme totale enfants
+✅ Messages pédagogiques clairs
 
+
+Onglet Retraite Définitive :
+
+✅ 9 validations spécifiques
+✅ Gestion des warnings vs erreurs bloquantes
+✅ Messages adaptés au contexte
+
+
+
+🎨 Améliorations UX
+Interface utilisateur :
+
+✅ Messages d'erreur hiérarchisés (❌ critique, ⚠️ warning, ℹ️ info)
+✅ Basculement automatique vers l'onglet Résultats en cas d'erreur
+✅ Affichage des warnings n'empêchant pas le calcul
+✅ Suggestions d'actions correctives
+✅ Messages pédagogiques avec contexte réglementaire
+
+🔧 Corrections techniques
+Optimisations du code :
+
+✅ Fonction validerParametres() restructurée et optimisée
+✅ Fonction validerParametresDefinitive() corrigée
+✅ Meilleure gestion des cas limites
+✅ Logique de validation plus robuste
+✅ Performance améliorée
+
+
+📚 Documentation
+Mode d'emploi complet
 Consultez le fichier MODE_EMPLOI.md pour :
-- Guide détaillé de chaque onglet
-- Explications des calculs
-- Guide des exports PDF
-- Cas d'usage concrets
-- FAQ complète
-- Conseils stratégiques
 
-### Sources réglementaires
+Guide détaillé de chaque onglet
+Explications des calculs
+Guide des exports PDF
+Cas d'usage concrets
+FAQ complète
+Conseils stratégiques
 
+Sources réglementaires
 Le simulateur s'appuie sur :
-
-| Texte | Description |
-|-------|-------------|
-| Code des pensions civiles et militaires | Articles L11 à L18, L89 bis à L89 ter, L9 |
-| Décret n°2023-799 (21/08/2023) | Surcote parentale (1,25% par trimestre, max 5%) |
-| Décret n°82-624 (20/07/1982) | Temps partiel (6/7ème et 32/35ème) |
-| Décret n°2007-262 (27/02/2007) | Rachat de trimestres fonction publique |
-| Loi n°2023-270 (14/04/2023) | Réforme des retraites 2023 |
-| Arrêté du 23/06/2023 | Valeur du point d'indice (4,92278 €) |
-
+TexteDescriptionCode des pensions civiles et militairesArticles L11 à L18, L89 bis à L89 ter, L9Décret n°2023-799 (21/08/2023)Surcote parentale (1,25% par trimestre, max 5%)Décret n°82-624 (20/07/1982)Temps partiel (6/7ème et 32/35ème)Décret n°2007-262 (27/02/2007)Rachat de trimestres fonction publiqueLoi n°2023-270 (14/04/2023)Réforme des retraites 2023Arrêté du 23/06/2023Valeur du point d'indice (4,92278 €)
 Sources officielles consultées :
-- [Service des Retraites de l'État](https://retraitesdeletat.gouv.fr)
-- [Service-Public.fr - Retraite progressive](https://www.service-public.fr/particuliers/vosdroits/F37400)
-- [Service-Public.fr - Rachat](https://www.service-public.fr/particuliers/vosdroits/F13243)
-- [CNRACL](https://www.cnracl.retraites.fr)
-- [Code des pensions (Légifrance)](https://www.legifrance.gouv.fr/codes/id/LEGITEXT000006070302/)
 
----
+Service des Retraites de l'État
+Service-Public.fr - Retraite progressive
+Service-Public.fr - Rachat
+CNRACL
+Code des pensions (Légifrance)
 
-## ⚠️ Avertissements importants
 
-### Non-opposabilité
-
-| ❌ Ce simulateur | ✅ Simulateur officiel SRE/ENSAP |
-|------------------|----------------------------------|
-| Aide à la décision | **Seul résultat opposable** |
-| Transparence pédagogique | **Calcul exact mais opaque** |
-| Écart possible 1-2% | **Référence légale** |
-
-➡️ **Pour une estimation officielle définitive, consultez toujours ensap.gouv.fr**
-
-### Écart connu - Calcul de la pension
-
-Un écart de **1 à 2 trimestres liquidables** (~1-2% de pension) peut exister avec le calcul officiel du SRE, probablement dû à des règles d'arrondi internes non documentées publiquement.
-
+⚠️ Avertissements importants
+Non-opposabilité
+❌ Ce simulateur✅ Simulateur officiel SRE/ENSAPAide à la décisionSeul résultat opposableTransparence pédagogiqueCalcul exact mais opaqueÉcart possible 1-2%Référence légale
+➡️ Pour une estimation officielle définitive, consultez toujours ensap.gouv.fr
+Écart connu - Calcul de la pension
+Un écart de 1 à 2 trimestres liquidables (~1-2% de pension) peut exister avec le calcul officiel du SRE, probablement dû à des règles d'arrondi internes non documentées publiquement.
 Le simulateur applique rigoureusement la méthode SRE documentée.
+Rachat de trimestres - Coefficients indicatifs
+Les coefficients de rachat sont indicatifs (base 2024, catégorie sédentaire). Demandez toujours un devis officiel au SRE via ensap.gouv.fr avant de prendre une décision.
 
-### Rachat de trimestres - Coefficients indicatifs
+💻 Technologies utilisées
+Stack technique
 
-**Important** : Les coefficients utilisés pour le rachat sont indicatifs (base 2024, catégorie sédentaire). Le coût exact dépend de nombreux paramètres :
-- Votre traitement indiciaire au moment du rachat
-- Votre catégorie (sédentaire, actif, insalubre)
-- Les barèmes en vigueur à la date du rachat
+HTML5 - Structure sémantique
+CSS3 - Design moderne et responsive
+JavaScript Vanilla - Aucune dépendance framework
+Chart.js 4.4.1 - Graphiques interactifs
+jsPDF 2.5.1 - Export PDF natif avec support accents
 
-**Pour un devis personnalisé et opposable, contactez toujours le SRE via ensap.gouv.fr**
+Performance
 
-### Règle des six mois
+⚡ Chargement instantané (fichier unique ~158 Ko)
+🔒 100% local (aucune donnée transmise)
+💾 Pas de base de données requise
+📱 Responsive (mobile, tablette, desktop)
 
-Une augmentation d'indice majoré doit avoir ≥ 6 mois d'ancienneté avant le départ en retraite pour être prise en compte.
-
----
-
-## 🧮 Méthodologie de calcul
-
-### Formule de base de la pension
-Pension = Traitement indiciaire × 75% × (Trimestres liquidables / Trimestres requis)
-
-### Méthode SRE (base 360 jours/an)
-
-- 1 année = 360 jours
-- 1 mois = 30 jours
-- 1 trimestre = 90 jours
-- Arrondi final : ≥45 jours = +1 trimestre
-
-### Rachat de trimestres (Fonction Publique) ⭐ CORRIGÉ V.04.2.5
-
-**Formule :**
-Coût = Traitement indiciaire × Coefficient d'âge × Nombre de trimestres
-
-**Coefficients indicatifs (base 2024) :**
-
-| Âge | Option 1 (Taux seul) | Option 2 (Taux + Durée) |
-|-----|---------------------|------------------------|
-| 20-29 ans | 25-28% | 45-50% |
-| 30-39 ans | 28-35% | 50-62% |
-| 40-49 ans | 35-48% | 62-85% |
-| 50-54 ans | 48-65% | 85-115% |
-| 55-59 ans | 65-85% | 115-150% |
-| 60+ ans | 85-90% | 150-160% |
-
-**Exemple concret :**
-- Âge : 42 ans
-- Traitement indiciaire : 2 353 €
-- Option 2 (Taux + Durée)
-- Coefficient interpolé : ~64%
-- Coût par trimestre : 2 353 × 0,64 = **1 506 €**
-- Coût 4 trimestres : 1 506 × 4 = **6 024 €**
-- Coût réel (TMI 30%) : 6 024 × 0,70 = **4 217 €**
-
-### Exports PDF - Support natif des accents
-
-**V.04.2.6+ - Amélioration majeure :**
-- jsPDF 2.5.1 supporte nativement tous les accents français
-- Plus besoin de conversion ou fonction spéciale
-- Accents parfaitement préservés dans les PDFs
-- Compatible tous systèmes
-
----
-
-## 💻 Aspects techniques
-
-### Technologies utilisées
-
-- **HTML5** : Structure de l'application
-- **CSS3** : Interface responsive et moderne
-- **JavaScript (Vanilla)** : Logique métier et calculs
-- **Chart.js 4.4.1** : Visualisations graphiques
-- **jsPDF 2.5.1** : Génération des exports PDF
-
-### Compatibilité
-
-| Navigateur | Version minimale | Support |
-|------------|------------------|---------|
-| Chrome | 90+ | ✅ Complet |
-| Firefox | 88+ | ✅ Complet |
-| Safari | 14+ | ✅ Complet |
-| Edge | 90+ | ✅ Complet |
-
-### Performances
-
-- ⚡ Chargement instantané (fichier unique ~130 Ko)
-- 🔒 100% local (aucune donnée transmise)
-- 💾 Pas de base de données requise
-- 📱 Responsive (mobile, tablette, desktop)
-
-### Architecture
+Architecture
 simulateur.html
 ├── Structure HTML
 │   ├── 7 onglets (tabs)
@@ -337,23 +224,18 @@ simulateur.html
 │   ├── Mode responsive
 │   └── Thème vert (fonctionnaire)
 └── Logique JavaScript
-├── Calculs SRE (base 360j/an)
-├── Analyses actuarielles
-├── Coefficients rachat FP (CORRIGÉ)
-├── Génération de graphiques
-├── Exports PDF natifs (V.04.2.6)
-├── Export/Import JSON
-└── Validations exhaustives (V.04.2.7) ⭐ NOUVEAU
+    ├── Calculs SRE (base 360j/an)
+    ├── Analyses actuarielles
+    ├── Coefficients rachat FP (CORRIGÉ)
+    ├── Génération de graphiques
+    ├── Exports PDF natifs (V.04.2.6)
+    ├── Export/Import JSON
+    └── Validations exhaustives (V.04.2.8) ⭐ AMÉLIORÉES
 
----
-
-## 🔧 Développement
-
-### Structure du code
-
-**Fonctions principales :**
-```javascript
-// Calculs de base
+🔧 Développement
+Structure du code
+Fonctions principales :
+javascript// Calculs de base
 calculerPeriodesServiceSRE(dateDebut, dateFin)
 arrondirTrimestresLiquidables(totalJours)
 calculerDureeAssurance(totalJours)
@@ -371,9 +253,9 @@ getCoutRachatParTrimestre(age, option, traitement) // Coût FP
 calculerRentabiliteSurcotisation(...)
 analyserRachat()
 
-// Validations (NOUVEAU V.04.2.7) ⭐
-validerParametres() // 22 validations onglet Paramètres
-validerParametresDefinitive() // 9 validations onglet Retraite Définitive
+// Validations (AMÉLIORÉES V.04.2.8) ⭐
+validerParametres() // 22 validations onglet Paramètres - OPTIMISÉES
+validerParametresDefinitive() // 9 validations onglet Retraite Définitive - CORRIGÉES
 
 // Exports PDF (V.04.2.6 - Support natif)
 exporterResultatsPDF()
@@ -383,7 +265,8 @@ exporterAnalyseRachatPDF()
 // Interface
 switchTab(tabName)
 updateChart(...)
-exporterParametresUtilisateur()
+exporterParams()
+importerParams()
 Contribuer
 Les contributions sont les bienvenues ! Pour contribuer :
 
@@ -403,9 +286,41 @@ Version du navigateur
 
 
 📜 Historique des versions
-V.04.2.7 (Octobre 2025) - Actuelle ⭐
-Améliorations majeures :
+V.04.2.8 (Novembre 2025) - Actuelle ⭐
+Corrections critiques de la validation :
+✅ Validation date de naissance optimisée :
 
+Messages d'erreur hiérarchisés (critiques vs warnings)
+Détection dates irréalistes (avant 1900, après 2080)
+Validation âge actuel améliorée
+Meilleure expérience utilisateur
+
+✅ Validation dates de départ améliorée :
+
+Priorisation des erreurs (dates irréalistes → âges → règles)
+Messages plus précis et pédagogiques
+Détection améliorée des erreurs de saisie
+
+✅ Validations trimestres et indices :
+
+Contrôles renforcés (négatifs, plages réalistes)
+Messages d'erreur plus explicites
+Cohérence assurance/liquidables vérifiée
+
+✅ Onglet Retraite Définitive :
+
+9 validations corrigées et optimisées
+Gestion warnings vs erreurs bloquantes
+Messages adaptés au contexte
+
+Améliorations techniques :
+
+Code de validation restructuré et optimisé
+Performance améliorée
+Gestion robuste des cas limites
+
+V.04.2.7 (Octobre 2025)
+Améliorations majeures :
 ✅ 31 validations de cohérence implémentées (22 Paramètres + 9 Retraite Définitive)
 ✅ Messages d'erreur pédagogiques avec basculement automatique
 ✅ Validation dates, trimestres, indices, enfants, quotités
@@ -413,16 +328,14 @@ Améliorations majeures :
 ✅ Bug syntaxe enfants corrigé
 ✅ Validation surcotisation + 100% ajoutée
 ✅ UX améliorée : champs grisés automatiquement
-
 Corrections techniques :
 
 Validation quotité progressive supprimée (trop restrictive)
-Double accolade });});  corrigée en });
+Double accolade });}); corrigée en });
 Distinction claire surcotisation vs rachat
 
 V.04.2.6 (Octobre 2025)
 Améliorations majeures :
-
 ✅ Support natif des accents par jsPDF 2.5.1 (plus de conversion nécessaire)
 ✅ Avertissements renforcés partout (bannière rouge, PDF, footer)
 ✅ Phase de validation en cours documentée correctement
@@ -430,29 +343,22 @@ Améliorations majeures :
 ✅ Protection juridique maximale (ensap.gouv.fr répété, disclaimers clairs)
 ✅ Correction toutes les dates : Octobre 2025
 ✅ Modèle 100% gratuit confirmé
-
 V.04.2.5 (Janvier 2025)
-
 🔴 CORRECTION MAJEURE : Remplacement barèmes secteur privé → coefficients Fonction Publique d'État
 ✅ Calcul rachat basé sur traitement indiciaire × coefficient d'âge
 ✅ Interpolation linéaire des coefficients selon l'âge précis
 ✅ Division du coût par ~2,5 (exemple : 15 200 € → 5 836 €)
 ✅ Tableau des coefficients dans l'onglet Sources
 ✅ Avertissements renforcés sur le caractère indicatif
-
 V.04.2.4 (Janvier 2025)
-
 ✅ CORRECTION MAJEURE : Documentation pension provisoire (évolution quotité)
 ✅ Ajout encadré informatif dans Paramètres
 ✅ Mise à jour onglet Sources
 ❌ Erreur corrigée en V.04.2.5 : Barèmes rachat incorrects
-
 V.04.2.3 (Janvier 2025)
-
 ✨ Nouvel onglet "Retraite Définitive"
 ✨ Option Décret 1982 (6/7ème et 32/35ème)
 📊 Graphiques optimisés (aspectRatio: 3, max-width: 800px)
-
 Versions antérieures
 
 V.04.2.x (2024) : Amélioration interface utilisateur
@@ -461,25 +367,19 @@ V.04.0.x (2023) : Intégration Décret 2023-799 (surcote parentale)
 
 
 📋 Roadmap
-Version 4.2.8 (Prévue Q4 2025)
-
-☐ Validation onglet Graphique
-☐ Tests finaux de tous les onglets
+Version 4.2.9 (Prévue Q1 2026)
+☐ Tests approfondis de tous les scénarios de validation
+☐ Amélioration messages d'erreur encore plus pédagogiques
 ☐ Documentation complète des cas limites
-
-Version 4.3.x (Prévue Q1 2026)
-
+Version 4.3.x (Prévue Q2 2026)
 ☐ Ajout de scenarios "what-if" multiples
 ☐ Mode sombre
 ☐ Comparaison côte à côte de 2 simulations
 ☐ Amélioration exports PDF (graphiques inclus)
-
-Version 4.4.x (Prévue Q2 2026)
-
+Version 4.4.x (Prévue Q3 2026)
 ☐ Intégration des régimes spéciaux
 ☐ Calculateur de pension de réversion
 ☐ Mise à jour automatique des barèmes rachat
-
 
 🤗 Remerciements
 Ce projet a été rendu possible grâce à :
@@ -495,6 +395,7 @@ Merci particulier :
 Aux utilisateurs qui ont signalé l'inexactitude sur la pension provisoire (V.04.2.4)
 À l'utilisateur qui a remarqué que les coûts de rachat étaient "très chers" (V.04.2.5)
 Aux beta-testeurs qui ont identifié les incohérences de saisie (V.04.2.7)
+Aux testeurs qui ont remonté les problèmes de validation (V.04.2.8)
 
 Ces retours ont permis des corrections majeures qui améliorent significativement la précision et la robustesse du simulateur !
 
@@ -550,13 +451,12 @@ Si ce simulateur vous a été utile, n'hésitez pas à :
 
 
 <p align="center">
-  <strong>Simulateur de Retraite Progressive V.04.2.7</strong><br>
+  <strong>Simulateur de Retraite Progressive V.04.2.8</strong><br>
   Développé avec Claude (Anthropic)<br>
-  Dernière mise à jour : Octobre 2025
+  Dernière mise à jour : Novembre 2025
 </p>
 <p align="center">
   <em>Ce simulateur ne remplace pas les outils officiels de l'État</em><br>
   <strong>Pour une estimation officielle : <a href="https://ensap.gouv.fr">ensap.gouv.fr</a></strong>
 </p>
-```
 
