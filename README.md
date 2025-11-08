@@ -1,8 +1,8 @@
-
-README.md mis à jour pour V.04.2.8
 🧮 Simulateur de Retraite Progressive - Fonctionnaire d'État
+
 [![Version](https://img.shields.io/badge/version-4.2.8-green.svg)](https://github.com/J34NMY/simulateur-retraite-progressive/blob/main/simulateur_retraite_V.04.2.8.html)
 [![License](https://img.shields.io/badge/license-Gratuit%20%C3%A9ducatif-blue.svg)](https://github.com/J34NMY/simulateur-retraite-progressive/blob/main/LICENSE)
+
 Un simulateur pédagogique gratuit et transparent pour estimer votre retraite progressive et définitive en tant que fonctionnaire d'État, basé sur la méthode officielle du Service des Retraites de l'État (SRE).
 🎓 Outil éducatif gratuit - Aucune inscription, aucun paiement, aucune donnée collectée.
 
