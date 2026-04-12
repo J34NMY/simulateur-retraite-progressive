@@ -36,7 +36,14 @@ Exportez vos résultats en PDF si souhaité
 
 ✨ Fonctionnalités principales
 📋 7 onglets complets
-OngletDescriptionParamètresSaisie de vos données personnelles et professionnelles + 31 validations renforcéesRésultats RPSimulation détaillée de la retraite progressive + Export PDFRetraite DéfinitiveProjection de votre retraite sans période progressive + Export PDFGraphiqueComparaison visuelle des revenus selon la quotitéAnalyse RachatÉvaluation de la rentabilité du rachat de trimestres + Export PDFSourcesRéférences réglementaires et documentationMentions LégalesConditions d'utilisation, confidentialité, crédits
+Onglet: Description Paramètres Saisie de vos données personnelles et professionnelles + 31 validations renforcées 
+Résultats:
+Simulation détaillée de la retraite progressive + Export PDF Retraite Définitive
+Projection de votre retraite sans période progressive + Export PDF 
+Graphique Comparaison visuelle des revenus selon la quotité
+Analyse Rachat Évaluation de la rentabilité du rachat de trimestres + Export PDF 
+Sources Références réglementaires et documentation 
+Mentions Légales Conditions d'utilisation, confidentialité, crédits
 🔧 Calculs avancés
 
 ✅ Méthode SRE officielle (base 360 jours/an, arrondi ≥45 jours)
@@ -177,7 +184,7 @@ Conseils stratégiques
 
 Sources réglementaires
 Le simulateur s'appuie sur :
-TexteDescriptionCode des pensions civiles et militairesArticles L11 à L18, L89 bis à L89 ter, L9Décret n°2023-799 (21/08/2023)Surcote parentale (1,25% par trimestre, max 5%)Décret n°82-624 (20/07/1982)Temps partiel (6/7ème et 32/35ème)Décret n°2007-262 (27/02/2007)Rachat de trimestres fonction publiqueLoi n°2023-270 (14/04/2023)Réforme des retraites 2023Arrêté du 23/06/2023Valeur du point d'indice (4,92278 €)
+Texte Description Code des pensions civiles et militaires Articles L11 à L18, L89 bis à L89 ter, L9 Décret n°2023-799 (21/08/2023)Surcote parentale (1,25% par trimestre, max 5%)Décret n°82-624 (20/07/1982)Temps partiel (6/7ème et 32/35ème)Décret n°2007-262 (27/02/2007)Rachat de trimestres fonction publique Loi n°2023-270 (14/04/2023)Réforme des retraites 2023 Arrêté du 23/06/2023Valeur du point d'indice (4,92278 €)
 Sources officielles consultées :
 
 Service des Retraites de l'État
@@ -189,7 +196,7 @@ Code des pensions (Légifrance)
 
 ⚠️ Avertissements importants
 Non-opposabilité
-❌ Ce simulateur✅ Simulateur officiel SRE/ENSAPAide à la décisionSeul résultat opposableTransparence pédagogiqueCalcul exact mais opaqueÉcart possible 1-2%Référence légale
+❌ Ce simulateur✅ Simulateur officiel SRE/ENSAP Aide à la décision Seul résultat opposable Transparence pédagogique Calcul exact mais opaque Écart possible 1-2% Référence légale
 ➡️ Pour une estimation officielle définitive, consultez toujours ensap.gouv.fr
 Écart connu - Calcul de la pension
 Un écart de 1 à 2 trimestres liquidables (~1-2% de pension) peut exister avec le calcul officiel du SRE, probablement dû à des règles d'arrondi internes non documentées publiquement.
