@@ -61,7 +61,7 @@
   <h1>Simulateur de Retraite Progressive – Fonctionnaire d'État</h1>
   <h1>Suspension de la réforme 2023 au 01/09/2026 (LFSS 2026, art. 105)</h1>
   <div style="margin:20px 0;padding:12px;background:#fff4e6;border-left:4px solid #f97316;border-radius:6px;text-align:center;">
-    <p><strong>Version :</strong> V.04.2.8-GEL2026 - <strong>Réglementation :</strong> LFSS 2026, art. 105 – Suspension de la réforme 2023 au 01/09/2026</p>
+    <p><strong>Version :</strong> V.05 - <strong>Réglementation :</strong> LFSS 2026, art. 105 – Suspension de la réforme 2023 au 01/09/2026</p>
     <p style="color:#c2410c;font-size:0.9rem;"><strong>CORRECTIONS 12/06/2026 :</strong> Surcote parentale non applicable génération 1964 et 1er trim. 1965 (âge légal 62T3 &lt; 63 ans). Plafond légal Article L13 (100% traitement). Surcote jusqu'à 70 ans. Source : CNRACL 19/05/2026 + ENSAP.</p>
   </div>
 
@@ -474,7 +474,7 @@
         <h4>Éditeur du simulateur</h4>
         <p><strong>Développé par :</strong> Jean-Michel DI PACO</p>
         <p><strong>Avec l'assistance technique de :</strong> Claude (Anthropic)</p>
-        <p><strong>Version :</strong> V.04.2.8-GEL2026 – Corrections 12/06/2026</p>
+        <p><strong>Version :</strong> V.05 – Corrections 14/06/2026</p>
         <p><strong>Réglementation :</strong> LFSS 2026, art. 105 – Suspension de la réforme 2023 au 01/09/2026</p>
       </div>
       <div class="warn">
@@ -484,7 +484,7 @@
   </div>
 
   <footer style="margin-top: 50px; padding: 20px; background: #f9fafb; border-top: 2px solid #e5e7eb; text-align: center; font-size: 0.85rem; color: #6b7280;">
-    <p><strong>Simulateur de Retraite Progressive V.04.2.8-GEL2026</strong> – Outil gratuit et pédagogique NON OFFICIEL</p>
+    <p><strong>Simulateur de Retraite Progressive V.05</strong> – Outil gratuit et pédagogique NON OFFICIEL</p>
     <p>Suspension réforme 2023 (LFSS 2026, art. 105) – Corrections 14/06/2026</p>
     <p style="color: #dc2626; font-weight: bold;">Pour une estimation OFFICIELLE : <a href="https://ensap.gouv.fr" target="_blank" style="color: #dc2626;">ensap.gouv.fr</a></p>
   </footer>
@@ -1119,7 +1119,7 @@
     resultHTML += '<p>Simulateur éducatif NON OFFICIEL. Pour une estimation officielle : <a href="https://ensap.gouv.fr" target="_blank">ensap.gouv.fr</a></p>';
     resultHTML += '</div>';
 
-    resultHTML += '<p class="muted" style="margin-top:20px;">V.04.2.8-GEL2026 – Corrections 12/06/2026</p>';
+    resultHTML += '<p class="muted" style="margin-top:20px;">V.05 – Corrections 14/06/2026</p>';
 
     document.getElementById('resultat').innerHTML = resultHTML;
     switchTab('resultats');
@@ -1559,7 +1559,7 @@
 
   function exporterParams() {
     const inputs = lireInputs();
-    const data = { version: "V.04.2.8-GEL2026", date: new Date().toISOString(), parametres: {
+    const data = { version: "V.05", date: new Date().toISOString(), parametres: {
       indice: inputs.indice, valeurPoint: inputs.valeurPoint,
       dateReleve: document.getElementById('dateReleve').value,
       trimAssuranceReleve: inputs.trimAssuranceReleve, joursAssuranceReleve: inputs.joursAssuranceReleve,
