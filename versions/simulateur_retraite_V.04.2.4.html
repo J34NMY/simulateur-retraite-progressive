@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <title>Simulateur Retraite Progressive - V.04.2.1</title>
+  <title>Simulateur Retraite Progressive - V.04.2.4</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root{--pri:#22c55e;--pri-200:rgba(34,197,94,0.15);--muted:#6b7280;--warn:#8a5a00;--ok:#166534;--warn-bg:#fff7e6;--ok-bg:#ecfdf5;--sep:#e5e7eb;--info-bg: #e8f4fc;--info-border: #3498db;}
@@ -40,11 +40,17 @@
     .tab-content { display: none; min-height: 400px; }
     .tab-content.active { display: block; }
     
-    canvas { max-width:100%; height:320px; margin: 20px 0; }
+    .graphique-container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 0 20px;
+    }
+    
+    canvas { max-width:100%; margin: 20px 0; display: block; }
     .bonif-label { display: flex; align-items: center; gap: 6px; font-size: 0.92rem; }
     .bonif-label input[type="checkbox"] { margin: 0; }
     .tooltip { position: relative; cursor: help; display: inline-flex; align-items: center; font-size: 1rem; }
-    .tooltiptext { visibility: hidden; width: 320px; background-color: #fffbe6; color: #614700; text-align: left; border-radius: 6px; padding: 12px; border: 1px solid #ffe58f; position: absolute; z-index: 1; top: 125%; left: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.15); font-size: 0.9rem; line-height: 1.4; }
+    .tooltiptext { visibility: hidden; width: 320px; background-color: #fffbe6; color: #614700; text-align: left; border-radius: 6px; padding: 12px; border: 1px solid #ffe58f; position: absolute; z-index: 1; top: 125%; right: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.15); font-size: 0.9rem; line-height: 1.4; }
     .tooltip:hover .tooltiptext { visibility: visible; }
     .remuneration-info { display: flex; align-items: center; gap: 8px; }
     .info-icon { font-size: 16px; color: #3498db; cursor: help; }
@@ -76,14 +82,15 @@
   <h1>Simulateur de Retraite Progressive – Fonctionnaire d'État</h1>
   
   <div style="margin:20px 0;padding:12px;background:#f0fdf4;border-left:4px solid #22c55e;border-radius:6px;text-align:center;">
-    <p><strong>Version :</strong> V.04.2.1 - Validation calcul + disclaimer écart SRE – <strong>Réglementation :</strong> Décret n° 2023-799 du 21 août 2023</p>
-    <p style="font-size:0.9rem;color:#166534;margin-top:5px;"><strong>Mise à jour :</strong> Ajout onglet "Analyse Rachat de trimestres"</p>
+    <p><strong>Version :</strong> V.04.2.4 - Correction méthode pension provisoire – <strong>Réglementation :</strong> Décret n° 2023-799 du 21 août 2023</p>
+    <p style="font-size:0.9rem;color:#166534;margin-top:5px;"><strong>Mise à jour :</strong> Correction documentation pension provisoire (évolution quotité)</p>
   </div>
 
   <div class="tabs-container">
     <nav class="tabs-nav">
       <button class="tab-button active" onclick="switchTab('parametres')">Paramètres</button>
-      <button class="tab-button" onclick="switchTab('resultats')">Résultats</button>
+      <button class="tab-button" onclick="switchTab('resultats')">Résultats RP</button>
+      <button class="tab-button" onclick="switchTab('definitive')">Retraite Définitive</button>
       <button class="tab-button" onclick="switchTab('graphique')">Graphique</button>
       <button class="tab-button" onclick="switchTab('rachat')">Analyse Rachat</button>
       <button class="tab-button" onclick="switchTab('sources')">Sources</button>
@@ -175,13 +182,33 @@
           <div style="background: #f0fdf4; padding: 10px; border-radius: 6px; margin: 10px 0;">
             <label for="quotite">Quotité pendant la retraite progressive</label>
             <select id="quotite">
-              <option value="0.90">90 % (32/35e)</option>
-              <option value="0.80" selected>80 % (6/7e)</option>
+              <option value="0.90">90 %</option>
+              <option value="0.80" selected>80 %</option>
               <option value="0.70">70 %</option>
               <option value="0.60">60 %</option>
               <option value="0.50">50 %</option>
             </select>
             <small>Quotité pendant la période progressive (impact surcote parentale)</small>
+          </div>
+
+          <div style="margin-top: 15px; background: #fff7ed; padding: 10px; border-radius: 6px; border-left: 3px solid #f97316;">
+            <label class="bonif-label">
+              <input type="checkbox" id="appliquerDecret1982" checked>
+              <span>Temps Partiel Appliquer le Décret n°82-624 (6/7ème et 32/35ème)</span>
+              <span class="tooltip info-icon">ℹ️
+                <span class="tooltiptext">
+                  <strong>Décret n°82-624 du 20 juillet 1982</strong><br><br>
+                  Pour certains fonctionnaires en temps partiel de droit commun :<br>
+                  • <strong>80%</strong> → rémunération à <strong>6/7ème</strong> (≈85,71%)<br>
+                  • <strong>90%</strong> → rémunération à <strong>32/35ème</strong> (≈91,43%)<br><br>
+                  <strong>Comment vérifier ?</strong><br>
+                  Consultez votre fiche de paie actuelle Traitement Brut si vous êtes déjà à temps partiel 80% ou 90%.<br><br>
+                  Si vous travaillez 4 jours/semaine (28h/35h) et êtes payé plus que 80%, ce décret s'applique à vous.<br><br>
+                  <strong>Par défaut : coché</strong> (cas majoritaire)
+                </span>
+              </span>
+            </label>
+            <small>Coché par défaut - Consultez le mode d'emploi pour plus de détails</small>
           </div>
         </div>
       </div>
@@ -295,6 +322,16 @@
               <strong>Règle SRE :</strong> Tous les trimestres excédentaires génèrent une majoration de 1,25%.
             </div>
           </div>
+          
+          <div class="info" style="margin-top: 15px; background: #fffbeb; border-left-color: #f59e0b;">
+            <h4 style="margin-top: 0; color: #b45309;">ℹ️ Pension provisoire pendant la retraite progressive</h4>
+            <p style="font-size: 0.85rem; margin: 0;">
+              <strong>Calculée au départ :</strong> basée sur les droits acquis AVANT le départ progressif<br>
+              <strong>Évolution possible :</strong> si vous changez de quotité, la part versée s'ajuste automatiquement<br>
+              <strong>Trimestres pendant la progressive :</strong> ne modifient PAS le montant provisoire<br>
+              <strong>Recalcul à la retraite définitive :</strong> tous les droits acquis pendant la progressive seront pris en compte
+            </p>
+          </div>
         </div>
       </div>
 
@@ -318,13 +355,123 @@
       </div>
     </div>
 
-    <!-- ONGLET GRAPHIQUE -->
-    <div id="tab-graphique" class="tab-content">
+    <!-- ONGLET RETRAITE DEFINITIVE -->
+    <div id="tab-definitive" class="tab-content">
       <div style="text-align: center; margin-bottom: 20px;">
-        <h3>Comparaison des revenus selon la quotité de travail</h3>
-        <p class="muted">Ce graphique compare vos revenus totaux selon différentes quotités de travail pendant la retraite progressive.</p>
+        <h3>Simulation Retraite Définitive (sans retraite progressive)</h3>
+        <p class="muted">Projetez votre pension de retraite définitive selon différents scénarios de quotité</p>
       </div>
-      <canvas id="graphique"></canvas>
+
+      <div class="info" style="margin-bottom: 20px;">
+        <strong>ℹ️ Mode d'emploi :</strong> Cliquez sur "Récupérer les données" pour importer vos informations depuis l'onglet Paramètres, puis définissez votre date de départ et la quotité envisagée jusqu'à la retraite.
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <h4>Données récupérées du simulateur</h4>
+          <div style="background: #f8f9fa; padding: 12px; border-radius: 6px; margin-bottom: 15px;">
+            <p><strong>Date de naissance :</strong> <span id="def-dateNaissance">-</span></p>
+            <p><strong>Date du relevé :</strong> <span id="def-dateReleve">-</span></p>
+            <p><strong>Traitement actuel :</strong> <span id="def-traitement">-</span> €</p>
+            <p><strong>Trimestres d'assurance au relevé :</strong> <span id="def-assurance">-</span></p>
+            <p><strong>Trimestres liquidables au relevé :</strong> <span id="def-liquidables">-</span></p>
+            <p><strong>Trimestres requis :</strong> <span id="def-requis">-</span></p>
+            <p><strong>Quotité actuelle :</strong> <span id="def-quotiteActuelle">-</span> %</p>
+          </div>
+          <button onclick="recupererDonneesDefinitive()" class="primary" style="width: 100%; max-width: 320px;">
+            ↻ Récupérer les données du simulateur
+          </button>
+        </div>
+
+        <div class="col">
+          <h4>Projection jusqu'à la retraite</h4>
+          
+          <label for="def-dateDepart">Date de départ en retraite</label>
+          <input id="def-dateDepart" type="date" value="2027-07-01" />
+          <small>Date souhaitée de départ en retraite définitive</small>
+
+          <label for="def-quotiteFuture">Quotité envisagée jusqu'au départ</label>
+          <select id="def-quotiteFuture">
+            <option value="1.00" selected>100 % (Temps plein)</option>
+            <option value="0.90">90 %</option>
+            <option value="0.80">80 %</option>
+            <option value="0.70">70 %</option>
+            <option value="0.60">60 %</option>
+            <option value="0.50">50 %</option>
+          </select>
+          <small>Quotité de travail prévue jusqu'à la retraite</small>
+
+          <div style="margin-top: 15px; background: #fff7ed; padding: 10px; border-radius: 6px; border-left: 3px solid #f97316;">
+            <label class="bonif-label">
+              <input type="checkbox" id="def-appliquerDecret1982" checked>
+              <span>Appliquer le Décret n°82-624 (6/7ème et 32/35ème)</span>
+            </label>
+            <small>Pour le calcul de la rémunération à temps partiel</small>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="surcotisation-section">
+            <h4 style="margin-top: 0; color: #3498db;">Options de surcotisation</h4>
+            <div class="surcotisation-label">
+              <input id="def-surcotisation" type="checkbox" />
+              <label for="def-surcotisation" style="display: inline;">Surcotisation pendant la période</label>
+              <span class="tooltip info-icon">ℹ️
+                <span class="tooltiptext">
+                  <strong>Surcotisation jusqu'à la retraite</strong><br><br>
+                  La surcotisation permet de comptabiliser les périodes à temps partiel comme des périodes à temps plein pour le calcul des droits à retraite. Une analyse comparative avec un placement alternatif sera affichée.
+                </span>
+              </span>
+            </div>
+            <small>Si coché: les LIQUIDABLES comptent à 100% + analyse actuarielle vs placement.</small>
+            
+            <div id="def-tauxSurcotisationContainer" class="hidden">
+              <label for="def-tauxSurcotisation">Taux de surcotisation (%)</label>
+              <input id="def-tauxSurcotisation" type="number" step="0.1" value="16.2" readonly style="background-color: #f3f4f6; cursor: not-allowed;" />
+              <small>Taux calculé automatiquement selon quotité choisie.</small>
+              
+              <div style="margin-top: 15px;">
+                <label for="def-tauxPlacement">Taux de placement alternatif (%)</label>
+                <select id="def-tauxPlacement">
+                  <option value="0.015">1,5 % (Comptes sur livret)</option>
+                  <option value="0.025">2,5 % (Comptes à terme)</option>
+                  <option value="0.03" selected>3,0 % (Livret A actuel)</option>
+                  <option value="0.035">3,5 % (Fonds euros AV)</option>
+                  <option value="0.04">4,0 % (LEP si éligible)</option>
+                  <option value="0.045">4,5 % (Placements dynamiques)</option>
+                  <option value="0.05">5,0 % (Scénario optimiste)</option>
+                </select>
+                <small>Taux de rendement pour la stratégie alternative d'épargne</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions" style="margin-top: 30px; justify-content: center;">
+        <button id="btnCalculerDefinitive" class="primary">Calculer la simulation</button>
+        <button onclick="switchTab('parametres')" class="secondary">← Modifier les paramètres</button>
+      </div>
+
+      <div id="resultat-definitive" style="margin-top: 30px;"></div>
+      
+      <div class="graphique-container">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <h4>Comparaison des scénarios de quotité</h4>
+          <p class="muted">Impact de la quotité de travail sur la pension définitive</p>
+        </div>
+        <canvas id="graphique-definitive"></canvas>
+      </div>
+    </div>
+	<!-- ONGLET GRAPHIQUE -->
+    <div id="tab-graphique" class="tab-content">
+      <div class="graphique-container">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <h3>Comparaison des revenus selon la quotité de travail</h3>
+          <p class="muted">Ce graphique compare vos revenus totaux selon différentes quotités de travail pendant la retraite progressive.</p>
+        </div>
+        <canvas id="graphique"></canvas>
+      </div>
     </div>
 
     <!-- ONGLET ANALYSE RACHAT -->
@@ -418,7 +565,7 @@
           <ul style="font-size: 0.9rem;">
             <li><strong>Article L11</strong> – Services pris en compte dans la liquidation</li>
             <li><strong>Article L12</strong> – Bonifications (enfants, dépaysement, militaires)</li>
-            <li><strong>Article L12 bis</strong> – Majoration de durée d'assurance (enfants après 2004)</li>
+			<li><strong>Article L12 bis</strong> – Majoration de durée d'assurance (enfants après 2004)</li>
             <li><strong>Article L13</strong> – Taux de liquidation (75% maximum, porté à 80% avec bonifications)</li>
             <li><strong>Article L14</strong> – Durée d'assurance, décote et surcote</li>
             <li><strong>Article L15</strong> – Règle des six mois pour le traitement de référence</li>
@@ -428,11 +575,12 @@
           
           <h4>Décrets et textes réglementaires</h4>
           <ul style="font-size: 0.9rem;">
+            <li><strong>Décret n°82-624</strong> du 20 juillet 1982 – Temps partiel (6/7ème pour 80%, 32/35ème pour 90%)</li>
             <li><strong>Décret n°2003-1306</strong> du 26 décembre 2003 – Régime de retraite CNRACL et bonifications pour enfants</li>
             <li><strong>Décret n°2011-620</strong> du 31 mai 2011 – Institution de la retraite progressive</li>
             <li><strong>Loi n°2023-270</strong> du 14 avril 2023 – Réforme des retraites (relèvement âge légal, durée de cotisation)</li>
             <li><strong>Décret n°2023-799</strong> du 21 août 2023 – Surcote parentale (1,25% par trimestre, max 5%)</li>
-            <li><strong>Arrêté du 23 juin 2023</strong> – Valeur dupoint d'indice à 4,92278 € au 1er juillet 2023</li>
+            <li><strong>Arrêté du 23 juin 2023</strong> – Valeur du point d'indice à 4,92278 € au 1er juillet 2023</li>
           </ul>
           
           <h4>Principes de calcul (méthode SRE)</h4>
@@ -447,7 +595,14 @@
             
             <p style="margin-top:10px;"><strong>Temps partiel :</strong><br>
             • Assurance : comptabilisé à 100%<br>
-            • Liquidables : proratisé selon la quotité (sauf surcotisation)</p>
+            • Liquidables : proratisé selon la quotité (sauf surcotisation)<br>
+            • Décret 1982 : 80% → 6/7ème, 90% → 32/35ème (si applicable)</p>
+            
+            <p style="margin-top:10px;"><strong>Pension provisoire (retraite progressive) :</strong><br>
+            • Calculée au départ sur les droits acquis à cette date<br>
+            • <strong>ÉVOLUTION :</strong> si changement de quotité, la part versée s'ajuste<br>
+            • Les nouveaux trimestres pendant la progressive ne modifient PAS le montant provisoire<br>
+            • Recalcul complet lors du départ en retraite définitive</p>
             
             <p style="margin-top:10px;"><strong>Surcotes cumulables :</strong><br>
             • Classique : 1,25% par trimestre au-delà de l'âge légal<br>
@@ -485,9 +640,10 @@
       </div>
       
       <div style="margin-top:20px;padding:12px;background:#f0fdf4;border-left:4px solid #22c55e;border-radius:6px;font-size:0.9rem;">
-        <p><strong>Version du simulateur :</strong> V.04.2.1 – Janvier 2025</p>
+        <p><strong>Version du simulateur :</strong> V.04.2.4 – Janvier 2025</p>
         <p><strong>Dernière mise à jour réglementaire :</strong> Décret n°2023-799 du 21 août 2023</p>
         <p><strong>Valeur du point d'indice :</strong> 4,92278 € (au 1er juillet 2023)</p>
+        <p><strong>Correction V.04.2.4 :</strong> Documentation sur l'évolution de la pension provisoire</p>
       </div>
     </div>
   </div>
@@ -495,6 +651,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script>
     let chart;
+    let chartDefinitive;
     
     function switchTab(tabName) {
       document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
@@ -748,13 +905,15 @@
       for (const r of trimestresParAnnee) {
         if (annee >= r.min && annee <= r.max) return r.trimestres;
       }
-      return '';
-    }
+      return '';}
 
     function calcTraitementPlein(indice, valeurPoint){ return indice * valeurPoint; }
-    function calcTraitementTP(traitementPlein, quotite){
-      if (Math.abs(quotite - 0.80) < 1e-9) return traitementPlein * (6/7);
-      if (Math.abs(quotite - 0.90) < 1e-9) return traitementPlein * (32/35);
+    
+    function calcTraitementTP(traitementPlein, quotite, appliquerDecret1982){
+      if (appliquerDecret1982) {
+        if (Math.abs(quotite - 0.80) < 1e-9) return traitementPlein * (6/7);
+        if (Math.abs(quotite - 0.90) < 1e-9) return traitementPlein * (32/35);
+      }
       return traitementPlein * quotite;
     }
 
@@ -786,12 +945,14 @@
       const nbEnfantsApres2003 = parseInt(document.getElementById('enfantsApres2003').value || '0', 10);
       const totalEnfantsEleves = parseInt(document.getElementById('totalEnfantsEleves').value || '0', 10);
       const dateNaissance = new Date(document.getElementById('dateNaissance').value);
+      const appliquerDecret1982 = document.getElementById('appliquerDecret1982').checked;
 
       return {
         indice, valeurPoint, tauxSurcotisation, dateReleve, trimAssuranceReleve, joursAssuranceReleve,
         trimLiquidablesReleve, joursLiquidablesReleve, trimestresRequis, dateDebut, dateFin,
         quotiteAvant, quotite, surcotisation, nbEnfantsAvant2004, nbEnfantsApres2003, totalEnfantsEleves,
-        conditionsEnfantsAvant2004: bonifEnfants, conditionsEnfantsApres2003: majorationEnfants, dateNaissance, sexe
+        conditionsEnfantsAvant2004: bonifEnfants, conditionsEnfantsApres2003: majorationEnfants, dateNaissance, sexe,
+        appliquerDecret1982
       };
     }
 
@@ -876,7 +1037,7 @@
       const dureeAssuranceDepartCalcul = calculerDureeAssurance(totalJoursAssuranceDepart);
       const assuranceDepart = dureeAssuranceDepartCalcul.trimestres;
       
-      const totalJoursLiquidablesDepart= joursLiqReleve + joursLiqP1 + bonifEnfantsJours;
+      const totalJoursLiquidablesDepart = joursLiqReleve + joursLiqP1 + bonifEnfantsJours;
       const liquidablesDepart = arrondirTrimestresLiquidables(totalJoursLiquidablesDepart);
 
       if (!(I.dateNaissance instanceof Date) || isNaN(I.dateNaissance)) {
@@ -1116,7 +1277,7 @@
       const traitementPleinDepart = I.indice * I.valeurPoint;
       const tauxReferenceDepart = 0.75 * (liquidablesDepart / TR);
       const montantReferenceDepart = traitementPleinDepart * tauxReferenceDepart;
-      const traitementTPDepart = calcTraitementTP(traitementPleinDepart, I.quotite);
+      const traitementTPDepart = calcTraitementTP(traitementPleinDepart, I.quotite, I.appliquerDecret1982);
       const pensionProvisoireDepart = montantReferenceDepart * (1 - I.quotite);
       
       let coutSurcotisationMensuel = 0;
@@ -1131,7 +1292,16 @@
       
       resultHTML += '<p><strong>Traitement plein temps :</strong> ' + formatEuro(traitementPleinDepart) + '</p>';
       resultHTML += '<p><strong>Traitement à la quotité:</strong> ' + formatEuro(traitementTPDepart) + '</p>';
+      
+      if (I.appliquerDecret1982 && (Math.abs(I.quotite - 0.80) < 1e-9 || Math.abs(I.quotite - 0.90) < 1e-9)) {
+        const quotitePourcent = (I.quotite * 100).toFixed(0);
+        const fractionAppliquee = Math.abs(I.quotite - 0.80) < 1e-9 ? '6/7ème' : '32/35ème';
+        const pourcentageReel = (traitementTPDepart / traitementPleinDepart * 100).toFixed(2);
+        resultHTML += '<p style="font-size:0.9rem;color:#ea580c;"><em>Décret n°82-624 appliqué : ' + quotitePourcent + '% → ' + fractionAppliquee + ' (≈' + pourcentageReel + '%)</em></p>';
+      }
+      
       resultHTML += '<p><strong>Pension provisoire:</strong> ' + formatEuro(pensionProvisoireDepart) + '</p>';
+      resultHTML += '<p style="font-size:0.85rem;color:#6b7280;"><em>ℹ️ Si vous changez de quotité, la pension provisoire s\'ajustera automatiquement</em></p>';
       resultHTML += '<p><strong>Total brut mensuel:</strong> ' + formatEuro(totalBrutMensuel) + '</p>';
       
       if (I.surcotisation) {
@@ -1166,7 +1336,7 @@
       resultHTML += '<p><strong>Pour une estimation officielle définitive :</strong> Consultez <a href="https://ensap.gouv.fr" target="_blank" style="color:#8a5a00;font-weight:bold;">ensap.gouv.fr</a></p>';
       resultHTML += '</div>';
 
-      resultHTML += '<p class="muted" style="margin-top:20px;">Calculs basés sur la méthode officielle SRE (base 360j/an). Version V.04.2.1.</p>';
+      resultHTML += '<p class="muted" style="margin-top:20px;">Calculs basés sur la méthode officielle SRE (base 360j/an). Version V.04.2.4.</p>';
 
       document.getElementById('resultat').innerHTML = resultHTML;
       switchTab('resultats');
@@ -1180,7 +1350,7 @@
         const traitementPlein = inputs.indice * inputs.valeurPoint;
         const tauxRef = 0.75 * (liquidablesDepart / TR);
         const montantRef = traitementPlein * tauxRef;
-        const traitementTP = calcTraitementTP(traitementPlein, q);
+        const traitementTP = calcTraitementTP(traitementPlein, q, inputs.appliquerDecret1982);
         const pensionProvisoire = montantRef * (1 - q);
         return traitementTP + pensionProvisoire;
       });
@@ -1206,10 +1376,465 @@
         },
         options: {
           responsive: true,
+          aspectRatio: 3,
           plugins: { legend: { display: true }, tooltip: { mode: 'index', intersect: false } },
           scales: {
             x: { title: { display: true, text: 'Quotité de travail' } },
             y: { title: { display: true, text: 'Revenu total brut (€)' }, beginAtZero: false }
+          }
+        }
+      });
+    }
+
+    // ============================================
+    // GESTION DE L'ONGLET RETRAITE DEFINITIVE
+    // ============================================
+
+    function recupererDonneesDefinitive() {
+      const inputs = lireInputs();
+      
+      const traitement = inputs.indice * inputs.valeurPoint;
+      const dateNaissanceStr = inputs.dateNaissance.toLocaleDateString('fr-FR');
+      const dateReleveStr = inputs.dateReleve.toLocaleDateString('fr-FR');
+      
+      const joursAssurance = (inputs.trimAssuranceReleve * 90) + inputs.joursAssuranceReleve;
+      const trimAssurance = Math.floor(joursAssurance / 90);
+      
+      const joursLiquidables = (inputs.trimLiquidablesReleve * 90) + inputs.joursLiquidablesReleve;
+      const trimLiquidables = Math.floor(joursLiquidables / 90);
+      
+      const quotiteActuelle = inputs.quotiteAvant * 100;
+      
+      document.getElementById('def-dateNaissance').textContent = dateNaissanceStr;
+      document.getElementById('def-dateReleve').textContent = dateReleveStr;
+      document.getElementById('def-traitement').textContent = traitement.toFixed(2);
+      document.getElementById('def-assurance').textContent = trimAssurance;
+      document.getElementById('def-liquidables').textContent = trimLiquidables;
+      document.getElementById('def-requis').textContent = inputs.trimestresRequis || autoRemplirTrimestres(inputs.dateNaissance);
+      document.getElementById('def-quotiteActuelle').textContent = quotiteActuelle.toFixed(0);
+    }
+
+    function mettreAJourTauxSurcotisationDefinitive() {
+      const quotite = document.getElementById('def-quotiteFuture').value;
+      const surcotisationCochee = document.getElementById('def-surcotisation').checked;
+      const tauxContainer = document.getElementById('def-tauxSurcotisationContainer');
+      
+      if (surcotisationCochee) {
+        tauxContainer.classList.remove('hidden');
+        if (baremeSurcotisation[quotite]) {
+          document.getElementById('def-tauxSurcotisation').value = baremeSurcotisation[quotite];
+        }
+      } else {
+        tauxContainer.classList.add('hidden');
+      }
+    }
+
+    function calculerRetraiteDefinitive() {
+      const inputs = lireInputs();
+      
+      const dateReleve = inputs.dateReleve;
+      const dateDepart = new Date(document.getElementById('def-dateDepart').value);
+      const quotiteFuture = parseFloat(document.getElementById('def-quotiteFuture').value);
+      const surcotisation = document.getElementById('def-surcotisation').checked;
+      const appliquerDecret1982 = document.getElementById('def-appliquerDecret1982').checked;
+      const tauxSurcotisation = parseFloat(document.getElementById('def-tauxSurcotisation').value) / 100 || 0.162;
+      const tauxPlacement = parseFloat(document.getElementById('def-tauxPlacement').value) || 0.03;
+      
+      if (isNaN(dateReleve) || isNaN(dateDepart) || dateDepart <= dateReleve) {
+        document.getElementById('resultat-definitive').innerHTML = '<p class="warn"><strong>Vérifiez les dates :</strong> le départ doit être postérieur au relevé.</p>';
+        return;
+      }
+      
+      const TR = inputs.trimestresRequis || autoRemplirTrimestres(inputs.dateNaissance);
+      
+      const joursAssuranceReleve = (inputs.trimAssuranceReleve * 90) + inputs.joursAssuranceReleve;
+      const joursLiquidablesReleve = (inputs.trimLiquidablesReleve * 90) + inputs.joursLiquidablesReleve;
+      
+      const periodeProjetee = diffDetaillee(dateReleve, dateDepart);
+      
+      const joursAssProjetee = periodeProjetee.totalJours;
+      const joursLiqProjetee = Math.floor(periodeProjetee.totalJours * (surcotisation ? 1 : quotiteFuture));
+      
+      const bonifEnfantsJours = inputs.conditionsEnfantsAvant2004 ? inputs.nbEnfantsAvant2004 * 4 * 90 : 0;
+      const bonifEnfantsTr = bonifEnfantsJours / 90;
+      
+      const majorationsApres2003Jours = inputs.conditionsEnfantsApres2003 ? inputs.nbEnfantsApres2003 * 2 * 90 : 0;
+      const majorationsApres2003Tr = majorationsApres2003Jours / 90;
+      
+      const totalJoursAssurance = joursAssuranceReleve + joursAssProjetee + bonifEnfantsJours + majorationsApres2003Jours;
+      const dureeAssuranceCalcul = calculerDureeAssurance(totalJoursAssurance);
+      const assuranceFinale = dureeAssuranceCalcul.trimestres;
+      
+      const totalJoursLiquidables = joursLiquidablesReleve + joursLiqProjetee + bonifEnfantsJours;
+      const liquidablesFinale = arrondirTrimestresLiquidables(totalJoursLiquidables);
+      
+      const ageAuDepart = (dateDepart - inputs.dateNaissance) / (1000 * 60 * 60 * 24 * 365.25);
+      
+      const traitementFin = inputs.indice * inputs.valeurPoint;
+      const ratioFin = clamp(liquidablesFinale / TR, 0, 1);
+      let tauxFinal = 0.75 * ratioFin;
+      
+      let blocDecote = '';
+      if (assuranceFinale < TR) {
+        const trimestresManquants = TR - assuranceFinale;
+        const tauxDecoteParTrim = inputs.dateNaissance.getFullYear() >= 1964 ? 1.09 : 1.25;
+        const decoteTotale = trimestresManquants * tauxDecoteParTrim;
+        const tauxApresDecote = Math.max(0, (75 - decoteTotale)) / 100;
+        tauxFinal = tauxApresDecote * ratioFin;
+        
+        const joursManquants = trimestresManquants * 90;
+        const dateTauxPlein = new Date(dateDepart.getTime() + joursManquants * 24 * 60 * 60 * 1000);
+        const dateTauxPleinStr = dateTauxPlein.toLocaleDateString('fr-FR');
+        const date67ans = new Date(inputs.dateNaissance.getFullYear() + 67, inputs.dateNaissance.getMonth(), inputs.dateNaissance.getDate());
+        const date67ansStr = date67ans.toLocaleDateString('fr-FR');
+        
+        blocDecote = '<div class="warn" style="margin-top:15px;"><strong>Détails de la décote :</strong><br>Trimestres manquants : <strong>' + trimestresManquants + '</strong><br>Décote appliquée : <strong>- ' + decoteTotale.toFixed(2) + ' %</strong><br>Taux après décote : <strong>' + (tauxFinal * 100).toFixed(2) + ' %</strong><br>Date estimée du taux plein : <strong>' + dateTauxPleinStr + '</strong><br>Annulation automatique à 67 ans : <strong>' + date67ansStr + '</strong></div>';
+      }
+      
+      if (liquidablesFinale < TR) {
+        const prorata = liquidablesFinale / TR;
+        const pourcentPerte = (1 - prorata) * 100;
+        const tauxApresReduction = (0.75 * prorata * 100).toFixed(2);
+        
+        blocDecote += '<div class="warn" style="margin-top:15px;"><strong>Détails de la réduction – Liquidables :</strong><br>Trimestres liquidables finaux : <strong>' + liquidablesFinale + '</strong> / <strong>' + TR + '</strong><br>Prorata appliqué : <strong>' + liquidablesFinale + ' ÷ ' + TR + ' = ' + prorata.toFixed(3) + '</strong> ( - ' + pourcentPerte.toFixed(1) + ' % )<br>Taux après réduction : <strong>75% × ' + prorata.toFixed(3) + ' = ' + tauxApresReduction + ' %</strong></div>';
+      }
+      
+      const ageSurcoteRequis = calculerAgeSurcote(inputs.dateNaissance);
+      let tauxSurcoteClassique = 0;
+      let tauxSurcoteParentale = 0;
+      let tauxMajorationExcedentaire = 0;
+      let surcoteAppliquee = false;
+      
+      const trimestresExcedentaires = Math.max(0, assuranceFinale - TR);
+      let trimestresExcedentairesRestants = trimestresExcedentaires;
+      
+      const surcoteParentale = calculerSurcoteParentaleSRE(
+        inputs.dateNaissance, TR, assuranceFinale,
+        bonifEnfantsTr, majorationsApres2003Tr, quotiteFuture
+      );
+      
+      if (surcoteParentale.applicable) {
+        tauxSurcoteParentale = surcoteParentale.tauxSurcote;
+        surcoteAppliquee = true;
+        trimestresExcedentairesRestants = Math.max(0, trimestresExcedentairesRestants - surcoteParentale.trimestresRetenus);
+      }
+      
+      if (assuranceFinale >= TR && ageAuDepart >= ageSurcoteRequis && ageAuDepart < 67) {
+        const trimestresSurcotes = Math.floor((ageAuDepart - ageSurcoteRequis) * 4);
+        
+        if (trimestresSurcotes > 0) {
+          tauxSurcoteClassique = trimestresSurcotes * 1.25;
+          surcoteAppliquee = true;
+          trimestresExcedentairesRestants = Math.max(0, trimestresExcedentairesRestants - trimestresSurcotes);
+        }
+      }
+      
+      if (trimestresExcedentairesRestants > 0) {
+        tauxMajorationExcedentaire = trimestresExcedentairesRestants * 1.25;
+        surcoteAppliquee = true;
+      }
+      
+      let tauxSurcoteFinale = 0;
+      let typesSurcoteAppliquees = [];
+      
+      if (tauxSurcoteClassique > 0) {
+        tauxSurcoteFinale += tauxSurcoteClassique;
+        typesSurcoteAppliquees.push("classique");
+      }
+      
+      if (tauxSurcoteParentale > 0) {
+        tauxSurcoteFinale += tauxSurcoteParentale;
+        typesSurcoteAppliquees.push("parentale");
+      }
+      
+      if (tauxMajorationExcedentaire > 0) {
+        tauxSurcoteFinale += tauxMajorationExcedentaire;
+        typesSurcoteAppliquees.push("excedentaire");
+      }
+      
+      if (surcoteAppliquee && tauxSurcoteFinale > 0) {
+        const tauxDeBase = 0.75;
+        const tauxAvecRatio = tauxDeBase * ratioFin;
+        const coefficientSurcote = 1 + (tauxSurcoteFinale / 100);
+        tauxFinal = tauxAvecRatio * coefficientSurcote;
+      }
+      
+      let blocSurcote = '';
+      if (surcoteAppliquee && tauxSurcoteFinale > 0) {
+        blocSurcote = '<div class="ok" style="margin-top:15px;">';
+        blocSurcote += '<strong>Majorations SRE appliquées :</strong><br>';
+        blocSurcote += '<div style="margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 6px;">';
+        blocSurcote += '<strong>Trimestres excédentaires totaux : ' + trimestresExcedentaires + '</strong><br>';
+        
+        if (typesSurcoteAppliquees.includes("parentale")) {
+          blocSurcote += '• <strong>Surcote parentale :</strong> +' + tauxSurcoteParentale.toFixed(2) + '%<br>';
+        }
+        
+        if (typesSurcoteAppliquees.includes("classique")) {
+          blocSurcote += '• <strong>Surcote classique :</strong> +' + tauxSurcoteClassique.toFixed(2) + '%<br>';
+        }
+        
+        if (typesSurcoteAppliquees.includes("excedentaire")) {
+          blocSurcote += '• <strong>Majoration excédentaire :</strong> +' + tauxMajorationExcedentaire.toFixed(2) + '%<br>';
+        }
+        
+        blocSurcote += '</div>';
+        blocSurcote += '<strong>Majoration totale cumulée : +' + tauxSurcoteFinale.toFixed(2) + '%</strong>';
+        blocSurcote += '</div>';
+      }
+      
+      let majorationFamiliale = 0;
+      if (inputs.totalEnfantsEleves >= 3) {
+        majorationFamiliale = 10 + Math.max(0, inputs.totalEnfantsEleves - 3) * 5;
+      }
+      
+      const pensionDefinitive = traitementFin * tauxFinal;
+      const pensionAvecMajorationFamiliale = pensionDefinitive * (1 + majorationFamiliale / 100);
+      
+      let blocMajorationFamiliale = '';
+      if (majorationFamiliale > 0) {
+        const gainMensuel = pensionAvecMajorationFamiliale - pensionDefinitive;
+        blocMajorationFamiliale = '<div class="info" style="margin-top:15px;background:#f3e8ff;border-left-color:#9333ea;"><strong>Majoration familiale : +' + majorationFamiliale + '%</strong><br>Gain : ' + formatEuro(gainMensuel) + '</div>';
+      }
+      
+      let blocSurcotisation = '';
+      if (surcotisation && quotiteFuture < 1) {
+        const traitementPlein = inputs.indice * inputs.valeurPoint;
+        const tauxRetenueSurcotisation = tauxSurcotisation * 100;
+        const tauxRetenueNormal = 11.10;
+        const montantSurcotisationMensuel = (tauxRetenueSurcotisation / 100 * traitementPlein) - (tauxRetenueNormal / 100 * quotiteFuture * traitementPlein);
+        const montantSurcotisationTotalPeriode = montantSurcotisationMensuel * periodeProjetee.moisApprox;
+        
+        blocSurcotisation = '<div class="info" style="margin-top:15px;"><strong>Coût total de la surcotisation : ' + formatEuro(montantSurcotisationTotalPeriode) + '</strong><br>';
+        blocSurcotisation += 'Coût mensuel : ' + formatEuro(montantSurcotisationMensuel) + ' sur ' + periodeProjetee.moisApprox.toFixed(0) + ' mois</div>';
+        
+        const joursLiqProjeteSansSurcotisation = Math.floor(periodeProjetee.totalJours * quotiteFuture);
+        const totalJoursLiquidablesSansSurcotisation = joursLiquidablesReleve + joursLiqProjeteSansSurcotisation + bonifEnfantsJours;
+        const liquidablesFinalesSansSurcotisation = arrondirTrimestresLiquidables(totalJoursLiquidablesSansSurcotisation);
+        const ratioFinSansSurcotisation = clamp(liquidablesFinalesSansSurcotisation / TR, 0, 1);
+        
+        let tauxFinalSansSurcotisation = 0.75 * ratioFinSansSurcotisation;
+        let tauxFinalAvecSurcotisation = 0.75 * ratioFin;
+        
+        if (surcoteAppliquee && tauxSurcoteFinale > 0) {
+          const tauxDeBase = 0.75;
+          const coefficientSurcote = 1 + (tauxSurcoteFinale / 100);
+          tauxFinalSansSurcotisation = (tauxDeBase * ratioFinSansSurcotisation) * coefficientSurcote;
+          tauxFinalAvecSurcotisation = (tauxDeBase * ratioFin) * coefficientSurcote;
+        }
+        
+        if (assuranceFinale < TR) {
+          const trimestresManquants = TR - assuranceFinale;
+          const tauxDecoteParTrim = inputs.dateNaissance.getFullYear() >= 1964 ? 1.09 : 1.25;
+          const decoteTotale = trimestresManquants * tauxDecoteParTrim;
+          const tauxApresDecote = Math.max(0, (75 - decoteTotale)) / 100;
+          tauxFinalSansSurcotisation = tauxApresDecote * ratioFinSansSurcotisation;
+          tauxFinalAvecSurcotisation = tauxApresDecote * ratioFin;
+        }
+        
+        const pensionSansSurcotisation = traitementFin * tauxFinalSansSurcotisation;
+        const pensionAvecSurcotisation = traitementFin * tauxFinalAvecSurcotisation;
+        
+        const analyseRentabilite = calculerRentabiliteSurcotisation(
+          pensionSansSurcotisation,
+          pensionAvecSurcotisation,
+          montantSurcotisationTotalPeriode,
+          inputs.sexe,
+          ageAuDepart,
+          montantSurcotisationMensuel,
+          periodeProjetee.moisApprox,
+          tauxPlacement
+        );
+        
+        blocSurcotisation += afficherAnalyseRentabilite(analyseRentabilite);
+      }
+      
+      let resultHTML = '<div class="result-section">';
+      resultHTML += '<h3>Projection de carrière (méthode SRE)</h3>';
+      resultHTML += '<p><strong>Période projetée :</strong> ' + periodeProjetee.annees + ' an(s), ' + periodeProjetee.mois + ' mois, ' + periodeProjetee.jours + ' jours</p>';
+      resultHTML += '<p><strong>Quotité envisagée :</strong> ' + (quotiteFuture * 100).toFixed(0) + ' %</p>';
+      
+      if (appliquerDecret1982 && (Math.abs(quotiteFuture - 0.80) < 1e-9 || Math.abs(quotiteFuture - 0.90) < 1e-9)) {
+        const fractionAppliquee = Math.abs(quotiteFuture - 0.80) < 1e-9 ? '6/7ème' : '32/35ème';
+        resultHTML += '<p style="font-size:0.9rem;color:#ea580c;"><em>Décret n°82-624 appliqué : ' + (quotiteFuture * 100).toFixed(0) + '% → ' + fractionAppliquee + '</em></p>';
+      }
+      
+      if (surcotisation && quotiteFuture < 1) {
+        resultHTML += '<p style="color:#10b981;"><strong>✓ Surcotisation activée</strong> : les trimestres liquidables comptent à 100%</p>';
+      }
+      resultHTML += '</div>';
+      
+      resultHTML += '<div class="result-section">';
+      resultHTML += '<h3>Trimestres au départ en retraite</h3>';
+      
+      if (inputs.conditionsEnfantsAvant2004 && inputs.nbEnfantsAvant2004 > 0) {
+        resultHTML += '<p><strong>Bonification pour enfants (avant 2004) :</strong> ' + bonifEnfantsTr.toFixed(2) + ' trimestres</p>';
+      }
+      
+      if (inputs.conditionsEnfantsApres2003 && inputs.nbEnfantsApres2003 > 0) {
+        resultHTML += '<p><strong>Majoration de durée d\'assurance (après 2003) :</strong> ' + majorationsApres2003Tr.toFixed(2) + ' trimestres</p>';
+      }
+      
+      resultHTML += '<p><strong>Assurance totale :</strong> ' + assuranceFinale + ' trimestres / ' + TR + '</p>';
+      resultHTML += '<p><strong>Liquidables totaux :</strong> ' + liquidablesFinale + ' / ' + TR + '</p>';
+      resultHTML += '<p><strong>Taux de liquidation estimé :</strong> ' + (tauxFinal * 100).toFixed(2) + ' %</p>';
+      resultHTML += '<p><strong>Âge au départ :</strong> ' + ageAuDepart.toFixed(1) + ' ans</p>';
+      resultHTML += '</div>';
+      
+      resultHTML += blocSurcotisation;
+      
+      resultHTML += '<div class="highlight-result">';
+      resultHTML += '<h3>Pension définitive estimée</h3>';
+      resultHTML += '<p style="font-size:1.3em;font-weight:bold;color:var(--pri);">' + formatEuro(pensionDefinitive) + '</p>';
+      if (majorationFamiliale > 0) {
+        resultHTML += '<p><strong>Avec majoration familiale (+' + majorationFamiliale + '%) :</strong><br><span style="font-size:1.2em;font-weight:bold;">' + formatEuro(pensionAvecMajorationFamiliale) + '</span></p>';
+      }
+      resultHTML += '</div>';
+      
+      resultHTML += blocDecote + blocSurcote + blocMajorationFamiliale;
+      
+      resultHTML += '<div class="warn" style="margin-top:20px;">';
+      resultHTML += '<h4 style="margin-top:0;">⚠️ Avertissement important</h4>';
+      resultHTML += '<p><strong>Écart possible avec le calcul officiel SRE/ENSAP :</strong></p>';
+      resultHTML += '<p>Ce simulateur applique la méthode SRE documentée. Un écart de <strong>1 à 2 trimestres liquidables</strong> peut exister avec le calcul officiel.</p>';
+      resultHTML += '<p><strong>Pour une estimation officielle définitive :</strong> Consultez <a href="https://ensap.gouv.fr" target="_blank" style="color:#8a5a00;font-weight:bold;">ensap.gouv.fr</a></p>';
+      resultHTML += '</div>';
+      
+      resultHTML += '<p class="muted" style="margin-top:20px;">Calculs basés sur la méthode officielle SRE (base 360j/an). Version V.04.2.4.</p>';
+      
+      document.getElementById('resultat-definitive').innerHTML = resultHTML;
+      
+      updateChartDefinitive(inputs, dateReleve, dateDepart, TR, appliquerDecret1982);
+    }
+
+    function updateChartDefinitive(inputs, dateReleve, dateDepart, TR, appliquerDecret1982) {
+      const quotitesAutorisees = [0.50, 0.60, 0.70, 0.80, 0.90, 1.00];
+      const labels = quotitesAutorisees.map(q => (q * 100).toFixed(0) + ' %');
+      const dataPensions = [];
+      
+      const joursAssuranceReleve = (inputs.trimAssuranceReleve * 90) + inputs.joursAssuranceReleve;
+      const joursLiquidablesReleve = (inputs.trimLiquidablesReleve * 90) + inputs.joursLiquidablesReleve;
+      const periodeProjetee = diffDetaillee(dateReleve, dateDepart);
+      
+      const bonifEnfantsJours = inputs.conditionsEnfantsAvant2004 ? inputs.nbEnfantsAvant2004 * 4 * 90 : 0;
+      const majorationsApres2003Jours = inputs.conditionsEnfantsApres2003 ? inputs.nbEnfantsApres2003 * 2 * 90 : 0;
+      
+      const joursAssProjetee = periodeProjetee.totalJours;
+      const totalJoursAssurance = joursAssuranceReleve + joursAssProjetee + bonifEnfantsJours + majorationsApres2003Jours;
+      const dureeAssuranceCalcul = calculerDureeAssurance(totalJoursAssurance);
+      const assuranceFinale = dureeAssuranceCalcul.trimestres;
+      
+      const ageAuDepart = (dateDepart - inputs.dateNaissance) / (1000 * 60 * 60 * 24 * 365.25);
+      const ageSurcoteRequis = calculerAgeSurcote(inputs.dateNaissance);
+      
+      const bonifEnfantsTr = bonifEnfantsJours / 90;
+      const majorationsApres2003Tr = majorationsApres2003Jours / 90;
+      
+      quotitesAutorisees.forEach(q => {
+        const joursLiqProjetee = Math.floor(periodeProjetee.totalJours * q);
+        const totalJoursLiquidables = joursLiquidablesReleve + joursLiqProjetee + bonifEnfantsJours;
+        const liquidablesFinale = arrondirTrimestresLiquidables(totalJoursLiquidables);
+        
+        const ratioFin = clamp(liquidablesFinale / TR, 0, 1);
+        let tauxFinal = 0.75 * ratioFin;
+        
+        if (assuranceFinale < TR) {
+          const trimestresManquants = TR - assuranceFinale;
+          const tauxDecoteParTrim = inputs.dateNaissance.getFullYear() >= 1964 ? 1.09 : 1.25;
+          const decoteTotale = trimestresManquants * tauxDecoteParTrim;
+          const tauxApresDecote = Math.max(0, (75 - decoteTotale)) / 100;
+          tauxFinal = tauxApresDecote * ratioFin;
+        }
+        
+        let tauxSurcoteFinale = 0;
+        
+        const surcoteParentale = calculerSurcoteParentaleSRE(
+          inputs.dateNaissance, TR, assuranceFinale,
+          bonifEnfantsTr, majorationsApres2003Tr, q
+        );
+        
+        if (surcoteParentale.applicable) {
+          tauxSurcoteFinale += surcoteParentale.tauxSurcote;
+        }
+        
+        if (assuranceFinale >= TR && ageAuDepart >= ageSurcoteRequis && ageAuDepart < 67) {
+          const trimestresSurcotes = Math.floor((ageAuDepart - ageSurcoteRequis) * 4);
+          if (trimestresSurcotes > 0) {
+            tauxSurcoteFinale += trimestresSurcotes * 1.25;
+          }
+        }
+        
+        const trimestresExcedentaires = Math.max(0, assuranceFinale - TR);
+        let trimestresExcedentairesRestants = trimestresExcedentaires;
+        
+        if (surcoteParentale.applicable) {
+          trimestresExcedentairesRestants -= surcoteParentale.trimestresRetenus;
+        }
+        
+        if (assuranceFinale >= TR && ageAuDepart >= ageSurcoteRequis) {
+          const trimestresSurcotes = Math.floor((ageAuDepart - ageSurcoteRequis) * 4);
+          trimestresExcedentairesRestants -= trimestresSurcotes;
+        }
+        
+        if (trimestresExcedentairesRestants > 0) {
+          tauxSurcoteFinale += trimestresExcedentairesRestants * 1.25;
+        }
+        
+        if (tauxSurcoteFinale > 0) {
+          const tauxDeBase = 0.75;
+          const tauxAvecRatio = tauxDeBase * ratioFin;
+          const coefficientSurcote = 1 + (tauxSurcoteFinale / 100);
+          tauxFinal = tauxAvecRatio * coefficientSurcote;
+        }
+        
+        const traitementFin = inputs.indice * inputs.valeurPoint;
+        const pensionDefinitive = traitementFin * tauxFinal;
+        
+        let pensionFinale = pensionDefinitive;
+        if (inputs.totalEnfantsEleves >= 3) {
+          const majorationFamiliale = 10 + Math.max(0, inputs.totalEnfantsEleves - 3) * 5;
+          pensionFinale = pensionDefinitive * (1 + majorationFamiliale / 100);
+        }
+        
+        dataPensions.push(pensionFinale);
+      });
+      
+      const quotiteSelectionnee = parseFloat(document.getElementById('def-quotiteFuture').value);
+      const selectedIndex = quotitesAutorisees.findIndex(q => Math.abs(q - quotiteSelectionnee) < 1e-9);
+      
+      const ctx = document.getElementById('graphique-definitive').getContext('2d');
+      if (chartDefinitive) chartDefinitive.destroy();
+      chartDefinitive = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Pension définitive estimée (€)',
+            data: dataPensions,
+            backgroundColor: dataPensions.map((_, i) => i === selectedIndex ? '#ef4444' : 'rgba(34,197,94,0.6)'),
+            borderColor: dataPensions.map((_, i) => i === selectedIndex ? '#dc2626' : '#22c55e'),
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          aspectRatio: 3,
+          plugins: { 
+            legend: { display: true },
+            tooltip: { 
+              callbacks: {
+                label: function(context) {
+                  return 'Pension : ' + context.parsed.y.toFixed(2) + ' €';
+                }
+              }
+            }
+          },
+          scales: {
+            x: { title: { display: true, text: 'Quotité de travail projetée' } },
+            y: { 
+              title: { display: true, text: 'Pension mensuelle brute (€)' },
+              beginAtZero: false
+            }
           }
         }
       });
@@ -1450,7 +2075,7 @@
     function exporterParametresUtilisateur() {
       const inputs = lireInputs();
       const metadata = {
-        version: "V.04.2.1",
+        version: "V.04.2.4",
         decret: "Décret n° 2023-799 du 21 août 2023",
         dateExport: new Date().toISOString()
       };
@@ -1460,7 +2085,7 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'parametres_simulateur_retraite_v04_2.json';
+      a.download = 'parametres_simulateur_retraite_v04_2_4.json';
       a.click();
       URL.revokeObjectURL(url);
     }
@@ -1487,6 +2112,7 @@
       document.getElementById('enfantsAvant2004').value = jsonData.nbEnfantsAvant2004 || '';
       document.getElementById('enfantsApres2003').value = jsonData.nbEnfantsApres2003 || '';
       document.getElementById('sexe').value = jsonData.sexe || 'H';
+      document.getElementById('appliquerDecret1982').checked = jsonData.appliquerDecret1982 !== undefined ? jsonData.appliquerDecret1982 : true;
       
       document.getElementById('enfantsAvant2004').disabled = !document.getElementById('bonifEnfants').checked;
       document.getElementById('enfantsApres2003').disabled = !document.getElementById('majorationEnfants').checked;
@@ -1522,6 +2148,7 @@
       document.getElementById('enfantsApres2003').disabled = true;
       document.getElementById('totalEnfantsEleves').value = '';
       document.getElementById('sexe').value = 'H';
+      document.getElementById('appliquerDecret1982').checked = true;
 
       const val = autoRemplirTrimestres(new Date('1964-06-25'));
       const trSelect = document.getElementById('trimestresRequis');
@@ -1534,6 +2161,7 @@
     document.getElementById('btnCalc').addEventListener('click', calculer);
     document.getElementById('btnDefault').addEventListener('click', chargerValeursDefaut);
     document.getElementById('btnAnalyserRachat').addEventListener('click', analyserRachat);
+    document.getElementById('btnCalculerDefinitive').addEventListener('click', calculerRetraiteDefinitive);
 
     document.getElementById('bonifEnfants').addEventListener('change', (ev) => {
       const inputEnfants = document.getElementById('enfantsAvant2004');
@@ -1567,6 +2195,9 @@
 
     document.getElementById('surcotisation').addEventListener('change', mettreAJourTauxSurcotisation);
     document.getElementById('quotite').addEventListener('change', mettreAJourTauxSurcotisation);
+    
+    document.getElementById('def-surcotisation').addEventListener('change', mettreAJourTauxSurcotisationDefinitive);
+    document.getElementById('def-quotiteFuture').addEventListener('change', mettreAJourTauxSurcotisationDefinitive);
 
     document.getElementById('btnExport').addEventListener('click', exporterParametresUtilisateur);
     document.getElementById('btnImport').addEventListener('click', () => {
@@ -1608,7 +2239,9 @@
       }
       
       mettreAJourTauxSurcotisation();
+      mettreAJourTauxSurcotisationDefinitive();
     });
   </script>
 </body>
+
 </html>

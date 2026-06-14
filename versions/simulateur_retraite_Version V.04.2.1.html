@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <title>Simulateur Retraite Progressive - V.04.2.2</title>
+  <title>Simulateur Retraite Progressive - V.04.2.1</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root{--pri:#22c55e;--pri-200:rgba(34,197,94,0.15);--muted:#6b7280;--warn:#8a5a00;--ok:#166534;--warn-bg:#fff7e6;--ok-bg:#ecfdf5;--sep:#e5e7eb;--info-bg: #e8f4fc;--info-border: #3498db;}
@@ -44,7 +44,7 @@
     .bonif-label { display: flex; align-items: center; gap: 6px; font-size: 0.92rem; }
     .bonif-label input[type="checkbox"] { margin: 0; }
     .tooltip { position: relative; cursor: help; display: inline-flex; align-items: center; font-size: 1rem; }
-    .tooltiptext { visibility: hidden; width: 320px; background-color: #fffbe6; color: #614700; text-align: left; border-radius: 6px; padding: 12px; border: 1px solid #ffe58f; position: absolute; z-index: 1; top: 125%; right: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.15); font-size: 0.9rem; line-height: 1.4; }
+    .tooltiptext { visibility: hidden; width: 320px; background-color: #fffbe6; color: #614700; text-align: left; border-radius: 6px; padding: 12px; border: 1px solid #ffe58f; position: absolute; z-index: 1; top: 125%; left: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.15); font-size: 0.9rem; line-height: 1.4; }
     .tooltip:hover .tooltiptext { visibility: visible; }
     .remuneration-info { display: flex; align-items: center; gap: 8px; }
     .info-icon { font-size: 16px; color: #3498db; cursor: help; }
@@ -76,8 +76,8 @@
   <h1>Simulateur de Retraite Progressive – Fonctionnaire d'État</h1>
   
   <div style="margin:20px 0;padding:12px;background:#f0fdf4;border-left:4px solid #22c55e;border-radius:6px;text-align:center;">
-    <p><strong>Version :</strong> V.04.2.2 - Ajout option Décret n°82-624 – <strong>Réglementation :</strong> Décret n° 2023-799 du 21 août 2023</p>
-    <p style="font-size:0.9rem;color:#166534;margin-top:5px;"><strong>Mise à jour :</strong> Option Décret 1982 (6/7ème et 32/35ème) + Onglet Analyse Rachat</p>
+    <p><strong>Version :</strong> V.04.2.1 - Validation calcul + disclaimer écart SRE – <strong>Réglementation :</strong> Décret n° 2023-799 du 21 août 2023</p>
+    <p style="font-size:0.9rem;color:#166534;margin-top:5px;"><strong>Mise à jour :</strong> Ajout onglet "Analyse Rachat de trimestres"</p>
   </div>
 
   <div class="tabs-container">
@@ -175,33 +175,13 @@
           <div style="background: #f0fdf4; padding: 10px; border-radius: 6px; margin: 10px 0;">
             <label for="quotite">Quotité pendant la retraite progressive</label>
             <select id="quotite">
-              <option value="0.90">90 %</option>
-              <option value="0.80" selected>80 %</option>
+              <option value="0.90">90 % (32/35e)</option>
+              <option value="0.80" selected>80 % (6/7e)</option>
               <option value="0.70">70 %</option>
               <option value="0.60">60 %</option>
               <option value="0.50">50 %</option>
             </select>
             <small>Quotité pendant la période progressive (impact surcote parentale)</small>
-          </div>
-
-          <div style="margin-top: 15px; background: #fff7ed; padding: 10px; border-radius: 6px; border-left: 3px solid #f97316;">
-            <label class="bonif-label">
-              <input type="checkbox" id="appliquerDecret1982" checked>
-              <span>Temps Partiel Appliquer le Décret n°82-624 (6/7ème et 32/35ème)</span>
-              <span class="tooltip info-icon">ℹ️
-                <span class="tooltiptext">
-                  <strong>Décret n°82-624 du 20 juillet 1982</strong><br><br>
-                  Pour certains fonctionnaires en temps partiel de droit commun :<br>
-                  • <strong>80%</strong> → rémunération à <strong>6/7ème</strong> (≈85,71%)<br>
-                  • <strong>90%</strong> → rémunération à <strong>32/35ème</strong> (≈91,43%)<br><br>
-                  <strong>Comment vérifier ?</strong><br>
-                  Consultez votre fiche de paie actuelle Traitement Brut si vous êtes déjà à temps partiel 80% ou 90%.<br><br>
-                  Si vous travaillez 4 jours/semaine (28h/35h) et êtes payé plus que 80%, ce décret s'applique à vous.<br><br>
-                  <strong>Par défaut : coché</strong> (cas majoritaire)
-                </span>
-              </span>
-            </label>
-            <small>Coché par défaut - Consultez le mode d'emploi pour plus de détails</small>
           </div>
         </div>
       </div>
@@ -438,7 +418,7 @@
           <ul style="font-size: 0.9rem;">
             <li><strong>Article L11</strong> – Services pris en compte dans la liquidation</li>
             <li><strong>Article L12</strong> – Bonifications (enfants, dépaysement, militaires)</li>
-			<li><strong>Article L12 bis</strong> – Majoration de durée d'assurance (enfants après 2004)</li>
+            <li><strong>Article L12 bis</strong> – Majoration de durée d'assurance (enfants après 2004)</li>
             <li><strong>Article L13</strong> – Taux de liquidation (75% maximum, porté à 80% avec bonifications)</li>
             <li><strong>Article L14</strong> – Durée d'assurance, décote et surcote</li>
             <li><strong>Article L15</strong> – Règle des six mois pour le traitement de référence</li>
@@ -448,12 +428,11 @@
           
           <h4>Décrets et textes réglementaires</h4>
           <ul style="font-size: 0.9rem;">
-            <li><strong>Décret n°82-624</strong> du 20 juillet 1982 – Temps partiel (6/7ème pour 80%, 32/35ème pour 90%)</li>
             <li><strong>Décret n°2003-1306</strong> du 26 décembre 2003 – Régime de retraite CNRACL et bonifications pour enfants</li>
             <li><strong>Décret n°2011-620</strong> du 31 mai 2011 – Institution de la retraite progressive</li>
             <li><strong>Loi n°2023-270</strong> du 14 avril 2023 – Réforme des retraites (relèvement âge légal, durée de cotisation)</li>
             <li><strong>Décret n°2023-799</strong> du 21 août 2023 – Surcote parentale (1,25% par trimestre, max 5%)</li>
-            <li><strong>Arrêté du 23 juin 2023</strong> – Valeur du point d'indice à 4,92278 € au 1er juillet 2023</li>
+            <li><strong>Arrêté du 23 juin 2023</strong> – Valeur dupoint d'indice à 4,92278 € au 1er juillet 2023</li>
           </ul>
           
           <h4>Principes de calcul (méthode SRE)</h4>
@@ -468,8 +447,7 @@
             
             <p style="margin-top:10px;"><strong>Temps partiel :</strong><br>
             • Assurance : comptabilisé à 100%<br>
-            • Liquidables : proratisé selon la quotité (sauf surcotisation)<br>
-            • Décret 1982 : 80% → 6/7ème, 90% → 32/35ème (si applicable)</p>
+            • Liquidables : proratisé selon la quotité (sauf surcotisation)</p>
             
             <p style="margin-top:10px;"><strong>Surcotes cumulables :</strong><br>
             • Classique : 1,25% par trimestre au-delà de l'âge légal<br>
@@ -507,7 +485,7 @@
       </div>
       
       <div style="margin-top:20px;padding:12px;background:#f0fdf4;border-left:4px solid #22c55e;border-radius:6px;font-size:0.9rem;">
-        <p><strong>Version du simulateur :</strong> V.04.2.2 – Janvier 2025</p>
+        <p><strong>Version du simulateur :</strong> V.04.2.1 – Janvier 2025</p>
         <p><strong>Dernière mise à jour réglementaire :</strong> Décret n°2023-799 du 21 août 2023</p>
         <p><strong>Valeur du point d'indice :</strong> 4,92278 € (au 1er juillet 2023)</p>
       </div>
@@ -774,12 +752,9 @@
     }
 
     function calcTraitementPlein(indice, valeurPoint){ return indice * valeurPoint; }
-    
-    function calcTraitementTP(traitementPlein, quotite, appliquerDecret1982){
-      if (appliquerDecret1982) {
-        if (Math.abs(quotite - 0.80) < 1e-9) return traitementPlein * (6/7);
-        if (Math.abs(quotite - 0.90) < 1e-9) return traitementPlein * (32/35);
-      }
+    function calcTraitementTP(traitementPlein, quotite){
+      if (Math.abs(quotite - 0.80) < 1e-9) return traitementPlein * (6/7);
+      if (Math.abs(quotite - 0.90) < 1e-9) return traitementPlein * (32/35);
       return traitementPlein * quotite;
     }
 
@@ -811,14 +786,12 @@
       const nbEnfantsApres2003 = parseInt(document.getElementById('enfantsApres2003').value || '0', 10);
       const totalEnfantsEleves = parseInt(document.getElementById('totalEnfantsEleves').value || '0', 10);
       const dateNaissance = new Date(document.getElementById('dateNaissance').value);
-      const appliquerDecret1982 = document.getElementById('appliquerDecret1982').checked;
 
       return {
         indice, valeurPoint, tauxSurcotisation, dateReleve, trimAssuranceReleve, joursAssuranceReleve,
         trimLiquidablesReleve, joursLiquidablesReleve, trimestresRequis, dateDebut, dateFin,
         quotiteAvant, quotite, surcotisation, nbEnfantsAvant2004, nbEnfantsApres2003, totalEnfantsEleves,
-        conditionsEnfantsAvant2004: bonifEnfants, conditionsEnfantsApres2003: majorationEnfants, dateNaissance, sexe,
-        appliquerDecret1982
+        conditionsEnfantsAvant2004: bonifEnfants, conditionsEnfantsApres2003: majorationEnfants, dateNaissance, sexe
       };
     }
 
@@ -903,7 +876,7 @@
       const dureeAssuranceDepartCalcul = calculerDureeAssurance(totalJoursAssuranceDepart);
       const assuranceDepart = dureeAssuranceDepartCalcul.trimestres;
       
-      const totalJoursLiquidablesDepart = joursLiqReleve + joursLiqP1 + bonifEnfantsJours;
+      const totalJoursLiquidablesDepart= joursLiqReleve + joursLiqP1 + bonifEnfantsJours;
       const liquidablesDepart = arrondirTrimestresLiquidables(totalJoursLiquidablesDepart);
 
       if (!(I.dateNaissance instanceof Date) || isNaN(I.dateNaissance)) {
@@ -1143,7 +1116,7 @@
       const traitementPleinDepart = I.indice * I.valeurPoint;
       const tauxReferenceDepart = 0.75 * (liquidablesDepart / TR);
       const montantReferenceDepart = traitementPleinDepart * tauxReferenceDepart;
-      const traitementTPDepart = calcTraitementTP(traitementPleinDepart, I.quotite, I.appliquerDecret1982);
+      const traitementTPDepart = calcTraitementTP(traitementPleinDepart, I.quotite);
       const pensionProvisoireDepart = montantReferenceDepart * (1 - I.quotite);
       
       let coutSurcotisationMensuel = 0;
@@ -1158,14 +1131,6 @@
       
       resultHTML += '<p><strong>Traitement plein temps :</strong> ' + formatEuro(traitementPleinDepart) + '</p>';
       resultHTML += '<p><strong>Traitement à la quotité:</strong> ' + formatEuro(traitementTPDepart) + '</p>';
-      
-      if (I.appliquerDecret1982 && (Math.abs(I.quotite - 0.80) < 1e-9 || Math.abs(I.quotite - 0.90) < 1e-9)) {
-        const quotitePourcent = (I.quotite * 100).toFixed(0);
-        const fractionAppliquee = Math.abs(I.quotite - 0.80) < 1e-9 ? '6/7ème' : '32/35ème';
-        const pourcentageReel = (traitementTPDepart / traitementPleinDepart * 100).toFixed(2);
-        resultHTML += '<p style="font-size:0.9rem;color:#ea580c;"><em>Décret n°82-624 appliqué : ' + quotitePourcent + '% → ' + fractionAppliquee + ' (≈' + pourcentageReel + '%)</em></p>';
-      }
-      
       resultHTML += '<p><strong>Pension provisoire:</strong> ' + formatEuro(pensionProvisoireDepart) + '</p>';
       resultHTML += '<p><strong>Total brut mensuel:</strong> ' + formatEuro(totalBrutMensuel) + '</p>';
       
@@ -1201,7 +1166,7 @@
       resultHTML += '<p><strong>Pour une estimation officielle définitive :</strong> Consultez <a href="https://ensap.gouv.fr" target="_blank" style="color:#8a5a00;font-weight:bold;">ensap.gouv.fr</a></p>';
       resultHTML += '</div>';
 
-      resultHTML += '<p class="muted" style="margin-top:20px;">Calculs basés sur la méthode officielle SRE (base 360j/an). Version V.04.2.2.</p>';
+      resultHTML += '<p class="muted" style="margin-top:20px;">Calculs basés sur la méthode officielle SRE (base 360j/an). Version V.04.2.1.</p>';
 
       document.getElementById('resultat').innerHTML = resultHTML;
       switchTab('resultats');
@@ -1215,7 +1180,7 @@
         const traitementPlein = inputs.indice * inputs.valeurPoint;
         const tauxRef = 0.75 * (liquidablesDepart / TR);
         const montantRef = traitementPlein * tauxRef;
-        const traitementTP = calcTraitementTP(traitementPlein, q, inputs.appliquerDecret1982);
+        const traitementTP = calcTraitementTP(traitementPlein, q);
         const pensionProvisoire = montantRef * (1 - q);
         return traitementTP + pensionProvisoire;
       });
@@ -1284,7 +1249,7 @@
       document.getElementById('rachat-requis').textContent = inputs.trimestresRequis || autoRemplirTrimestres(inputs.dateNaissance);
       
       const ageActuel = Math.floor((new Date() - inputs.dateNaissance) / (365.25 * 24 * 60 * 60 * 1000));
-	  if (ageActuel >= 20 && ageActuel <= 62) {
+      if (ageActuel >= 20 && ageActuel <= 62) {
         document.getElementById('rachat-ageRachat').value = ageActuel;
       }
     }
@@ -1485,7 +1450,7 @@
     function exporterParametresUtilisateur() {
       const inputs = lireInputs();
       const metadata = {
-        version: "V.04.2.2",
+        version: "V.04.2.1",
         decret: "Décret n° 2023-799 du 21 août 2023",
         dateExport: new Date().toISOString()
       };
@@ -1495,7 +1460,7 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'parametres_simulateur_retraite_v04_2_2.json';
+      a.download = 'parametres_simulateur_retraite_v04_2.json';
       a.click();
       URL.revokeObjectURL(url);
     }
@@ -1522,7 +1487,6 @@
       document.getElementById('enfantsAvant2004').value = jsonData.nbEnfantsAvant2004 || '';
       document.getElementById('enfantsApres2003').value = jsonData.nbEnfantsApres2003 || '';
       document.getElementById('sexe').value = jsonData.sexe || 'H';
-      document.getElementById('appliquerDecret1982').checked = jsonData.appliquerDecret1982 !== undefined ? jsonData.appliquerDecret1982 : true;
       
       document.getElementById('enfantsAvant2004').disabled = !document.getElementById('bonifEnfants').checked;
       document.getElementById('enfantsApres2003').disabled = !document.getElementById('majorationEnfants').checked;
@@ -1558,7 +1522,6 @@
       document.getElementById('enfantsApres2003').disabled = true;
       document.getElementById('totalEnfantsEleves').value = '';
       document.getElementById('sexe').value = 'H';
-      document.getElementById('appliquerDecret1982').checked = true;
 
       const val = autoRemplirTrimestres(new Date('1964-06-25'));
       const trSelect = document.getElementById('trimestresRequis');

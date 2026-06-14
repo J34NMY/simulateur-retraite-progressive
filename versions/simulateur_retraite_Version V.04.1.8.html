@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <title>Simulateur Retraite Progressive - V.04.1.9</title>
+  <title>Simulateur Retraite Progressive - V.04.1.8 CORRIGÉ</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root{--pri:#22c55e;--pri-200:rgba(34,197,94,0.15);--muted:#6b7280;--warn:#8a5a00;--ok:#166534;--warn-bg:#fff7e6;--ok-bg:#ecfdf5;--sep:#e5e7eb;--info-bg: #e8f4fc;--info-border: #3498db;}
@@ -76,8 +76,8 @@
   <h1>Simulateur de Retraite Progressive – Fonctionnaire d'État</h1>
   
   <div style="margin:20px 0;padding:12px;background:#f0fdf4;border-left:4px solid #22c55e;border-radius:6px;text-align:center;">
-    <p><strong>Version :</strong> V.04.1.9 - Validation calcul + disclaimer écart SRE – <strong>Réglementation :</strong> Décret n° 2023-799 du 21 août 2023</p>
-    <p style="font-size:0.9rem;color:#166534;margin-top:5px;"><strong>Mise à jour :</strong> Ajout avertissement sur écart potentiel avec calcul SRE/ENSAP officiel</p>
+    <p><strong>Version :</strong> V.04.1.8 - CORRECTION PLAFOND SURCOTE — <strong>Réglementation :</strong> Décret n° 2023-799 du 21 août 2023</p>
+    <p style="font-size:0.9rem;color:#166534;margin-top:5px;"><strong>Correctif :</strong> Le plafond de 80% ne s'applique pas après les surcotes (conforme SRE)</p>
   </div>
 
   <div class="tabs-container">
@@ -347,7 +347,6 @@
             <li><a href="https://retraitesdeletat.gouv.fr/actif/carriere/mes-cotisations" target="_blank">Service des Retraites de l'État</a></li>
             <li><a href="https://www.service-public.fr/particuliers/vosdroits/F37400" target="_blank">Service-Public.fr – Retraite progressive</a></li>
             <li><a href="https://www.insee.fr/fr/statistiques/8327319" target="_blank">INSEE – Données d'espérance de vie 2024</a></li>
-            <li><a href="https://ensap.gouv.fr" target="_blank">ENSAP – Simulation officielle</a></li>
           </ul>
           
           <h4>Barèmes officiels 2024</h4>
@@ -360,16 +359,6 @@
             <tr><td>90 %</td><td>13,65 %</td><td>5,00 %</td></tr>
           </table>
         </div>
-      </div>
-      
-      <div class="warn" style="margin-top: 30px;">
-        <h4 style="margin-top:0;">⚠️ Précision du simulateur</h4>
-        <p><strong>Écart possible avec le calcul SRE/ENSAP officiel :</strong></p>
-        <p>Ce simulateur applique rigoureusement la méthode de calcul SRE documentée publiquement (base 360 jours/an, règle d'arrondi ≥45 jours = 1 trimestre, application correcte des quotités et bonifications).</p>
-        <p><strong>Cependant</strong>, un écart de <strong>1 à 2 trimestres liquidables</strong> peut exister avec le calcul officiel du SRE/ENSAP, probablement dû à des règles d'arrondi intermédiaires ou des modalités de calcul spécifiques non documentées publiquement.</p>
-        <p><strong>Impact estimé sur la pension finale :</strong> environ 1-2% du montant.</p>
-        <p><strong>Recommandation :</strong> Ce simulateur est un excellent outil pédagogique pour comprendre les mécanismes de la retraite progressive. Pour une estimation définitive et officielle, consultez toujours votre simulation sur <a href="https://ensap.gouv.fr" target="_blank" style="color:#8a5a00;font-weight:bold;">ensap.gouv.fr</a> ou contactez directement le Service des Retraites de l'État.</p>
-        <p style="margin-top:10px;font-size:0.9rem;"><strong>Note technique :</strong> Le code source de ce simulateur est conforme aux textes réglementaires en vigueur (Code des pensions civiles et militaires, décrets applicables). L'écart observé avec les calculs officiels relève de modalités d'application internes au SRE.</p>
       </div>
     </div>
   </div>
@@ -428,7 +417,7 @@
         jours += 30;
       }
       
-      if (mois <0) {
+      if (mois < 0) {
         annees--;
         mois += 12;
       }
@@ -456,8 +445,7 @@
       const gainMensuel = Math.max(0, pensionAvecSurcote - pensionSansSurcote);
       const gainAnnuel = gainMensuel * 12;
       
-      let valeurActualiseGains = 0;
-      for (let annee = 1; annee <= esperanceVieAjustee; annee++) {
+      let valeurActualiseGains = 0;for (let annee = 1; annee <= esperanceVieAjustee; annee++) {
         const gainActualise = gainAnnuel / Math.pow(1 + donneesActuarielles.tauxActualisation, annee);
         valeurActualiseGains += gainActualise * Math.pow(donneesActuarielles.coefficientRevalorisation, annee);
       }
@@ -842,11 +830,17 @@
         surcoteAppliquee = true;
       }
       
+      // ✅ CORRECTION PRINCIPALE V.04.1.8
+      // Le plafond de 80% ne s'applique PAS après les surcotes
+      // Application correcte de la surcote selon méthode SRE officielle
       if (surcoteAppliquee && tauxSurcoteFinale > 0) {
         const tauxDeBase = 0.75;
         const tauxAvecRatio = tauxDeBase * ratioFin;
         const coefficientSurcote = 1 + (tauxSurcoteFinale / 100);
         tauxFinal = tauxAvecRatio * coefficientSurcote;
+        
+        // SUPPRESSION du plafond artificiel qui bloquait les cas avec forte surcote
+        // tauxFinal = Math.min(tauxFinal, tauxMaximal); ❌ LIGNE SUPPRIMÉE
       }
 
       let majorationFamiliale = 0;
@@ -883,7 +877,7 @@
 
       let blocSurcote = '';
       if (surcoteAppliquee && tauxSurcoteFinale > 0) {
-	  blocSurcote = '<div class="ok" style="margin-top:15px;">';
+        blocSurcote = '<div class="ok" style="margin-top:15px;">';
         blocSurcote += '<strong>Majorations SRE appliquées :</strong><br>';
         blocSurcote += '<div style="margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 6px;">';
         blocSurcote += '<strong>Trimestres excédentaires totaux : ' + trimestresExcedentaires + '</strong><br>';
@@ -902,7 +896,7 @@
         
         blocSurcote += '</div>';
         blocSurcote += '<strong>Majoration totale cumulée : +' + tauxSurcoteFinale.toFixed(2) + '%</strong><br>';
-        blocSurcote += '<div class="ok" style="margin-top:10px;font-size:0.9rem;"><strong>✅ CALCUL MÉTHODE SRE :</strong><br>';
+		blocSurcote += '<div class="ok" style="margin-top:10px;font-size:0.9rem;"><strong>✅ CALCUL CORRIGÉ V.04.1.8 :</strong><br>';
         blocSurcote += '• Taux base × ratio = ' + (0.75 * ratioFin * 100).toFixed(2) + '%<br>';
         blocSurcote += '• × Coefficient (1 + ' + (tauxSurcoteFinale).toFixed(2) + '%) = ' + (tauxFinal * 100).toFixed(2) + '%<br>';
         blocSurcote += '• Pas de plafond appliqué (conforme SRE)</div>';
@@ -932,6 +926,8 @@
           const coefficientSurcote = 1 + (tauxSurcoteFinale / 100);
           tauxFinalSansSurcotisation = (tauxDeBase * ratioFinSansSurcotisation) * coefficientSurcote;
           tauxFinalAvecSurcotisation = (tauxDeBase * ratioFin) * coefficientSurcote;
+          
+          // Pas de plafond appliqué V.04.1.8
         }
         
         if (assuranceFinale < TR) {
@@ -1039,15 +1035,9 @@
 
       resultHTML += blocDecote + blocSurcote + blocMajorationFamiliale;
 
-      resultHTML += '<div class="warn" style="margin-top:20px;">';
-      resultHTML += '<h4 style="margin-top:0;">⚠️ Avertissement important</h4>';
-      resultHTML += '<p><strong>Écart possible avec le calcul officiel SRE/ENSAP :</strong></p>';
-      resultHTML += '<p>Ce simulateur applique la méthode SRE documentée. Un écart de <strong>1 à 2 trimestres liquidables</strong> peut exister avec le calcul officiel, probablement dû à des règles d\'arrondi internes non documentées publiquement.</p>';
-      resultHTML += '<p><strong>Impact estimé :</strong> ~1-2% sur le montant final de la pension.</p>';
-      resultHTML += '<p><strong>Pour une estimation officielle définitive :</strong> Consultez <a href="https://ensap.gouv.fr" target="_blank" style="color:#8a5a00;font-weight:bold;">ensap.gouv.fr</a></p>';
-      resultHTML += '</div>';
+      resultHTML += '<div class="ok" style="margin-top:20px;"><h4 style="margin-top:0;">Corrections V.04.1.7 et V.04.1.8</h4><p><strong>Méthode SRE correctement appliquée :</strong><br>• Étape 1 : Calcul ratio liquidation (liquidables/requis)<br>• Étape 2 : Application au taux de base (75% × ratio)<br>• Étape 3 : Application coefficient surcote (résultat × 1,0375)<br>• <strong>V.04.1.8 :</strong> Suppression du plafond 80% après surcotes (conforme SRE)<br>• Résultat : Conforme aux calculs officiels SRE</p></div>';
 
-      resultHTML += '<p class="muted" style="margin-top:20px;">Calculs basés sur la méthode officielle SRE (base 360j/an). Version V.04.1.9.</p>';
+      resultHTML += '<p class="muted" style="margin-top:20px;">Calculs basés sur la méthode officielle SRE (base 360j/an). Version corrigée V.04.1.8.</p>';
 
       document.getElementById('resultat').innerHTML = resultHTML;
       switchTab('resultats');
@@ -1099,7 +1089,7 @@
     function exporterParametresUtilisateur() {
       const inputs = lireInputs();
       const metadata = {
-        version: "V.04.1.9",
+        version: "V.04.1.8 - Correction plafond surcote",
         decret: "Décret n° 2023-799 du 21 août 2023",
         dateExport: new Date().toISOString()
       };
@@ -1109,7 +1099,7 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'parametres_simulateur_retraite_v04_1_9.json';
+      a.download = 'parametres_simulateur_retraite_v04_1_8.json';
       a.click();
       URL.revokeObjectURL(url);
     }
