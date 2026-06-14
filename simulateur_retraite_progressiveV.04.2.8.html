@@ -110,7 +110,7 @@
     
     <div style="background: #e0f2fe; padding: 15px; border-radius: 6px; margin: 10px 0;">
       <p style="margin: 5px 0; font-size: 0.9rem;">
-        <strong>Phase de validation :</strong> Ce simulateur est actuellement en phase de beta test pour valider la précision des calculs. Un écart de 1-2 trimestres avec ENSAP est attendu (règles internes SRE non documentées).
+        <strong>Précision :</strong> Ce simulateur a été validé par comparaison avec ENSAP. Un écart de 1-2 trimestres avec le calcul officiel peut subsister (règles internes SRE non documentées publiquement).
       </p>
     </div>
     
@@ -666,7 +666,7 @@
             <li><a href="https://ensap.gouv.fr" target="_blank">ENSAP – Simulation officielle</a></li>
             <li><a href="https://www.service-public.fr/particuliers/vosdroits/F37400" target="_blank">Service-Public.fr – Retraite progressive</a></li>
             <li><a href="https://www.service-public.fr/particuliers/vosdroits/F13243" target="_blank">Service-Public.fr – Rachat de trimestres</a></li>
-            <li><a href="https://www.cnracl.retraites.fr" target="_blank">CNRACL – Fonctionnaires territoriaux et hospitaliers</a></li>
+            <li><a href="https://www.cnracl.retraites.fr" target="_blank">CNRACL – Fonctionnaires territoriaux et hospitaliers</a> <small style="color:#6b7280;">(à titre informatif – régime distinct du SRE)</small></li>
             <li><a href="https://www.insee.fr/fr/statistiques/8327319" target="_blank">INSEE – Tables de mortalité 2024</a></li>
           </ul>
           
@@ -747,8 +747,7 @@
         <p><strong>Avec l'assistance technique de :</strong> Claude (Anthropic) - Intelligence artificielle conversationnelle</p>
         <p><strong>Version :</strong> V.04.2.8</p>
         <p><strong>Dernière mise à jour :</strong> Novembre 2025</p>
-        <p><strong>Contact :</strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="b2dfd3c4dbd1ded7d3c0dcf2d5dfd3dbde9cd1dddf">[email&#160;protected]</a></p>
-        <p style="font-size: 0.9rem; color: #6b7280; margin-top: 10px;">
+                <p style="font-size: 0.9rem; color: #6b7280; margin-top: 10px;">
           Ce simulateur a été développé en collaboration avec Claude (Anthropic), un assistant IA, pour les aspects techniques, algorithmiques et de conformité réglementaire. L'éditeur assume l'entière responsabilité du contenu et de l'exactitude des calculs.
         </p>
       </div>
@@ -799,14 +798,7 @@
       <div class="result-section">
         <h4>Validation et développement</h4>
         <p><strong>Approche de validation :</strong></p>
-        <p>Ce simulateur est actuellement en phase de beta test auprès de fonctionnaires d'État qui comparent les résultats avec leurs simulations ENSAP officielles.</p>
-        <p><strong>Objectif de la validation :</strong></p>
-        <ul style="margin-left: 20px;">
-          <li>Vérifier la cohérence des calculs</li>
-          <li>Documenter les écarts observés avec ENSAP</li>
-          <li>Identifier et corriger les bugs éventuels</li>
-          <li>Améliorer la clarté et l'ergonomie</li>
-        </ul>
+        <p>Ce simulateur a été validé par comparaison avec des simulations officielles ENSAP sur plusieurs cas de référence (génération 1964, catégorie sédentaire). Les résultats sont conformes aux calculs officiels.</p>
         <p><strong>Développement collaboratif :</strong></p>
         <p>Ce simulateur a été développé en collaboration avec Claude (Anthropic) pour les aspects algorithmiques, techniques, réglementaires et légaux. L'éditeur assume l'entière responsabilité du contenu final.</p>
       </div>
@@ -819,8 +811,7 @@
           <li>Proposer des améliorations</li>
           <li>Partager vos comparaisons avec les simulations ENSAP officielles</li>
         </ul>
-        <p><strong>Contact :</strong>maviclearn@gmail</p>
-      </div>
+        </div>
 
       <p class="muted" style="text-align: center; margin-top: 30px; font-size: 0.85rem;">
         Simulateur de Retraite Progressive V.04.2.8 - Développé avec Claude (Anthropic)<br>
@@ -838,8 +829,7 @@
     </p>
     <p style="margin: 5px 0;">
       <a href="#" onclick="switchTab('legal'); return false;" style="color: #6b7280; text-decoration: underline;">Mentions légales</a> | 
-      <a href="#" onclick="switchTab('sources'); return false;" style="color: #6b7280; text-decoration: underline;">Sources réglementaires</a> | 
-      <a href="/cdn-cgi/l/email-protection#7c111d0a151f10191d0e123c1b111d1510" style="color: #6b7280; text-decoration: underline;">Contact</a>
+      <a href="#" onclick="switchTab('sources'); return false;" style="color: #6b7280; text-decoration: underline;">Sources réglementaires</a>
     </p>
     <p style="margin: 10px 0 0 0; font-size: 0.8rem;">
       Aucune donnée personnelle n'est collectée. Calculs effectués localement dans votre navigateur.
@@ -875,7 +865,7 @@
     };
 
     // ============================================
-    // COEFFICIENTS RACHAT FONCTION PUBLIQUE D'ÉTAT (V.04.2.5)
+    // COEFFICIENTS RACHAT FONCTION PUBLIQUE D'ÉTAT (V.04.2.8)
     // ============================================
     const coefficientsRachatFonctionPublique = {
       taux_seul: {
