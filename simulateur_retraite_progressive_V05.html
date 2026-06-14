@@ -246,7 +246,7 @@
               • <strong>Surcote parentale :</strong> NON applicable génération 1964 et 1er trim. 1965 (âge légal 62T3 &lt; 63 ans)<br>
               • <strong>Majoration excédentaire :</strong> suspendue (LFSS 2026, art. 105)<br>
               • <strong>Plafond :</strong> 100% du traitement indiciaire (Article L13)<br>
-              <small style="color:#dc2626;">Source : CNRACL 19/05/2026 + ENSAP</small>
+              <small style="color:#dc2626;">Source : retraitesdeletat.gouv.fr + ENSAP (ensap.gouv.fr)</small>
             </div>
           </div>
         </div>
@@ -440,8 +440,8 @@
         <h4 style="margin-top:0;">Textes de la suspension réforme 2023</h4>
         <ul style="font-size: 0.9rem;">
           <li><strong>Loi n°2025-1403 du 30 décembre 2025</strong> (LFSS 2026), art. 105 – Suspension de la réforme des retraites 2023 au 01/09/2026</li>
-          <li><strong>Décret n°2026-344 du 8 mai 2026</strong> – Adaptation des conditions d'âge et de durée d'assurance (CNRACL)</li>
-          <li><strong>CNRACL, 19/05/2026</strong> – Génération 1964 et 1er trim. 1965 non éligibles à la surcote parentale (âge légal 62T3 &lt; 63 ans)</li>
+          <li><strong>Décret n°2026-344 du 8 mai 2026</strong> – Adaptation des conditions d'âge et de durée d'assurance (FPE et FPT/FPH)</li>
+          <li><strong>retraitesdeletat.gouv.fr / ENSAP</strong> – Génération 1964 et 1er trim. 1965 non éligibles à la surcote parentale (âge légal 62T3 &lt; 63 ans)</li>
           <li><strong>Article L13 CPCMR</strong> – Plafond pension ≤ 100% du traitement indiciaire (confirmé ENSAP simulation 70 ans)</li>
         </ul>
         <p style="font-size:0.85rem;"><strong>Trimestres requis – suspension réforme 2023 :</strong> 1958-1960 : 168 | 1961-1962 : 169 | 1963-1965 : 170 | 1966-1967 : 171 | 1968+ : 172</p>
@@ -461,7 +461,7 @@
           <ul style="font-size: 0.9rem;">
             <li><a href="https://retraitesdeletat.gouv.fr" target="_blank">Service des Retraites de l'État (SRE)</a></li>
             <li><a href="https://ensap.gouv.fr" target="_blank">ENSAP – Simulation officielle</a></li>
-            <li><a href="https://www.cnracl.retraites.fr/employeur/actualites/impact-de-la-suspension-de-la-reforme-sur-la-surcote-parentale" target="_blank">CNRACL – Impact suspension sur surcote parentale</a></li>
+            <li><a href="https://www.cnracl.retraites.fr/employeur/actualites/impact-de-la-suspension-de-la-reforme-sur-la-surcote-parentale" target="_blank">CNRACL – Impact suspension sur surcote parentale</a> <small style="color:#6b7280;">(à titre informatif – règles proches du SRE)</small></li>
           </ul>
         </div>
       </div>
@@ -710,7 +710,7 @@
 
   // SURCOTE PARENTALE – GEL 2026
   // Génération 1964 et 1er trim. 1965 NON ÉLIGIBLES (âge légal 62T3 < 63 ans requis)
-  // Source : CNRACL, 19/05/2026
+  // Source : retraitesdeletat.gouv.fr + ENSAP
   function calculerSurcoteParentaleSRE(dateNaissance, trimestresRequis, assuranceFinale, bonifEnfantsTr, majorationsApres2003Tr, quotiteProgressive) {
     if (!(dateNaissance instanceof Date) || isNaN(dateNaissance)) return { applicable: false };
     const anneeNaissance = dateNaissance.getFullYear();
@@ -1093,7 +1093,7 @@
         resultHTML += '<div class="info" style="margin-top:15px;background:#fef3c7;border-left-color:#f59e0b;">';
         resultHTML += '<strong>ℹ️ Surcote parentale – Suspension réforme 2023 :</strong><br>';
         resultHTML += 'La génération 1964 et le 1er trimestre 1965 ne sont plus éligibles à la surcote parentale.<br>';
-        resultHTML += '<small>Âge légal 62T3 &lt; 63 ans requis. Source : CNRACL, 19/05/2026.</small>';
+        resultHTML += '<small>Âge légal 62T3 &lt; 63 ans requis. Source : retraitesdeletat.gouv.fr</small>';
         resultHTML += '</div>';
       }
     }
