@@ -2,67 +2,321 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>ClartéRetraite – Accueil</title>
-  <link rel="favicon" sizes="180x180" href="favicon.PNG">
-<link rel="icon" type="image png" sizes="32x32" href="favicon.PNG">
- <style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulateur Retraite Progressive – Fonction Publique d'État</title>
+  <link rel="icon" type="image/png" href="favicon.PNG">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bleu:    #1a3a5c;
+      --bleu2:   #2563a8;
+      --vert:    #16a34a;
+      --vert2:   #dcfce7;
+      --ambre:   #b45309;
+      --ambre2:  #fef3c7;
+      --gris1:   #f1f5f9;
+      --gris2:   #e2e8f0;
+      --gris3:   #64748b;
+      --texte:   #1e293b;
+      --blanc:   #ffffff;
+    }
+
     body {
-      font-family: "Segoe UI", sans-serif;
-      background: linear-gradient(to bottom right, #e6f2ff, #ffffff);
-      color: #333;
-      margin: 2em;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: var(--gris1);
+      color: var(--texte);
       line-height: 1.6;
     }
-    .container {
-      max-width: 800px;
-      margin: auto;
-      background: #fff;
-      padding: 2em;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    .logo {
-      display: block;
-      margin: 0 auto 1em auto;
-      max-width: 180px;
-    }
-    h1 {
-      color: #005a9c;
+
+    /* ── HEADER ── */
+    header {
+      background: linear-gradient(135deg, var(--bleu) 0%, var(--bleu2) 100%);
+      color: var(--blanc);
+      padding: 3rem 1.5rem 2.5rem;
       text-align: center;
     }
-    a {
-      color: #0078d4;
+    header .badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 20px;
+      font-size: 0.78rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      padding: .3rem .9rem;
+      margin-bottom: 1.2rem;
+    }
+    header h1 {
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 700;
+      line-height: 1.25;
+      margin-bottom: .6rem;
+    }
+    header p {
+      font-size: 1rem;
+      opacity: .85;
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    /* ── AVERTISSEMENT ── */
+    .avertissement {
+      background: var(--ambre2);
+      border-left: 4px solid var(--ambre);
+      border-radius: 0;
+      padding: 1rem 1.5rem;
+      text-align: center;
+      font-size: .88rem;
+      color: #78350f;
+    }
+    .avertissement strong { color: var(--ambre); }
+    .avertissement a { color: var(--ambre); font-weight: 600; }
+
+    /* ── CARDS ── */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      max-width: 900px;
+      margin: 2.5rem auto;
+      padding: 0 1.5rem;
+    }
+
+    .card {
+      background: var(--blanc);
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.08);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: box-shadow .2s;
+    }
+    .card:hover { box-shadow: 0 6px 20px rgba(0,0,0,.13); }
+
+    .card-header {
+      padding: 1.4rem 1.5rem 1rem;
+      border-bottom: 1px solid var(--gris2);
+    }
+    .card-header .version-tag {
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: .25rem .7rem;
+      border-radius: 20px;
+      display: inline-block;
+      margin-bottom: .7rem;
+    }
+    .tag-reforme { background: #dbeafe; color: #1d4ed8; }
+    .tag-gel     { background: var(--vert2); color: #15803d; }
+
+    .card-header h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--bleu);
+      margin-bottom: .3rem;
+    }
+    .card-header .sous-titre {
+      font-size: .83rem;
+      color: var(--gris3);
+    }
+
+    .card-body {
+      padding: 1.2rem 1.5rem;
+      flex: 1;
+    }
+    .card-body ul {
+      list-style: none;
+      font-size: .88rem;
+      color: #475569;
+    }
+    .card-body ul li {
+      padding: .28rem 0;
+      padding-left: 1.4rem;
+      position: relative;
+    }
+    .card-body ul li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: var(--vert);
+      font-weight: 700;
+    }
+
+    .card-body .regle {
+      margin-top: 1rem;
+      background: var(--gris1);
+      border-radius: 8px;
+      padding: .75rem 1rem;
+      font-size: .82rem;
+      color: #374151;
+    }
+    .card-body .regle strong { display: block; margin-bottom: .2rem; color: var(--bleu); }
+
+    .card-footer {
+      padding: 1rem 1.5rem 1.4rem;
+      border-top: 1px solid var(--gris2);
+    }
+    .btn {
+      display: block;
+      width: 100%;
+      text-align: center;
+      padding: .75rem 1rem;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: .95rem;
       text-decoration: none;
-      font-weight: bold;
+      transition: opacity .15s, transform .1s;
     }
-    a:hover {
-      text-decoration: underline;
+    .btn:hover { opacity: .88; transform: translateY(-1px); }
+    .btn-bleu  { background: var(--bleu2); color: var(--blanc); }
+    .btn-vert  { background: var(--vert);  color: var(--blanc); }
+
+    /* ── FONCTIONNALITES ── */
+    .features {
+      max-width: 900px;
+      margin: 0 auto 2.5rem;
+      padding: 0 1.5rem;
     }
-    .infobulle {
-      background: #eef;
-      padding: 1em;
-      border-left: 4px solid #0078d4;
-      margin-top: 2em;
-      font-size: 0.95em;
+    .features h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--bleu);
+      text-align: center;
+      margin-bottom: 1.2rem;
+      text-transform: uppercase;
+      letter-spacing: .06em;
     }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: .8rem;
+    }
+    .feature-item {
+      background: var(--blanc);
+      border-radius: 10px;
+      padding: .9rem 1rem;
+      font-size: .84rem;
+      color: #374151;
+      border: 1px solid var(--gris2);
+      display: flex;
+      align-items: flex-start;
+      gap: .6rem;
+    }
+    .feature-item .ico { font-size: 1.1rem; flex-shrink: 0; margin-top: .05rem; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--bleu);
+      color: rgba(255,255,255,.7);
+      text-align: center;
+      font-size: .82rem;
+      padding: 1.5rem 1rem;
+    }
+    footer a { color: rgba(255,255,255,.9); }
+    footer p + p { margin-top: .4rem; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <img src="assets/logo_clarteretraite.png" alt="Logo ClartéRetraite" class="logo">
 
-    <h1>🧮 ClartéRetraite – Version V.04.2.3</h1>
-    <p style="text-align:center;">Simulateur conforme au décret <strong>82-624 modifié au 1er octobre 2025</strong>.</p>
+  <header>
+    <div class="badge">🏛️ Fonction Publique d'État · Catégorie sédentaire</div>
+    <h1>Simulateur de Retraite Progressive</h1>
+    <p>Estimez votre retraite progressive et définitive selon la réglementation en vigueur — aucune installation requise.</p>
+  </header>
 
-    <p><a href="simulateur_retraite_V.04.2.3.html">▶️ Accéder au simulateur</a></p>
-    <p><a href="mode_emploi_simulateur.html">📘 Lire le mode d’emploi</a></p>
+  <div class="avertissement">
+    <strong>⚠️ Outil éducatif non officiel.</strong>
+    Pour toute décision, consultez impérativement
+    <a href="https://ensap.gouv.fr" target="_blank">ensap.gouv.fr</a> ou le Service des Retraites de l'État.
+    Aucune donnée saisie n'est transmise — tout reste dans votre navigateur.
+  </div>
 
-    <div class="infobulle">
-      Ce simulateur vous permet de comparer plusieurs scénarios de retraite progressive ou définitive.  
-      Les calculs sont basés sur les paramètres que vous saisissez, en conformité avec les textes réglementaires en vigueur.  
-      <br><br>
-      <strong>⚠️ Attention :</strong> cette version est destinée aux tests. Les résultats ne sont pas contractuels.
+  <div class="cards">
+
+    <!-- CARTE V.04.2.8 -->
+    <div class="card">
+      <div class="card-header">
+        <span class="version-tag tag-reforme">Réforme 2023</span>
+        <h2>Simulateur V.04.2.8</h2>
+        <div class="sous-titre">Décret n°2023-799 du 21 août 2023</div>
+      </div>
+      <div class="card-body">
+        <ul>
+          <li>Âge légal progressif (62 → 64 ans)</li>
+          <li>Durée de cotisation réforme 2023</li>
+          <li>Surcote classique, parentale et excédentaire</li>
+          <li>31 règles de validation des données</li>
+          <li>Analyse rachat de trimestres + export PDF</li>
+        </ul>
+        <div class="regle">
+          <strong>Cadre réglementaire</strong>
+          Loi n°2023-270 du 14 avril 2023 et décrets d'application
+        </div>
+      </div>
+      <div class="card-footer">
+        <a class="btn btn-bleu" href="simulateur_retraite_progressiveV.04.2.8.html" download>
+          ⬇️ Télécharger V.04.2.8
+        </a>
+      </div>
+    </div>
+
+    <!-- CARTE V.05 -->
+    <div class="card">
+      <div class="card-header">
+        <span class="version-tag tag-gel">Gel 2026</span>
+        <h2>Simulateur V.05</h2>
+        <div class="sous-titre">LFSS 2026, art. 103 – Suspension au 1er septembre 2026</div>
+      </div>
+      <div class="card-body">
+        <ul>
+          <li>Âge légal maintenu à 62 ans pour tous</li>
+          <li>Barème pré-réforme (génération 1964 : 171 trim.)</li>
+          <li>Majoration excédentaire suspendue</li>
+          <li>Avertissement si départ > 31/12/2027</li>
+          <li>Analyse rachat de trimestres + export PDF</li>
+        </ul>
+        <div class="regle">
+          <strong>Cadre réglementaire</strong>
+          LFSS 2026, article 103 — suspension applicable au 1<sup>er</sup> septembre 2026
+        </div>
+      </div>
+      <div class="card-footer">
+        <a class="btn btn-vert" href="simulateur_gel_2026_V05.html" download>
+          ⬇️ Télécharger V.05 – Gel 2026
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FONCTIONNALITES COMMUNES -->
+  <div class="features">
+    <h3>Fonctionnalités communes aux deux simulateurs</h3>
+    <div class="features-grid">
+      <div class="feature-item"><span class="ico">📊</span> Retraite progressive et définitive (méthode SRE, base 360 j/an)</div>
+      <div class="feature-item"><span class="ico">📈</span> Graphique des revenus selon la quotité de travail</div>
+      <div class="feature-item"><span class="ico">💡</span> Analyse actuarielle de la surcotisation vs placement</div>
+      <div class="feature-item"><span class="ico">🔢</span> Rachat de trimestres avec coefficients FPE 2024</div>
+      <div class="feature-item"><span class="ico">👨‍👩‍👧</span> Bonifications et majorations pour enfants</div>
+      <div class="feature-item"><span class="ico">💾</span> Export / import des paramètres en JSON</div>
+      <div class="feature-item"><span class="ico">📄</span> Export PDF des analyses</div>
+      <div class="feature-item"><span class="ico">🔒</span> 100% local — aucune donnée transmise</div>
     </div>
   </div>
+
+  <footer>
+    <p>Développé bénévolement par <strong>J34NMY</strong> · Licence CC BY-NC-SA 4.0</p>
+    <p>
+      <a href="https://github.com/J34NMY/simulateur-retraite-progressive" target="_blank">GitHub</a> ·
+      <a href="MENTIONS_LEGALES.md" target="_blank">Mentions légales</a> ·
+      <a href="https://ensap.gouv.fr" target="_blank">ENSAP (officiel)</a>
+    </p>
+    <p style="margin-top:.8rem;font-size:.76rem;opacity:.6;">
+      Ce simulateur ne remplace pas les outils officiels de l'État.
+    </p>
+  </footer>
+
 </body>
 </html>
