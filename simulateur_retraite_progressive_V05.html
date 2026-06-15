@@ -81,11 +81,11 @@
     </div>
     <div style="background: #fef3c7; padding: 15px; border-radius: 6px; margin: 10px 0; border-left: 4px solid #f59e0b;">
       <p style="margin: 5px 0; font-weight: bold;">✓ Pour votre estimation officielle :</p>
-      <p style="margin: 5px 0;">Consultez impérativement <a href="https://ensap.gouv.fr" target="_blank" style="color: #92400e; font-weight: bold; text-decoration: underline;">ensap.gouv.fr</a></p>
+      <p style="margin: 5px 0;">Consultez impérativement <a href="https://info-retraite.fr" target="_blank" style="color: #92400e; font-weight: bold; text-decoration: underline;">info-retraite.fr</a></p>
     </div>
     <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px;">
       <button onclick="accepterConditions()" class="primary">J'ai lu et j'accepte ces conditions</button>
-      <button onclick="window.open('https://ensap.gouv.fr', '_blank')" class="secondary">Aller sur ENSAP (officiel)</button>
+      <button onclick="window.open('https://info-retraite.fr', '_blank')" class="secondary">Aller sur info-retraite (officiel)</button>
       <button onclick="switchTab('legal')" class="secondary">Lire les mentions légales complètes</button>
     </div>
   </div>
@@ -460,7 +460,7 @@
           <h4>Ressources officielles</h4>
           <ul style="font-size: 0.9rem;">
             <li><a href="https://retraitesdeletat.gouv.fr" target="_blank">Service des Retraites de l'État (SRE)</a></li>
-            <li><a href="https://ensap.gouv.fr" target="_blank">ENSAP – Simulation officielle</a></li>
+            <li><a href="https://info-retraite.fr" target="_blank">info-retraite – Simulation officielle</a></li>
             <li><a href="https://www.cnracl.retraites.fr/employeur/actualites/impact-de-la-suspension-de-la-reforme-sur-la-surcote-parentale" target="_blank">CNRACL – Impact suspension sur surcote parentale</a> <small style="color:#6b7280;">(à titre informatif – règles proches du SRE)</small></li>
           </ul>
         </div>
@@ -477,7 +477,7 @@
         <p><strong>Réglementation :</strong> LFSS 2026, art. 105 – Suspension de la réforme 2023 au 01/09/2026</p>
       </div>
       <div class="warn">
-        <p><strong>Ce simulateur ne remplace en aucun cas les outils officiels de l'État.</strong> Seules les simulations effectuées sur <a href="https://ensap.gouv.fr" target="_blank">ensap.gouv.fr</a> ont valeur légale.</p>
+        <p><strong>Ce simulateur ne remplace en aucun cas les outils officiels de l'État.</strong> Seules les simulations effectuées sur <a href="https://info-retraite.fr" target="_blank">info-retraite.fr</a> ont valeur légale.</p>
       </div>
     </div>
   </div>
@@ -485,7 +485,7 @@
   <footer style="margin-top: 50px; padding: 20px; background: #f9fafb; border-top: 2px solid #e5e7eb; text-align: center; font-size: 0.85rem; color: #6b7280;">
     <p><strong>Simulateur de Retraite Progressive V.05</strong> – Outil gratuit et pédagogique NON OFFICIEL</p>
     <p>Suspension réforme 2023 (LFSS 2026, art. 105) – Corrections 14/06/2026</p>
-    <p style="color: #dc2626; font-weight: bold;">Pour votre estimation officielle : <a href="https://www.info-retraite.fr" target="_blank" style="color: #dc2626;">ensap.gouv.fr</a></p>
+    <p style="color: #dc2626; font-weight: bold;">Pour votre estimation officielle : <a href="https://www.info-retraite.fr" target="_blank" style="color: #dc2626;">info-retraite.fr</a></p>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -1115,7 +1115,7 @@
     }
 
     resultHTML += '<div class="warn" style="margin-top:20px;"><h4 style="margin-top:0;">Avertissement</h4>';
-    resultHTML += '<p>Simulateur éducatif NON OFFICIEL. Pour votre estimation officielle : <a href="https://www.info-retraite.fr" target="_blank">ensap.gouv.fr</a></p>';
+    resultHTML += '<p>Simulateur éducatif NON OFFICIEL. Pour votre estimation officielle : <a href="https://www.info-retraite.fr" target="_blank">info-retraite.fr</a></p>';
     resultHTML += '</div>';
 
     resultHTML += '<p class="muted" style="margin-top:20px;">V.05 – Corrections 14/06/2026</p>';
@@ -1256,7 +1256,7 @@
     if (majorationFamiliale > 0) resultHTML += '<p><strong>Avec majoration familiale (+' + majorationFamiliale + '%) :</strong> ' + formatEuro(pensionAvecMajorationFamiliale) + '</p>';
     resultHTML += '</div>';
 
-    resultHTML += '<div class="warn" style="margin-top:20px;"><p>Simulateur éducatif NON OFFICIEL. <a href="https://ensap.gouv.fr" target="_blank">ensap.gouv.fr</a></p></div>';
+    resultHTML += '<div class="warn" style="margin-top:20px;"><p>Simulateur éducatif NON OFFICIEL. <a href="https://info-retraite.fr" target="_blank">info-retraite.fr</a></p></div>';
 
     document.getElementById('resultat-definitive').innerHTML = resultHTML;
     updateChartDefinitive(quotiteFuture, inputs, dateDepart);
