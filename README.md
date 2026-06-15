@@ -1,7 +1,7 @@
 # 🧮 Simulateur de Retraite Progressive – Fonctionnaire d'État
 
 [![V04.2.8 Réforme 2023](https://img.shields.io/badge/V04.2.8-R%C3%A9forme%202023-blue.svg)](https://github.com/J34NMY/simulateur-retraite-progressive/blob/main/simulateur_retraite_progressiveV.04.2.8.html)
-[![V05 Suspension 2023](https://img.shields.io/badge/V05-Suspension%202023-green.svg)](https://github.com/J34NMY/simulateur-retraite-progressive/blob/main/simulateur_retraite_progressive_V05.html)
+[![V06 Suspension 2023](https://img.shields.io/badge/V06-Suspension%202023-green.svg)](https://github.com/J34NMY/simulateur-retraite-progressive/blob/main/simulateur_retraite_progressive_V06.html)
 [![Licence CC BY-NC-SA 4.0](https://img.shields.io/badge/licence-CC%20BY--NC--SA%204.0-lightgrey.svg)](LICENSE.md)
 
 Outil pédagogique gratuit pour estimer la retraite progressive et définitive des **fonctionnaires d'État sédentaires**, basé sur la méthode de calcul du Service des Retraites de l'État (SRE).
@@ -15,7 +15,9 @@ Outil pédagogique gratuit pour estimer la retraite progressive et définitive d
 | Version | Cadre réglementaire | Télécharger |
 |---|---|---|
 | **V04.2.8** | Réforme 2023 — Décret n°2023-799 du 21 août 2023 | [⬇️ Télécharger](https://github.com/J34NMY/simulateur-retraite-progressive/raw/main/simulateur_retraite_progressiveV.04.2.8.html) |
-| **V05** | Suspension de la réforme 2023 au 01/09/2026 — LFSS 2026, art. 105 | [⬇️ Télécharger](https://github.com/J34NMY/simulateur-retraite-progressive/raw/main/simulateur_retraite_progressive_V05.html) |
+| **V06** ⭐ | Suspension de la réforme 2023 au 01/09/2026 — LFSS 2026, art. 105 | [⬇️ Télécharger](https://github.com/J34NMY/simulateur-retraite-progressive/raw/main/simulateur_retraite_progressive_V06.html) |
+
+> La **V06** est la version recommandée pour le cadre gel 2026 — elle inclut la validation des données saisies, des commentaires pédagogiques détaillés et l'export PDF des résultats.
 
 ---
 
@@ -33,9 +35,11 @@ Outil pédagogique gratuit pour estimer la retraite progressive et définitive d
 - Décote, surcote classique et parentale, majoration familiale
 - Bonifications enfants (avant/après 2004)
 - Décret n°82-624 (6/7ème pour 80%, 32/35ème pour 90%)
+- Validation des données saisies (9 règles — V06 uniquement)
 - Analyse de rentabilité de la surcotisation vs placement alternatif
 - Rachat de trimestres avec coefficients FPE 2024
-- Export / import des paramètres en JSON — Export PDF
+- Export PDF des résultats, de la retraite définitive et de l'analyse rachat
+- Export / import des paramètres en JSON
 - 100% local : aucune donnée transmise, fonctionne hors ligne
 
 ---
