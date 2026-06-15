@@ -206,17 +206,22 @@
               </span>
             </div>
             <small>Si coché: les LIQUIDABLES comptent à 100% pendant la progressive + analyse actuarielle.</small>
+            <div id="surcotPlafondAtteint" style="display:none;background:#fee2e2;border-left:3px solid #dc2626;padding:8px;border-radius:6px;margin:5px 0;font-size:0.85rem;color:#991b1b;">
+              ⛔ Plafond atteint : vous avez déjà utilisé vos 4 trimestres de surcotisation (Art. L11 bis CPCMR). La surcotisation n'est plus disponible.
+            </div>
             <div id="tauxSurcotisationContainer" class="hidden">
+              <div style="background:#fff3cd;border-left:3px solid #f59e0b;padding:10px;border-radius:6px;margin:10px 0;">
+                <label for="trimSurcotDejaUtilises"><strong>Trimestres de surcotisation déjà utilisés</strong></label>
+                <input id="trimSurcotDejaUtilises" type="number" min="0" max="4" step="1" value="0" style="max-width:80px;" />
+                <small>⚠️ Art. L11 bis CPCMR : maximum <strong>4 trimestres sur toute la carrière</strong>. Indiquez combien vous en avez déjà utilisés (vérifiez auprès de votre employeur ou sur ENSAP). Disponibles : <span id="trimSurcotDisponibles">4</span> trimestres.</small>
+              </div>
               <label for="tauxSurcotisation">Taux de surcotisation (%)</label>
               <input id="tauxSurcotisation" type="number" step="0.1" value="16.2" readonly style="background-color: #f3f4f6; cursor: not-allowed;" />
               <small>Taux calculé automatiquement selon quotité choisie (barème 2024).</small>
-              <div style="margin-top: 15px;">
-                <label for="tauxPlacement">Taux de placement alternatif (%)</label>
-                <select id="tauxPlacement">
-                  <option value="0.015">1,5 %</option><option value="0.025">2,5 %</option>
-                  <option value="0.03" selected>3,0 % (Livret A)</option><option value="0.035">3,5 %</option>
-                  <option value="0.04">4,0 %</option><option value="0.045">4,5 %</option><option value="0.05">5,0 %</option>
-                </select>
+              <div style="margin-top:10px;background:#f0fdf4;padding:8px;border-radius:6px;font-size:0.85rem;">
+                <strong>ℹ️ Comparaison avec 3 placements :</strong><br>
+                Livret A 1,7% · Assurance-vie 3,5% · PEA ETF 5%<br>
+                <small style="color:#6b7280;">Le tableau comparatif s'affiche dans les résultats</small>
               </div>
             </div>
           </div>
@@ -332,6 +337,11 @@
               <label for="def-surcotisation" style="display: inline;">Surcotisation pendant la période</label>
             </div>
             <div id="def-tauxSurcotisationContainer" class="hidden">
+              <div style="background:#fff3cd;border-left:3px solid #f59e0b;padding:10px;border-radius:6px;margin:10px 0;">
+                <label for="def-trimSurcotDejaUtilises"><strong>Trimestres de surcotisation déjà utilisés</strong></label>
+                <input id="def-trimSurcotDejaUtilises" type="number" min="0" max="4" step="1" value="0" style="max-width:80px;" />
+                <small>⚠️ Art. L11 bis CPCMR : maximum <strong>4 trimestres sur toute la carrière</strong>. Disponibles : <span id="def-trimSurcotDisponibles">4</span> trimestres.</small>
+              </div>
               <label for="def-tauxSurcotisation">Taux de surcotisation (%)</label>
               <input id="def-tauxSurcotisation" type="number" step="0.1" value="16.2" readonly style="background-color: #f3f4f6; cursor: not-allowed;" />
               <div style="margin-top: 15px;">
@@ -395,17 +405,36 @@
           <small>Maximum : 12 trimestres</small>
 
           <label for="rachat-typeRachat">Type de rachat</label>
-          <select id="rachat-typeRachat">
+          <select id="rachat-typeRachat" onchange="mettreAJourTypeRachat()">
             <option value="etudes">Années d'études supérieures</option>
             <option value="incompletes">Années civiles incomplètes</option>
+            <option value="surcotisation_retroactive">Surcotisation rétroactive — temps partiel depuis 2004 (Art. L11 bis CPCMR)</option>
           </select>
 
-          <label for="rachat-optionRachat">Option de rachat</label>
-          <select id="rachat-optionRachat">
-            <option value="taux_seul">Option 1 : Taux seul (moins cher)</option>
-            <option value="taux_duree">Option 2 : Taux + Durée d'assurance</option>
-          </select>
-          <small>Option 1 : évite la décote | Option 2 : augmente aussi la pension</small>
+          <div id="rachat-optionContainer">
+            <label for="rachat-optionRachat">Option de rachat</label>
+            <select id="rachat-optionRachat">
+              <option value="taux_seul">Option 1 : Taux seul (moins cher)</option>
+              <option value="taux_duree">Option 2 : Taux + Durée d'assurance</option>
+            </select>
+            <small>Option 1 : évite la décote | Option 2 : augmente aussi la pension</small>
+          </div>
+
+          <div id="rachat-surcotContainer" style="display:none;background:#eff6ff;border-left:3px solid #3b82f6;padding:10px;border-radius:6px;margin:8px 0;">
+            <strong>Surcotisation rétroactive (Art. L11 bis CPCMR)</strong><br>
+            <small style="color:#1d4ed8;">
+              Récupère jusqu'à <strong>4 trimestres liquidables</strong> pour des périodes à temps partiel effectuées depuis le 01/01/2004.<br>
+              Coût calculé selon le Décret n°2004-678 : <strong>(11,10% × QT + 80% × (11,10% + 37,65%) × QNT) × traitement plein</strong>
+            </small>
+            <label for="rachat-quotitePassee" style="margin-top:8px;display:block;">Quotité travaillée pendant la période à récupérer (%)</label>
+            <select id="rachat-quotitePassee">
+              <option value="0.50">50 %</option>
+              <option value="0.60">60 %</option>
+              <option value="0.70">70 %</option>
+              <option value="0.80" selected>80 %</option>
+              <option value="0.90">90 %</option>
+            </select>
+          </div>
 
           <label for="rachat-ageRachat">Âge au moment du rachat (ans)</label>
           <input id="rachat-ageRachat" type="number" min="20" max="62" step="1" value="40" />
@@ -423,14 +452,10 @@
 
         <div class="col">
           <h4>Comparaison avec placement</h4>
-
-          <label for="rachat-tauxPlacement">Taux de placement alternatif (%)</label>
-          <select id="rachat-tauxPlacement">
-            <option value="0.02">2,0% (Livret A historique)</option>
-            <option value="0.03" selected>3,0% (Livret A actuel)</option>
-            <option value="0.04">4,0% (LEP si éligible)</option>
-            <option value="0.05">5,0% (Placements dynamiques)</option>
-          </select>
+          <div style="background:#f0fdf4;padding:8px;border-radius:6px;font-size:0.85rem;margin-bottom:12px;">
+            <strong>ℹ️ 3 scénarios comparés automatiquement :</strong><br>
+            Livret A 1,7% · Assurance-vie 3,5% · PEA ETF 5%
+          </div>
 
           <div style="margin-top: 20px;">
             <button id="btnAnalyserRachat" class="primary" style="width: 100%;">
@@ -536,6 +561,44 @@
     taux_duree: { 20: 0.45, 25: 0.47, 30: 0.50, 35: 0.55, 40: 0.62, 45: 0.74, 50: 0.85, 55: 1.15, 60: 1.50, 62: 1.60 }
   };
 
+  // ============================================
+  // SURCOTISATION RÉTROACTIVE — Art. L11 bis CPCMR + Décret n°2004-678
+  // Formule : (11,10% × QT + 80% × (11,10% + 37,65%) × QNT) × traitement plein
+  // QT = quotité travaillée, QNT = quotité non travaillée = (1 - QT)
+  // Taux employeur 2026 : 37,65%
+  // ============================================
+  function calculerCoutSurcotisationRetroactive(quotite, traitementPlein) {
+    const tauxRetenue = 11.10 / 100;
+    const tauxEmployeur = 37.65 / 100;
+    const QT = quotite;
+    const QNT = 1 - quotite;
+    // Taux surcotisé selon Décret 2004-678
+    const tauxSurcot = (tauxRetenue * QT) + (0.80 * (tauxRetenue + tauxEmployeur) * QNT);
+    // Coût mensuel = différence entre surcotisation et retenue normale
+    const coutMensuel = (tauxSurcot * traitementPlein) - (tauxRetenue * QT * traitementPlein);
+    // Durée pour 1 trimestre supplémentaire selon quotité (en mois)
+    // À 80% : 1 trim perdu tous les 5 ans → 5 ans = 60 mois pour 1 trimestre
+    const gainTrimParMois = (1 - quotite) / 3; // trimestres gagnés par mois de surcotisation
+    const moisPour1Trim = gainTrimParMois > 0 ? 1 / gainTrimParMois : Infinity;
+    return { tauxSurcot, coutMensuel, moisPour1Trim };
+  }
+
+  function mettreAJourTypeRachat() {
+    const type = document.getElementById('rachat-typeRachat').value;
+    const optionContainer = document.getElementById('rachat-optionContainer');
+    const surcotContainer = document.getElementById('rachat-surcotContainer');
+    if (type === 'surcotisation_retroactive') {
+      optionContainer.style.display = 'none';
+      surcotContainer.style.display = 'block';
+    } else {
+      optionContainer.style.display = 'block';
+      surcotContainer.style.display = 'none';
+    }
+    // Vider les résultats pour forcer un nouveau calcul
+    document.getElementById('resultat-rachat').innerHTML =
+      '<div class="info" style="text-align:center;padding:20px;"><p>Paramètres modifiés — cliquez sur <strong>"Analyser la rentabilité"</strong> pour recalculer.</p></div>';
+  }
+
   function getCoefficientRachat(age, option) {
     const coefficients = coefficientsRachatFonctionPublique[option];
     const ages = Object.keys(coefficients).map(Number).sort((a, b) => a - b);
@@ -591,7 +654,13 @@
 
   // Barème trimestres requis GEL 2026
   // Source : LFSS 2026 + Décret n°2026-344 du 8 mai 2026
-  function calculerRentabiliteSurcotisation(pensionSansSurcote, pensionAvecSurcote, coutTotalSurcotisation, sexe, ageDepartDefinitif, coutMensuelSurcotisation, dureePeriodeProgressive, tauxPlacement) {
+  // ============================================
+  // CALCUL RENTABILITÉ SURCOTISATION
+  // Compare le gain de pension avec 3 scénarios de placement
+  // Correction : rente mensuelle = intérêts / 12 (pas intérêts × taux / 12)
+  // Scénarios fixes : Livret A 1,7% / Assurance-vie 3,5% / PEA ETF 5%
+  // ============================================
+  function calculerRentabiliteSurcotisation(pensionSansSurcote, pensionAvecSurcote, coutTotalSurcotisation, sexe, ageDepartDefinitif, coutMensuelSurcotisation, dureePeriodeProgressive) {
     const esperanceVie = sexe === 'F' ? donneesActuarielles.esperanceVie.femmes : donneesActuarielles.esperanceVie.hommes;
     const ajustementAge = Math.max(0, (ageDepartDefinitif - 62) * 0.5);
     const esperanceVieAjustee = Math.max(15, esperanceVie - ajustementAge);
@@ -606,100 +675,122 @@
     }
 
     const dureePeriodeAnnees = dureePeriodeProgressive / 12;
-    const capitalPlacement = coutTotalSurcotisation * Math.pow(1 + tauxPlacement, dureePeriodeAnnees);
-    const interessPlacementTotal = capitalPlacement - coutTotalSurcotisation;
-    const renteMensuelle = (interessPlacementTotal * tauxPlacement) / 12;
 
+    // Trois scénarios de placement fixes
+    // Rente mensuelle corrigée : intérêts / 12 (les intérêts sont déjà le gain annuel)
     const scenarios = [
-      { taux: 0.02, label: "2%" },
-      { taux: 0.03, label: "3% (Livret A)" },
-      { taux: 0.04, label: "4% (LEP)" }
+      { taux: 0.017, label: "Livret A", detail: "1,7% — garanti, disponible, variable", couleur: "#3b82f6" },
+      { taux: 0.035, label: "Assurance-vie", detail: "3,5% — garanti, fonds euros", couleur: "#8b5cf6" },
+      { taux: 0.050, label: "PEA ETF MSCI World", detail: "5% — non garanti, long terme", couleur: "#f59e0b" }
     ].map(s => {
-      const cap = coutTotalSurcotisation * Math.pow(1 + s.taux, dureePeriodeAnnees);
-      const int = cap - coutTotalSurcotisation;
-      const rente = (int * s.taux) / 12;
-      return { ...s, capital: cap, interets: int, rente };
+      const capital = coutTotalSurcotisation * Math.pow(1 + s.taux, dureePeriodeAnnees);
+      const interets = capital - coutTotalSurcotisation;
+      // CORRECTION : rente mensuelle = intérêts générés / 12
+      const renteMensuelle = interets / 12;
+      return { ...s, capital, interets, renteMensuelle };
     });
 
-    let strategieOptimale = "surcotisation";
-    let avantageComparatif = gainMensuel - renteMensuelle;
-
-    if (renteMensuelle > gainMensuel) {
-      strategieOptimale = "placement";
-      avantageComparatif = renteMensuelle - gainMensuel;
-    }
-
-    const tauxRentabilite = coutTotalSurcotisation > 0 ?
-      ((valeurActualiseGains - coutTotalSurcotisation) / coutTotalSurcotisation) * 100 : 0;
+    // Comparaison basée sur le Livret A (scénario le plus conservateur)
+    const scenarioRef = scenarios[0];
+    const renteMensuelleRef = scenarioRef.renteMensuelle;
 
     const pointMort = gainAnnuel > 0 ? coutTotalSurcotisation / gainAnnuel : Infinity;
 
-    let evaluation, couleur, recommandation;
+    let strategieOptimale = gainMensuel >= renteMensuelleRef ? "surcotisation" : "placement";
+    let avantageComparatif = Math.abs(gainMensuel - renteMensuelleRef);
 
+    let evaluation, couleur, recommandation;
     if (strategieOptimale === "placement") {
-      // Le placement génère plus que la surcotisation -> défavorable
       evaluation = "défavorable";
       couleur = "#dc2626";
-      recommandation = `Le placement à ${(tauxPlacement*100).toFixed(1)}% semble plus avantageux que la surcotisation.`;
+      recommandation = "Le placement semble plus avantageux que la surcotisation, même sur le Livret A.";
+    } else if (pointMort < esperanceVieAjustee * 0.5) {
+      evaluation = "favorable";
+      couleur = "#16a34a";
+      recommandation = "La surcotisation est rentable : elle génère plus qu'un placement et se rentabilise rapidement.";
     } else {
-      // La surcotisation génère plus que le placement -> favorable ou neutre selon pointMort
-      if (pointMort < esperanceVieAjustee * 0.5) {
-        evaluation = "favorable";
-        couleur = "#16a34a";
-        recommandation = `La surcotisation est plus rentable que l'épargne à ${(tauxPlacement*100).toFixed(1)}% dans votre situation.`;
-      } else {
-        evaluation = "neutre";
-        couleur = "#ca8a04";
-        recommandation = `La surcotisation présente un intérêt limité par rapport à l'épargne à ${(tauxPlacement*100).toFixed(1)}%. À évaluer selon votre situation personnelle.`;
-      }
+      evaluation = "neutre";
+      couleur = "#ca8a04";
+      recommandation = "La surcotisation génère plus qu'un Livret A mais la durée de rentabilisation est longue. À évaluer selon votre situation.";
     }
 
     return {
-      gainMensuel, gainAnnuel, valeurActualiseGains, tauxRentabilite, pointMort,
+      gainMensuel, gainAnnuel, valeurActualiseGains, pointMort,
       esperanceVie: esperanceVieAjustee, evaluation, couleur, recommandation,
       coutTotal: coutTotalSurcotisation, sexeAnalyse: sexe === 'F' ? 'Femme' : 'Homme',
-      capitalPlacement, interessPlacementTotal, renteMensuelle, tauxPlacement,
       strategieOptimale, avantageComparatif, dureePeriodeAnnees, scenarios
     };
   }
 
+  // ============================================
+  // AFFICHAGE ANALYSE RENTABILITÉ — TABLEAU 3 SCÉNARIOS
+  // Terminologie officielle CPCMR : "supplément de pension"
+  // Sans jugement : l'utilisateur compare et décide
+  // ============================================
   function afficherAnalyseRentabilite(analyse) {
-    const pointMortAffichage = analyse.pointMort === Infinity ? "Jamais rentabilisé" : analyse.pointMort.toFixed(1) + " ans";
-    const tauxChoisi = (analyse.tauxPlacement * 100).toFixed(1);
+    const pointMortAffichage = analyse.pointMort === Infinity ? "Jamais récupéré" : analyse.pointMort.toFixed(1) + " ans";
+
+    // Tableau comparatif 3 scénarios — sans colonne "meilleur choix"
+    const lignesTableau = analyse.scenarios.map(s => `
+      <tr>
+        <td style="padding:8px;border:1px solid #e5e7eb;">
+          <strong style="color:${s.couleur};">${s.label}</strong><br>
+          <small style="color:#6b7280;">${s.detail}</small>
+        </td>
+        <td style="padding:8px;border:1px solid #e5e7eb;text-align:right;">${formatEuro(s.capital)}</td>
+        <td style="padding:8px;border:1px solid #e5e7eb;text-align:right;">${formatEuro(s.interets)}</td>
+        <td style="padding:8px;border:1px solid #e5e7eb;text-align:right;font-weight:bold;">${formatEuro(s.renteMensuelle)}/mois</td>
+        <td style="padding:8px;border:1px solid #e5e7eb;text-align:center;color:#16a34a;font-size:0.8rem;">✓ conservé<br>transmissible</td>
+      </tr>`).join('');
 
     return `
       <div class="info" style="margin-top:15px;border-left-color:${analyse.couleur};background:#f8fafc;">
         <h4 style="color:${analyse.couleur};margin-top:0;">Analyse de rentabilité actuarielle (données INSEE 2024)</h4>
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:10px 0;">
-          <div>
-            <strong>Surcotisation :</strong><br>
-            • Coût total : <strong>${formatEuro(analyse.coutTotal)}</strong><br>
-            • Gain mensuel de pension : <strong>+${formatEuro(analyse.gainMensuel)}</strong><br>
-            • Gain annuel de pension : <strong>+${formatEuro(analyse.gainAnnuel)}</strong><br>
-            • Durée pour rentabiliser l'investissement : <strong>${pointMortAffichage}</strong><br>
-            <small style="color:#6b7280;">(nombre d'années de retraite nécessaires pour récupérer le coût de la surcotisation)</small>
-          </div>
-          <div>
-            <strong>Alternative placement à ${tauxChoisi}% :</strong><br>
-            • Capital après ${analyse.dureePeriodeAnnees.toFixed(1)} ans : <strong>${formatEuro(analyse.capitalPlacement)}</strong><br>
-            • Intérêts générés : <strong>${formatEuro(analyse.interessPlacementTotal)}</strong><br>
-            • Rente mensuelle (intérêts seuls) : <strong>${formatEuro(analyse.renteMensuelle)}</strong><br>
-            • Capital préservé : <strong>Oui</strong>
-          </div>
+        <div style="background:#f1f5f9;padding:12px;border-radius:6px;margin-bottom:12px;">
+          <strong>Surcotisation :</strong><br>
+          • Coût total : <strong>${formatEuro(analyse.coutTotal)}</strong><br>
+          • Supplément de pension mensuel : <strong style="color:#16a34a;">+${formatEuro(analyse.gainMensuel)}/mois à vie</strong><br>
+          • Supplément de pension annuel : <strong style="color:#16a34a;">+${formatEuro(analyse.gainAnnuel)}/an</strong><br>
+          • Durée pour récupérer le coût : <strong>${pointMortAffichage}</strong>
+          <small style="display:block;color:#6b7280;margin-top:4px;">(années de retraite nécessaires pour récupérer le coût de la surcotisation — capital non conservé)</small>
         </div>
 
-        <div style="padding:12px;background:#f1f5f9;border-radius:6px;margin:10px 0;border-left:3px solid ${analyse.strategieOptimale === 'surcotisation' ? '#16a34a' : '#3b82f6'};">
-          <strong>Comparaison stratégique :</strong><br>
-          ${analyse.strategieOptimale === 'surcotisation' ?
-            `La <strong style="color:#16a34a;">surcotisation</strong> génère <strong>+${formatEuro(Math.abs(analyse.avantageComparatif))}/mois</strong> de plus que le placement à ${tauxChoisi}%.` :
-            `Le <strong style="color:#3b82f6;">placement à ${tauxChoisi}%</strong> génère <strong>+${formatEuro(Math.abs(analyse.avantageComparatif))}/mois</strong> de plus que la surcotisation.`
-          }
+        <strong>Comparaison avec des placements alternatifs :</strong>
+        <small style="display:block;color:#6b7280;margin-bottom:8px;">
+          Taux indicatifs 2026. Le Livret A varie régulièrement ; le PEA dépend des marchés financiers.<br>
+          Le revenu mensuel indiqué correspond aux intérêts générés divisés par 12 — le capital reste disponible et transmissible.
+        </small>
+        <div style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;font-size:0.88rem;margin:8px 0;">
+            <thead>
+              <tr style="background:#e2e8f0;">
+                <th style="padding:8px;border:1px solid #e5e7eb;text-align:left;">Placement</th>
+                <th style="padding:8px;border:1px solid #e5e7eb;text-align:right;">Capital après ${analyse.dureePeriodeAnnees.toFixed(1)} ans</th>
+                <th style="padding:8px;border:1px solid #e5e7eb;text-align:right;">Intérêts générés</th>
+                <th style="padding:8px;border:1px solid #e5e7eb;text-align:right;">Revenu mensuel sur intérêts</th>
+                <th style="padding:8px;border:1px solid #e5e7eb;text-align:center;">Capital</th>
+              </tr>
+            </thead>
+            <tbody>${lignesTableau}</tbody>
+            <tfoot>
+              <tr style="background:#eff6ff;border-top:2px solid #3b82f6;">
+                <td style="padding:8px;border:1px solid #e5e7eb;font-weight:bold;">Surcotisation<br><small style="color:#6b7280;font-weight:normal;">supplément de pension (Art. L11 bis CPCMR)</small></td>
+                <td style="padding:8px;border:1px solid #e5e7eb;text-align:right;color:#6b7280;">—</td>
+                <td style="padding:8px;border:1px solid #e5e7eb;text-align:right;color:#6b7280;">—</td>
+                <td style="padding:8px;border:1px solid #e5e7eb;text-align:right;font-weight:bold;color:#16a34a;">+${formatEuro(analyse.gainMensuel)}/mois à vie</td>
+                <td style="padding:8px;border:1px solid #e5e7eb;text-align:center;color:#dc2626;font-size:0.8rem;">non conservé</td>
+              </tr>
+            </tfoot>
+          </table>
         </div>
 
-        <div style="padding:10px;background:${analyse.couleur === '#16a34a' ? '#f0fdf4' : analyse.strategieOptimale === 'surcotisation' ? '#fefce8' : '#eff6ff'};border-radius:6px;margin:10px 0;">
-          <strong style="color:${analyse.strategieOptimale === 'surcotisation' ? analyse.couleur : '#3b82f6'};">Recommandation ${analyse.evaluation.toUpperCase()} :</strong><br>
-          ${analyse.recommandation}
+        <div style="padding:12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;margin:10px 0;font-size:0.88rem;">
+          <strong>📊 Pour vous aider à décider :</strong><br>
+          • La surcotisation vous coûte <strong>${formatEuro(analyse.coutTotal)}</strong> et vous rapporte <strong>+${formatEuro(analyse.gainMensuel)}/mois à vie</strong> (supplément de pension — capital non récupérable).<br>
+          • Le même montant placé génère un revenu mensuel variable selon le support, avec le capital <strong>conservé et transmissible</strong>.<br>
+          • La durée de récupération du coût de la surcotisation est de <strong>${pointMortAffichage}</strong> de retraite.<br>
+          <small style="color:#6b7280;">Ce tableau est informatif. La décision dépend de votre situation personnelle, fiscale et patrimoniale.</small>
         </div>
       </div>
     `;
@@ -924,6 +1015,9 @@
     const quotiteAvant = parseFloat(document.getElementById('quotiteAvant').value);
     const quotite = parseFloat(document.getElementById('quotite').value);
     const surcotisation = document.getElementById('surcotisation').checked;
+    // Art. L11 bis CPCMR : limite 4 trimestres de surcotisation sur toute la carrière
+    const trimSurcotDejaUtilises = parseInt(document.getElementById('trimSurcotDejaUtilises').value) || 0;
+    const trimSurcotDisponibles = Math.max(0, 4 - trimSurcotDejaUtilises);
     const bonifEnfants = document.getElementById('bonifEnfants').checked;
     const majorationEnfants = document.getElementById('majorationEnfants').checked;
     const nbEnfantsAvant2004 = parseInt(document.getElementById('enfantsAvant2004').value || '0', 10);
@@ -944,6 +1038,28 @@
     const e1 = parseInt(document.getElementById('enfantsAvant2004').value || '0', 10);
     const e2 = parseInt(document.getElementById('enfantsApres2003').value || '0', 10);
     document.getElementById('totalEnfantsEleves').value = e1 + e2;
+  }
+
+  function mettreAJourCompteurSurcot() {
+    const deja = parseInt(document.getElementById('trimSurcotDejaUtilises').value) || 0;
+    const disponibles = Math.max(0, 4 - deja);
+    const span = document.getElementById('trimSurcotDisponibles');
+    if (span) {
+      span.textContent = disponibles;
+      span.style.color = disponibles === 0 ? '#dc2626' : disponibles <= 2 ? '#f59e0b' : '#16a34a';
+      span.style.fontWeight = 'bold';
+    }
+    if (disponibles === 0) {
+      document.getElementById('surcotisation').checked = false;
+      document.getElementById('surcotisation').disabled = true;
+      document.getElementById('tauxSurcotisationContainer').classList.add('hidden');
+      const warn = document.getElementById('surcotPlafondAtteint');
+      if (warn) warn.style.display = 'block';
+    } else {
+      document.getElementById('surcotisation').disabled = false;
+      const warn = document.getElementById('surcotPlafondAtteint');
+      if (warn) warn.style.display = 'none';
+    }
   }
 
   function mettreAJourTauxSurcotisation() {
@@ -1021,7 +1137,19 @@
     const bonifEnfantsTr = bonifEnfantsJours / 90;
     const majorationsApres2003Jours = I.conditionsEnfantsApres2003 ? I.nbEnfantsApres2003 * 2 * 90 : 0;
     const majorationsApres2003Tr = majorationsApres2003Jours / 90;
-    const joursLiqP2 = Math.floor(P2.totalJours * (I.surcotisation ? 1 : I.quotite));
+    // Art. L11 bis CPCMR : la surcotisation est limitée à 4 trimestres sur toute la carrière
+    // On calcule la durée utile de surcotisation selon les trimestres encore disponibles
+    let joursLiqP2;
+    if (I.surcotisation && I.trimSurcotDisponibles > 0) {
+      const gainTrimParJour = (1 - I.quotite) / 90;
+      const joursUtiles = gainTrimParJour > 0
+        ? Math.min(P2.totalJours, Math.floor(I.trimSurcotDisponibles / gainTrimParJour))
+        : 0;
+      const joursApresLimite = P2.totalJours - joursUtiles;
+      joursLiqP2 = Math.floor(joursUtiles * 1) + Math.floor(joursApresLimite * I.quotite);
+    } else {
+      joursLiqP2 = Math.floor(P2.totalJours * (I.surcotisation ? 1 : I.quotite));
+    }
 
     const totalJoursAssurance = joursAssReleve + P1.totalJours + P2.totalJours + bonifEnfantsJours + majorationsApres2003Jours;
     const assuranceFinale = calculerDureeAssurance(totalJoursAssurance).trimestres;
@@ -1182,6 +1310,7 @@
       const pensionSansSurcotisation = traitementFin * tauxFinalSansSurcotisation;
       const pensionAvecSurcotisation = traitementFin * tauxFinalAvecSurcotisation;
 
+      // Art. L11 bis CPCMR — calcul avec 3 scénarios de placement (taux unique supprimé)
       const analyseRentabilite = calculerRentabiliteSurcotisation(
         pensionSansSurcotisation,
         pensionAvecSurcotisation,
@@ -1189,8 +1318,7 @@
         I.sexe,
         ageDepartDefinitif,
         montantSurcotisationMensuel,
-        P2.moisApprox,
-        parseFloat(document.getElementById('tauxPlacement').value)
+        P2.moisApprox
       );
 
       blocSurcotisation += afficherAnalyseRentabilite(analyseRentabilite);
@@ -1358,11 +1486,26 @@
     const dateDepart = new Date(document.getElementById('def-dateDepart').value);
     const quotiteFuture = parseFloat(document.getElementById('def-quotiteFuture').value);
     const surcotisation = document.getElementById('def-surcotisation').checked;
+    // Art. L11 bis CPCMR : limite 4 trimestres de surcotisation sur toute la carrière
+    const defTrimSurcotDejaUtilises = parseInt(document.getElementById('def-trimSurcotDejaUtilises').value) || 0;
+    const defTrimSurcotDisponibles = Math.max(0, 4 - defTrimSurcotDejaUtilises);
 
     const periodeProjection = diffDetaillee(inputs.dateReleve, dateDepart);
     const joursAssuranceReleve = (inputs.trimAssuranceReleve * 90) + inputs.joursAssuranceReleve;
     const joursLiquidablesReleve = (inputs.trimLiquidablesReleve * 90) + inputs.joursLiquidablesReleve;
-    const joursLiquidablesProjection = Math.floor(periodeProjection.totalJours * (surcotisation ? 1 : quotiteFuture));
+
+    // Calcul des liquidables avec limite surcotisation (Art. L11 bis CPCMR)
+    let joursLiquidablesProjection;
+    if (surcotisation && defTrimSurcotDisponibles > 0) {
+      const gainTrimParJour = (1 - quotiteFuture) / 90;
+      const joursUtiles = gainTrimParJour > 0
+        ? Math.min(periodeProjection.totalJours, Math.floor(defTrimSurcotDisponibles / gainTrimParJour))
+        : 0;
+      const joursApresLimite = periodeProjection.totalJours - joursUtiles;
+      joursLiquidablesProjection = Math.floor(joursUtiles * 1) + Math.floor(joursApresLimite * quotiteFuture);
+    } else {
+      joursLiquidablesProjection = Math.floor(periodeProjection.totalJours * (surcotisation ? 1 : quotiteFuture));
+    }
     const bonifEnfantsJours = inputs.conditionsEnfantsAvant2004 ? inputs.nbEnfantsAvant2004 * 4 * 90 : 0;
     const bonifEnfantsTr = bonifEnfantsJours / 90;
     const majorationsApres2003Jours = inputs.conditionsEnfantsApres2003 ? inputs.nbEnfantsApres2003 * 2 * 90 : 0;
@@ -1447,6 +1590,38 @@
       resultHTML += '</div>';
     }
 
+    // ANALYSE DE RENTABILITÉ SURCOTISATION — Onglet Retraite Définitive
+    if (surcotisation && defTrimSurcotDisponibles > 0) {
+      const traitementPlein = inputs.indice * inputs.valeurPoint;
+      const tauxSurcotDef = parseFloat(document.getElementById('def-tauxSurcotisation').value) / 100 || 0.162;
+      const tauxRetenueNormal = 11.10;
+      const montantSurcotMensuel = (tauxSurcotDef * traitementPlein) - (tauxRetenueNormal / 100 * quotiteFuture * traitementPlein);
+      const montantSurcotTotal = montantSurcotMensuel * periodeProjection.moisApprox;
+
+      // Pension sans surcotisation (pour comparaison)
+      const joursLiqSansSurcot = Math.floor(periodeProjection.totalJours * quotiteFuture);
+      const totalLiqSansSurcot = joursLiquidablesReleve + joursLiqSansSurcot + bonifEnfantsJours;
+      const liquidablesSansSurcot = arrondirTrimestresLiquidables(totalLiqSansSurcot);
+      const ratioSansSurcot = clamp(liquidablesSansSurcot / TR, 0, 1);
+      let tauxSansSurcot = 0.75 * ratioSansSurcot;
+      if (surcoteAppliquee && tauxSurcoteFinale > 0) tauxSansSurcot = (0.75 * ratioSansSurcot) * (1 + tauxSurcoteFinale / 100);
+      if (assuranceFinale < TR) tauxSansSurcot = (0.75 * ratioSansSurcot) * (1 - (TR - assuranceFinale) * 1.25 / 100);
+      const pensionSansSurcot = traitementFin * tauxSansSurcot;
+
+      if (montantSurcotTotal > 0) {
+        const analyseRentabilite = calculerRentabiliteSurcotisation(
+          pensionSansSurcot,
+          pensionDefinitive,
+          montantSurcotTotal,
+          inputs.sexe,
+          ageDepartDefinitif,
+          montantSurcotMensuel,
+          periodeProjection.moisApprox
+        );
+        resultHTML += afficherAnalyseRentabilite(analyseRentabilite);
+      }
+    }
+
     resultHTML += '<div class="highlight-result"><h3>Pension définitive estimée</h3>';
     resultHTML += '<p style="font-size:1.3em;font-weight:bold;color:var(--pri);">' + formatEuro(pensionDefinitive) + '</p>';
     if (plafondL13Atteint) {
@@ -1501,88 +1676,182 @@
 
     const nbTrimestres = parseInt(document.getElementById('rachat-nbTrimestres').value);
     const ageRachat = parseInt(document.getElementById('rachat-ageRachat').value);
+    const typeRachat = document.getElementById('rachat-typeRachat').value;
     const optionRachat = document.getElementById('rachat-optionRachat').value;
     const TMI = parseFloat(document.getElementById('rachat-TMI').value) / 100;
-    const tauxPlacement = parseFloat(document.getElementById('rachat-tauxPlacement').value);
-
     const traitementIndiciaire = inputs.indice * inputs.valeurPoint;
-    const coefficient = getCoefficientRachat(ageRachat, optionRachat);
-    const coutParTrimestre = traitementIndiciaire * coefficient;
-    const coutNominal = coutParTrimestre * nbTrimestres;
-    const economieImpot = coutNominal * TMI;
-    const coutReel = coutNominal - economieImpot;
-
     const TR = inputs.trimestresRequis;
-    const gainTrimestres = optionRachat === 'taux_duree' ? nbTrimestres : 0;
-    const gainMensuel = gainTrimestres > 0 ? (traitementIndiciaire * 0.75 * (gainTrimestres / TR)) : 0;
-    const gainAnnuel = gainMensuel * 12;
-    const dureeRentabilisation = gainAnnuel > 0 ? coutReel / gainAnnuel : Infinity;
+
+    let coutNominal, coutReel, gainTrimestres, gainMensuel, gainAnnuel,
+        dureeRentabilisation, typeLabel, economieImpot,
+        coefficient = 0, coutParTrimestre = 0;
+
+    if (typeRachat === 'surcotisation_retroactive') {
+      // Art. L11 bis CPCMR — Surcotisation rétroactive
+      // Limité à 4 trimestres max sur toute la carrière
+      const nbTrimsLimite = Math.min(nbTrimestres, 4);
+      const quotitePassee = parseFloat(document.getElementById('rachat-quotitePassee').value);
+      const { coutMensuel, moisPour1Trim } = calculerCoutSurcotisationRetroactive(quotitePassee, traitementIndiciaire);
+      const moisTotaux = moisPour1Trim * nbTrimsLimite;
+      coutNominal = coutMensuel * moisTotaux;
+      economieImpot = coutNominal * TMI;
+      coutReel = coutNominal - economieImpot;
+      // La surcotisation L11 bis augmente TOUJOURS les liquidables (équivalent option taux+durée)
+      gainTrimestres = nbTrimsLimite;
+      gainMensuel = traitementIndiciaire * 0.75 * (gainTrimestres / TR);
+      gainAnnuel = gainMensuel * 12;
+      dureeRentabilisation = gainAnnuel > 0 ? coutReel / gainAnnuel : Infinity;
+      typeLabel = `Surcotisation rétroactive Art. L11 bis — ${(quotitePassee*100).toFixed(0)}% — ${nbTrimsLimite} trimestre(s)`;
+    } else {
+      // Rachat classique (études / années incomplètes)
+      coefficient = getCoefficientRachat(ageRachat, optionRachat);
+      coutParTrimestre = traitementIndiciaire * coefficient;
+      coutNominal = coutParTrimestre * nbTrimestres;
+      economieImpot = coutNominal * TMI;
+      coutReel = coutNominal - economieImpot;
+      gainTrimestres = optionRachat === 'taux_duree' ? nbTrimestres : 0;
+      gainMensuel = gainTrimestres > 0 ? (traitementIndiciaire * 0.75 * (gainTrimestres / TR)) : 0;
+      gainAnnuel = gainMensuel * 12;
+      dureeRentabilisation = gainAnnuel > 0 ? coutReel / gainAnnuel : Infinity;
+      typeLabel = typeRachat === 'etudes' ? "Rachat années d'études" : "Rachat années incomplètes";
+    }
 
     const esperanceVie = inputs.sexe === 'F' ? donneesActuarielles.esperanceVie.femmes : donneesActuarielles.esperanceVie.hommes;
 
-    let dureeAvantRetraite = 5;
+    // Durée totale jusqu'à la retraite depuis l'âge du rachat
+    let dureeJusquRetraite = 22; // défaut
     if (inputs.dateDebut && inputs.dateNaissance) {
       const ageDebut = (inputs.dateDebut - inputs.dateNaissance) / (1000 * 60 * 60 * 24 * 365.25);
-      dureeAvantRetraite = Math.max(1, ageDebut - ageRachat);
+      dureeJusquRetraite = Math.max(1, ageDebut - ageRachat);
     }
 
-    const capitalPlacement = coutReel * Math.pow(1 + tauxPlacement, dureeAvantRetraite);
-    const interessPlacementTotal = capitalPlacement - coutReel;
-    const renteMensuelle = (interessPlacementTotal * tauxPlacement) / 12;
-
-    let evaluation = "défavorable";
-    let couleur = "#dc2626";
-    let recommandation = "Le placement semble plus avantageux que le rachat dans votre situation.";
-
-    if (gainMensuel > renteMensuelle && dureeRentabilisation < esperanceVie * 0.5) {
-      evaluation = "favorable";
-      couleur = "#16a34a";
-      recommandation = "Le rachat est rentable si vous vivez au moins " + dureeRentabilisation.toFixed(1) + " ans en retraite.";
-    } else if (gainMensuel > renteMensuelle * 0.8 && dureeRentabilisation < esperanceVie * 0.7) {
-      evaluation = "neutre";
-      couleur = "#ca8a04";
-      recommandation = "Le rachat présente un intérêt limité. À évaluer selon votre situation personnelle.";
+    // Pour la surcotisation rétroactive : versements mensuels sur dureeCotisation
+    // Pour le rachat classique : versement unique du coutReel
+    let dureeCotisationAns = 0;
+    let versementMensuel = 0;
+    if (typeRachat === 'surcotisation_retroactive') {
+      const quotitePassee = parseFloat(document.getElementById('rachat-quotitePassee').value);
+      const nbTrimsLimite = Math.min(nbTrimestres, 4);
+      const { coutMensuel, moisPour1Trim } = calculerCoutSurcotisationRetroactive(quotitePassee, traitementIndiciaire);
+      dureeCotisationAns = (moisPour1Trim * nbTrimsLimite) / 12;
+      versementMensuel = coutMensuel;
+    } else {
+      // Rachat classique : versement unique considéré au moment du rachat
+      dureeCotisationAns = 0;
+      versementMensuel = 0;
     }
+    const dureeCapitalisationAns = Math.max(0, dureeJusquRetraite - dureeCotisationAns);
 
     let resultHTML = '<div class="result-section">';
-    resultHTML += '<h3>Coût du rachat (Fonction Publique d\'État)</h3>';
-    resultHTML += '<p><strong>Coefficient appliqué :</strong> ' + (coefficient * 100).toFixed(2) + '% du traitement</p>';
-    resultHTML += '<p><strong>Coût par trimestre :</strong> ' + formatEuro(coutParTrimestre) + '</p>';
-    resultHTML += '<p><strong>Coût nominal :</strong> ' + formatEuro(coutNominal) + ' (' + nbTrimestres + ' trimestres)</p>';
+    resultHTML += '<h3>' + typeLabel + '</h3>';
+
+    // Détail du coût selon le type
+    if (typeRachat === 'surcotisation_retroactive') {
+      const quotitePassee = parseFloat(document.getElementById('rachat-quotitePassee').value);
+      const nbTrimsLimite = Math.min(nbTrimestres, 4);
+      const { moisPour1Trim } = calculerCoutSurcotisationRetroactive(quotitePassee, traitementIndiciaire);
+      resultHTML += '<p><strong>Quotité passée :</strong> ' + (quotitePassee * 100).toFixed(0) + '%</p>';
+      resultHTML += '<p><strong>Trimestres récupérés :</strong> ' + nbTrimsLimite + ' (limité à 4 par Art. L11 bis CPCMR)</p>';
+      resultHTML += '<p><strong>Durée de surcotisation nécessaire :</strong> ' + (moisPour1Trim * nbTrimsLimite / 12).toFixed(1) + ' ans</p>';
+    } else {
+      resultHTML += '<p><strong>Coefficient appliqué :</strong> ' + (coefficient * 100).toFixed(2) + '% du traitement</p>';
+      resultHTML += '<p><strong>Coût par trimestre :</strong> ' + formatEuro(coutParTrimestre) + '</p>';
+    }
+    resultHTML += '<p><strong>Coût nominal :</strong> ' + formatEuro(coutNominal) + '</p>';
     resultHTML += '<p><strong>Économie d\'impôt (TMI ' + (TMI * 100).toFixed(0) + '%) :</strong> -' + formatEuro(economieImpot) + '</p>';
     resultHTML += '<p style="font-size:1.1em;font-weight:bold;color:#2563eb;"><strong>Coût réel après impôt :</strong> ' + formatEuro(coutReel) + '</p>';
     resultHTML += '</div>';
 
-    if (optionRachat === 'taux_duree') {
+    // Impact sur la pension
+    if (typeRachat === 'surcotisation_retroactive' || optionRachat === 'taux_duree') {
       resultHTML += '<div class="result-section">';
-      resultHTML += '<h3>Impact sur la pension</h3>';
-      resultHTML += '<p><strong>Gain mensuel estimé :</strong> +' + formatEuro(gainMensuel) + '</p>';
-      resultHTML += '<p><strong>Gain annuel estimé :</strong> +' + formatEuro(gainAnnuel) + '</p>';
-      const dureeAffichage = dureeRentabilisation === Infinity ? 'Jamais' : dureeRentabilisation.toFixed(1) + ' ans';
-      resultHTML += '<p><strong>Durée pour rentabiliser :</strong> ' + dureeAffichage + '</p>';
+      resultHTML += '<h3>Supplément de pension (Art. L11 bis CPCMR)</h3>';
+      resultHTML += '<p><strong>Supplément mensuel estimé :</strong> <strong style="color:#16a34a;">+' + formatEuro(gainMensuel) + '/mois à vie</strong></p>';
+      resultHTML += '<p><strong>Supplément annuel estimé :</strong> <strong style="color:#16a34a;">+' + formatEuro(gainAnnuel) + '/an</strong></p>';
+      const dureeAffichage = dureeRentabilisation === Infinity ? 'Jamais récupéré' : dureeRentabilisation.toFixed(1) + ' ans';
+      resultHTML += '<p><strong>Durée pour récupérer le coût :</strong> ' + dureeAffichage + '</p>';
+      resultHTML += '<small style="color:#6b7280;">Capital non conservé — le supplément est versé à vie</small>';
       resultHTML += '</div>';
     } else {
       resultHTML += '<div class="info" style="margin-top:15px;">';
-      resultHTML += '<p><strong>Option 1 (Taux seul) :</strong> Cette option permet d\'éviter la décote mais n\'augmente pas le montant de la pension.</p>';
-      resultHTML += '<p>Elle est pertinente si vous avez suffisamment de trimestres liquidables mais pas assez de trimestres d\'assurance pour atteindre le taux plein.</p>';
+      resultHTML += '<p><strong>Option 1 (Taux seul) :</strong> Permet d\'éviter la décote mais n\'augmente pas le montant de la pension.</p>';
       resultHTML += '</div>';
     }
+
+    // Tableau comparatif 3 placements
+    // Calcul en 2 phases pour chaque scénario de placement
+    // Phase 1 : versements mensuels pendant dureeCotisationAns → C1
+    // Phase 2 : C1 capitalisé pendant dureeCapitalisationAns → C2 à la retraite
+    // Revenu mensuel à la retraite = intérêts annuels de C2 / 12
+    const scenarios3 = [
+      { taux: 0.017, label: 'Livret A', detail: '1,7% — variable', couleur: '#3b82f6' },
+      { taux: 0.035, label: 'Assurance-vie', detail: '3,5% — fonds euros', couleur: '#8b5cf6' },
+      { taux: 0.050, label: 'PEA ETF MSCI World', detail: '5% — non garanti', couleur: '#f59e0b' }
+    ].map(s => {
+      const tauxMensuel = s.taux / 12;
+      let C1;
+      if (typeRachat === 'surcotisation_retroactive' && dureeCotisationAns > 0) {
+        // Phase 1 : épargne mensuelle (versements réguliers)
+        const nMois = Math.round(dureeCotisationAns * 12);
+        C1 = versementMensuel * ((Math.pow(1 + tauxMensuel, nMois) - 1) / tauxMensuel);
+      } else {
+        // Rachat classique : versement unique
+        C1 = coutReel;
+      }
+      // Phase 2 : capitalisation jusqu'à la retraite
+      const C2 = C1 * Math.pow(1 + s.taux, dureeCapitalisationAns);
+      // Gain total = C2 - versements réels totaux (pas coutReel qui est après déduction fiscale)
+      const versementsTotaux = typeRachat === 'surcotisation_retroactive'
+        ? versementMensuel * Math.round(dureeCotisationAns * 12)
+        : coutNominal;
+      const gainTotal = C2 - versementsTotaux;
+      // Revenu mensuel = intérêts annuels de C2 / 12
+      const revenuMensuel = (C2 * s.taux) / 12;
+      return { ...s, C1, C2, int: gainTotal, revenuMensuel };
+    });
 
     resultHTML += '<div class="result-section">';
-    resultHTML += '<h3>Comparaison avec placement à ' + (tauxPlacement * 100).toFixed(1) + '%</h3>';
-    resultHTML += '<p><strong>Si vous placez ' + formatEuro(coutReel) + ' :</strong></p>';
-    resultHTML += '<p>• Capital après ' + dureeAvantRetraite.toFixed(0) + ' ans : ' + formatEuro(capitalPlacement) + '</p>';
-    resultHTML += '<p>• Intérêts générés : ' + formatEuro(interessPlacementTotal) + '</p>';
-    resultHTML += '<p>• Rente mensuelle (intérêts seuls) : ' + formatEuro(renteMensuelle) + '</p>';
-    resultHTML += '<p>• <strong>Capital préservé et transmissible</strong></p>';
+    resultHTML += '<h3>Comparaison avec des placements alternatifs</h3>';
+    const descPlacement = typeRachat === 'surcotisation_retroactive'
+      ? 'Si vous placez ' + formatEuro(versementMensuel) + '/mois pendant ' + dureeCotisationAns.toFixed(1) + ' ans, puis laissez fructifier ' + dureeCapitalisationAns.toFixed(0) + ' ans jusqu\'à la retraite :'
+      : 'Si vous placez ' + formatEuro(coutReel) + ' pendant ' + dureeJusquRetraite.toFixed(0) + ' ans jusqu\'à la retraite :';
+    resultHTML += '<small style="color:#6b7280;">' + descPlacement + '</small>';
+    resultHTML += '<table style="width:100%;border-collapse:collapse;font-size:0.88rem;margin:10px 0;">';
+    resultHTML += '<thead><tr style="background:#e2e8f0;">';
+    resultHTML += '<th style="padding:8px;border:1px solid #e5e7eb;text-align:left;">Placement</th>';
+    resultHTML += '<th style="padding:8px;border:1px solid #e5e7eb;text-align:right;">Capital à la retraite</th>';
+    resultHTML += '<th style="padding:8px;border:1px solid #e5e7eb;text-align:right;">Gain total</th>';
+    resultHTML += '<th style="padding:8px;border:1px solid #e5e7eb;text-align:right;">Revenu mensuel à la retraite</th>';
+    resultHTML += '<th style="padding:8px;border:1px solid #e5e7eb;text-align:center;">Capital</th>';
+    resultHTML += '</tr></thead><tbody>';
+    scenarios3.forEach(s => {
+      resultHTML += '<tr>';
+      resultHTML += '<td style="padding:8px;border:1px solid #e5e7eb;"><strong style="color:' + s.couleur + ';">' + s.label + '</strong><br><small style="color:#6b7280;">' + s.detail + '</small></td>';
+      resultHTML += '<td style="padding:8px;border:1px solid #e5e7eb;text-align:right;">' + formatEuro(s.C2) + '</td>';
+      resultHTML += '<td style="padding:8px;border:1px solid #e5e7eb;text-align:right;">' + formatEuro(s.int) + '</td>';
+      resultHTML += '<td style="padding:8px;border:1px solid #e5e7eb;text-align:right;font-weight:bold;">' + formatEuro(s.revenuMensuel) + '/mois</td>';
+      resultHTML += '<td style="padding:8px;border:1px solid #e5e7eb;text-align:center;color:#16a34a;font-size:0.8rem;">✓ conservé</td>';
+      resultHTML += '</tr>';
+    });
+    resultHTML += '<tr style="background:#eff6ff;">';
+    resultHTML += '<td style="padding:8px;border:1px solid #e5e7eb;font-weight:bold;">Rachat/Surcotisation</td>';
+    resultHTML += '<td style="padding:8px;border:1px solid #e5e7eb;text-align:right;color:#6b7280;">—</td>';
+    resultHTML += '<td style="padding:8px;border:1px solid #e5e7eb;text-align:right;color:#6b7280;">—</td>';
+    resultHTML += '<td style="padding:8px;border:1px solid #e5e7eb;text-align:right;font-weight:bold;color:#16a34a;">+' + formatEuro(gainMensuel) + '/mois à vie</td>';
+    resultHTML += '<td style="padding:8px;border:1px solid #e5e7eb;text-align:center;color:#dc2626;font-size:0.8rem;">non conservé</td>';
+    resultHTML += '</tr>';
+    resultHTML += '</tbody></table>';
+    resultHTML += '<small style="color:#6b7280;">Ce tableau est informatif. La décision dépend de votre situation personnelle, fiscale et patrimoniale.</small>';
     resultHTML += '</div>';
 
-    if (optionRachat === 'taux_duree') {
-      resultHTML += '<div style="padding:15px;background:' + (evaluation === 'favorable' ? '#f0fdf4' : evaluation === 'neutre' ? '#fefce8' : '#eff6ff') + ';border-radius:8px;border-left:4px solid ' + couleur + ';margin:15px 0;">';
-      resultHTML += '<h4 style="color:' + couleur + ';margin-top:0;">Recommandation ' + evaluation.toUpperCase() + '</h4>';
-      resultHTML += '<p>' + recommandation + '</p>';
-      resultHTML += '</div>';
-    }
+    // Note neutre — la décision appartient à l'utilisateur
+    resultHTML += '<div style="padding:12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;margin:10px 0;font-size:0.88rem;">';
+    resultHTML += '<strong>📊 À vous de décider :</strong><br>';
+    resultHTML += '• La surcotisation/rachat génère un <strong>supplément de pension à vie</strong> — le capital investi est définitivement perdu.<br>';
+    resultHTML += '• Le placement génère un <strong>revenu mensuel sur intérêts</strong> — le capital reste disponible, fructifie et est transmissible à vos héritiers.<br>';
+    resultHTML += '<small style="color:#6b7280;">La durée pour récupérer le coût et votre situation patrimoniale et familiale sont les critères clés de cette décision.</small>';
+    resultHTML += '</div>';
+
 
     resultHTML += '<div class="info" style="margin-top:20px;">';
     resultHTML += '<h4 style="margin-top:0;">Points d\'attention</h4>';
@@ -2150,6 +2419,7 @@
     document.getElementById('enfantsAvant2004').addEventListener('input', mettreAJourTotalEnfants);
     document.getElementById('enfantsApres2003').addEventListener('input', mettreAJourTotalEnfants);
     document.getElementById('surcotisation').addEventListener('change', mettreAJourTauxSurcotisation);
+    document.getElementById('trimSurcotDejaUtilises').addEventListener('input', mettreAJourCompteurSurcot);
     document.getElementById('quotite').addEventListener('change', mettreAJourTauxSurcotisation);
     document.getElementById('def-surcotisation').addEventListener('change', mettreAJourTauxSurcotisationDefinitive);
     document.getElementById('def-quotiteFuture').addEventListener('change', mettreAJourTauxSurcotisationDefinitive);
