@@ -106,7 +106,7 @@
         <div class="col">
           <h3>Données du relevé de carrière</h3>
           <label for="dateReleve">Date du relevé</label>
-          <input id="dateReleve" type="date" value="2024-12-31" />
+          <input id="dateReleve" type="date" value="" />
           <small>Date du dernier relevé de carrière officiel SRE</small>
           <div style="background: #f8f9fa; padding: 10px; border-radius: 6px; margin: 10px 0;">
             <label for="trimAssuranceReleve">Trimestres d'assurance au relevé</label>
@@ -126,7 +126,7 @@
         <div class="col">
           <h3>Informations personnelles</h3>
           <label for="dateNaissance">Date de naissance</label>
-          <input id="dateNaissance" type="date" value="1964-06-25" />
+          <input id="dateNaissance" type="date" value="" />
           <small>Nécessaire pour déterminer l'âge légal et les trimestres requis</small>
           <label for="sexe">Sexe (pour l'analyse actuarielle)</label>
           <select id="sexe"><option value="H">Homme</option><option value="F">Femme</option></select>
@@ -147,10 +147,10 @@
         <div class="col">
           <h3>Planning de retraite progressive</h3>
           <label for="dateDebut">Date de départ retraite progressive</label>
-          <input id="dateDebut" type="date" value="2025-12-01" />
+          <input id="dateDebut" type="date" value="" />
           <small>Minimum 60 ans + 150 trimestres d'assurance</small>
           <label for="dateFin">Date de départ retraite définitive</label>
-          <input id="dateFin" type="date" value="2027-10-01" />
+          <input id="dateFin" type="date" value="" />
           <small>Fin de la période progressive</small>
           <div style="background: #fffbeb; padding: 10px; border-radius: 6px; margin: 10px 0;">
             <label for="quotiteAvant">Quotité entre relevé et départ progressif</label>
@@ -315,7 +315,7 @@
         <div class="col">
           <h4>Projection jusqu'à la retraite</h4>
           <label for="def-dateDepart">Date de départ en retraite</label>
-          <input id="def-dateDepart" type="date" value="2027-10-01" />
+          <input id="def-dateDepart" type="date" value="" />
           <label for="def-quotiteFuture">Quotité envisagée jusqu'au départ</label>
           <select id="def-quotiteFuture">
             <option value="1.00" selected>100 %</option><option value="0.90">90 %</option>
@@ -1487,6 +1487,10 @@
 
   function calculerRetraiteDefinitive() {
     const inputs = lireInputs();
+    if (!document.getElementById('def-dateDepart').value) {
+      document.getElementById('resultat-definitive').innerHTML = '<div class="warn"><h4>⚠️ Données invalides</h4><p>La date de départ en retraite est obligatoire.</p></div>';
+      return;
+    }
     const dateDepart = new Date(document.getElementById('def-dateDepart').value);
     const quotiteFuture = parseFloat(document.getElementById('def-quotiteFuture').value);
     const surcotisation = document.getElementById('def-surcotisation').checked;
@@ -1804,6 +1808,7 @@
       dureeCotisationAns = 0;
       versementMensuel = 0;
     }
+    const delaiInsuffisant = dureeCotisationAns > dureeJusquRetraite;
     const dureeCapitalisationAns = Math.max(0, dureeJusquRetraite - dureeCotisationAns);
 
     let resultHTML = '<div class="result-section">';
@@ -1817,6 +1822,12 @@
       resultHTML += '<p><strong>Quotité passée :</strong> ' + (quotitePassee * 100).toFixed(0) + '%</p>';
       resultHTML += '<p><strong>Trimestres récupérés :</strong> ' + nbTrimsLimite + ' (limité à 4 par Art. L11 bis CPCMR)</p>';
       resultHTML += '<p><strong>Durée de surcotisation nécessaire :</strong> ' + (moisPour1Trim * nbTrimsLimite / 12).toFixed(1) + ' ans</p>';
+      if (delaiInsuffisant) {
+        resultHTML += '<div style="background:#fee2e2;border-left:4px solid #dc2626;padding:10px;border-radius:6px;margin:10px 0;">';
+        resultHTML += '<strong style="color:#991b1b;">⛔ Délai insuffisant avant le départ en retraite progressive</strong><br>';
+        resultHTML += '<span style="color:#991b1b;">La surcotisation nécessite <strong>' + (moisPour1Trim * nbTrimsLimite / 12).toFixed(1) + ' ans</strong>, mais il ne reste que <strong>' + dureeJusquRetraite.toFixed(1) + ' ans</strong> avant la date de départ en retraite progressive renseignée dans l\'onglet Paramètres. Réduisez le nombre de trimestres souhaités ou vérifiez votre date de départ.</span>';
+        resultHTML += '</div>';
+      }
     } else {
       resultHTML += '<p><strong>Coefficient appliqué :</strong> ' + (coefficient * 100).toFixed(2) + '% du traitement</p>';
       resultHTML += '<p><strong>Coût par trimestre :</strong> ' + formatEuro(coutParTrimestre) + '</p>';
