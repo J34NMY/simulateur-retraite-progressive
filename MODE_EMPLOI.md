@@ -26,6 +26,8 @@
 
 ## 1️⃣ Onglet Paramètres
 
+⚠️ Les valeurs qui s'affichent a l'ouverture sont des valeurs d'exemples a modifier selon vos données.
+
 ### Données du relevé de carrière
 
 **Date du relevé**
