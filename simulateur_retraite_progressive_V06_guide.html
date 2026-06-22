@@ -1,0 +1,1728 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Assistant Simulateur de Retraite Progressive</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    :root {
+      --bleu:#1e40af; --bleu-clair:#eff6ff; --bleu-bord:#bfdbfe;
+      --vert:#15803d; --vert-clair:#f0fdf4;
+      --gris-fond:#f8fafc; --gris-bord:#e2e8f0; --gris-txt:#64748b;
+      --rouge:#dc2626; --orange:#f59e0b;
+      --blanc:#ffffff; --noir:#0f172a;
+      --radius:10px; --shadow:0 2px 12px rgba(0,0,0,0.07);
+    }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:system-ui,-apple-system,sans-serif; background:var(--gris-fond); color:var(--noir); min-height:100vh; }
+
+    .header { background:var(--bleu); color:#fff; padding:16px 24px; text-align:center; }
+    .header h1 { font-size:1.3rem; font-weight:700; }
+    .header p  { font-size:0.82rem; opacity:.85; margin-top:3px; }
+    .mode-badge { display:inline-block; background:rgba(255,255,255,.2); border-radius:20px; padding:3px 12px; font-size:.75rem; margin-top:5px; }
+    .expert-btn { display:inline-block; background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.4); border-radius:6px; padding:6px 14px; font-size:.8rem; color:#fff; text-decoration:none; margin-top:8px; cursor:pointer; }
+    .expert-btn:hover { background:rgba(255,255,255,.25); }
+
+    .wizard-container { max-width:680px; margin:0 auto; padding:20px 16px 60px; }
+
+    /* Barre de progression */
+    .progress-bar { background:#fff; border:1px solid var(--gris-bord); border-radius:var(--radius); padding:14px 20px; margin-bottom:20px; box-shadow:var(--shadow); }
+    .progress-steps { display:flex; align-items:center; margin-bottom:8px; }
+    .step-dot { width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.78rem; font-weight:700; flex-shrink:0; transition:all .3s; border:2px solid var(--gris-bord); background:#fff; color:var(--gris-txt); }
+    .step-dot.active { background:var(--bleu); color:#fff; border-color:var(--bleu); }
+    .step-dot.done   { background:var(--vert); color:#fff; border-color:var(--vert); }
+    .step-line { flex:1; height:2px; background:var(--gris-bord); transition:background .3s; }
+    .step-line.done { background:var(--vert); }
+    .progress-label { font-size:.82rem; color:var(--gris-txt); }
+    .progress-label strong { color:var(--bleu); }
+    .progress-track { height:4px; background:var(--gris-bord); border-radius:2px; margin-top:6px; }
+    .progress-fill  { height:4px; background:var(--bleu); border-radius:2px; transition:width .4s ease; }
+
+    /* Carte étape */
+    .step-card { background:#fff; border:1px solid var(--gris-bord); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; display:none; }
+    .step-card.active { display:block; }
+    .step-header { background:var(--bleu-clair); border-bottom:1px solid var(--bleu-bord); padding:16px 20px; }
+    .step-header h2 { font-size:1.05rem; color:var(--bleu); font-weight:700; }
+    .step-header p  { font-size:.82rem; color:var(--gris-txt); margin-top:3px; }
+    .step-body { padding:20px; }
+
+    /* Champs */
+    .field { margin-bottom:18px; }
+    .field label { display:block; font-size:.86rem; font-weight:600; margin-bottom:5px; }
+    .field input,.field select { width:100%; padding:9px 12px; border:1.5px solid var(--gris-bord); border-radius:7px; font-size:.93rem; color:var(--noir); background:#fff; transition:border-color .2s; }
+    .field input:focus,.field select:focus { outline:none; border-color:var(--bleu); box-shadow:0 0 0 3px rgba(30,64,175,.1); }
+    .field small { display:block; font-size:.76rem; color:var(--gris-txt); margin-top:4px; }
+    .field-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+    .info-box { background:var(--bleu-clair); border-left:3px solid var(--bleu); border-radius:6px; padding:10px 12px; font-size:.81rem; color:#1e3a8a; margin-bottom:14px; }
+    .warn-box  { background:#fff7ed; border-left:3px solid var(--orange); border-radius:6px; padding:10px 12px; font-size:.81rem; color:#92400e; margin-bottom:14px; }
+
+    .check-field { display:flex; align-items:flex-start; gap:10px; padding:11px 13px; background:var(--gris-fond); border:1px solid var(--gris-bord); border-radius:7px; margin-bottom:10px; cursor:pointer; }
+    .check-field input[type="checkbox"] { width:17px; height:17px; flex-shrink:0; margin-top:1px; accent-color:var(--bleu); }
+    .check-field .check-label strong { display:block; font-size:.86rem; margin-bottom:1px; }
+    .check-field .check-label span   { color:var(--gris-txt); font-size:.78rem; }
+
+    /* Navigation */
+    .step-nav { display:flex; justify-content:space-between; align-items:center; padding:14px 20px; border-top:1px solid var(--gris-bord); background:var(--gris-fond); }
+    .btn { padding:9px 20px; border-radius:7px; font-size:.88rem; font-weight:600; border:none; cursor:pointer; transition:all .2s; }
+    .btn-primary   { background:var(--bleu); color:#fff; }
+    .btn-primary:hover { background:#1d3ba0; }
+    .btn-secondary { background:#fff; color:var(--bleu); border:1.5px solid var(--bleu); }
+    .btn-secondary:hover { background:var(--bleu-clair); }
+    .btn-success { background:var(--vert); color:#fff; padding:11px 26px; font-size:.95rem; }
+    .btn-success:hover { background:#14532d; }
+
+    /* Récap */
+    .recap-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:16px; }
+    .recap-item { background:var(--gris-fond); border:1px solid var(--gris-bord); border-radius:7px; padding:9px 11px; font-size:.8rem; }
+    .recap-item .recap-label { color:var(--gris-txt); margin-bottom:2px; }
+    .recap-item .recap-val   { font-weight:700; }
+
+    /* Résultats */
+    .results-section { display:none; margin-top:20px; }
+    .results-section.active { display:block; }
+    .result-section { background:#fff; border:1px solid var(--gris-bord); border-radius:var(--radius); padding:16px; margin-bottom:12px; }
+    .result-section h3 { color:var(--bleu); font-size:.95rem; margin-bottom:8px; border-bottom:1px solid var(--gris-bord); padding-bottom:6px; }
+    .result-section p { font-size:.86rem; padding:3px 0; }
+    .highlight-result { background:var(--vert-clair); border:2px solid #86efac; border-radius:var(--radius); padding:18px; text-align:center; margin-bottom:12px; }
+    .highlight-result h3 { color:var(--vert); font-size:1rem; margin-bottom:8px; }
+    .highlight-result .montant { font-size:1.8rem; font-weight:800; color:var(--vert); }
+    .info { background:#fefce8; border-left:3px solid var(--orange); border-radius:6px; padding:11px 14px; margin-bottom:10px; font-size:.83rem; }
+    .warn { background:#fff7ed; border-left:3px solid var(--orange); border-radius:6px; padding:11px 14px; margin-bottom:10px; font-size:.83rem; }
+    .ok   { background:var(--vert-clair); border-left:3px solid var(--vert); border-radius:6px; padding:11px 14px; margin-bottom:10px; font-size:.83rem; }
+
+    .validation-error { background:#fee2e2; border-left:4px solid var(--rouge); border-radius:6px; padding:9px 13px; font-size:.81rem; color:#991b1b; margin-top:10px; display:none; }
+    .validation-error.show { display:block; }
+
+    .primary { background:var(--vert); color:#fff; border:none; padding:10px 20px; border-radius:7px; font-size:.88rem; font-weight:600; cursor:pointer; }
+
+    footer { text-align:center; padding:18px; font-size:.76rem; color:var(--gris-txt); border-top:1px solid var(--gris-bord); margin-top:28px; }
+    footer a { color:var(--bleu); }
+
+    @media (max-width:480px) {
+      .field-row { grid-template-columns:1fr; }
+      .recap-grid { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🏛️ Assistant Simulateur de Retraite Progressive</h1>
+  <p>Fonctionnaire d'État – Mode Guidé · Gel 2026 (LFSS 2026, art. 105)</p>
+  <span class="mode-badge">✨ Assistant guidé — Résultat Retraite Progressive</span><br>
+  <a class="expert-btn" href="simulateur_retraite_progressive_V06_expert.html" target="_blank">
+    🔧 Accéder au Mode Expert (V06) — Retraite Définitive, Analyse Rachat, PDF...
+  </a>
+</div>
+
+<div class="wizard-container">
+
+  <!-- BARRE DE PROGRESSION -->
+  <div class="progress-bar">
+    <div class="progress-steps">
+      <div class="step-dot active" id="dot-1">1</div>
+      <div class="step-line" id="line-1"></div>
+      <div class="step-dot" id="dot-2">2</div>
+      <div class="step-line" id="line-2"></div>
+      <div class="step-dot" id="dot-3">3</div>
+      <div class="step-line" id="line-3"></div>
+      <div class="step-dot" id="dot-4">4</div>
+      <div class="step-line" id="line-4"></div>
+      <div class="step-dot" id="dot-5">5</div>
+      <div class="step-line" id="line-5"></div>
+      <div class="step-dot" id="dot-6">6</div>
+    </div>
+    <div class="progress-label">Étape <strong id="step-current">1</strong> / <strong>6</strong> — <span id="step-name">Identité</span></div>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:16.6%"></div></div>
+  </div>
+
+  <!-- ÉTAPE 1 — IDENTITÉ -->
+  <div class="step-card active" id="step-1">
+    <div class="step-header">
+      <h2>👤 Étape 1 — Votre identité</h2>
+      <p>Détermine votre âge légal et les trimestres requis selon votre génération.</p>
+    </div>
+    <div class="step-body">
+      <div class="field">
+        <label for="dateNaissance">Date de naissance</label>
+        <input type="date" id="dateNaissance" value="" />
+        <small>Obligatoire — détermine votre génération et les trimestres requis</small>
+      </div>
+      <div class="field">
+        <label for="sexe">Sexe</label>
+        <select id="sexe"><option value="H">Homme</option><option value="F">Femme</option></select>
+        <small>Utilisé pour l'espérance de vie dans l'analyse de rentabilité (tables INSEE 2024)</small>
+      </div>
+      <div id="field-trimRequis" style="display:none;">
+        <div style="padding:10px 14px;background:var(--bleu-clair);border-radius:7px;font-weight:700;color:var(--bleu);font-size:1.05rem;" id="trimRequisAffichage">—</div>
+        <small style="color:var(--gris-txt);display:block;margin-top:4px;">Trimestres requis calculés automatiquement (Gel 2026, LFSS 2026 art. 105)</small>
+      </div>
+      <div id="err-1" class="validation-error"></div>
+    </div>
+    <div class="step-nav">
+      <span></span>
+      <button class="btn btn-primary" onclick="allerEtape(2)">Suivant →</button>
+    </div>
+  </div>
+
+  <!-- ÉTAPE 2 — RELEVÉ -->
+  <div class="step-card" id="step-2">
+    <div class="step-header">
+      <h2>📋 Étape 2 — Données de votre relevé</h2>
+      <p>Relevé Individuel de Situation (RIS) disponible sur info-retraite.fr.</p>
+    </div>
+    <div class="step-body">
+      <div class="info-box">
+        <strong>📅 Date du relevé</strong>
+        Date de votre dernier relevé de carrière officiel SRE.
+      </div>
+      <div class="field">
+        <label for="dateReleve">Date du relevé</label>
+        <input type="date" id="dateReleve" value="" />
+      </div>
+      <div class="info-box" style="margin-top:14px;">
+        <strong>🔍 Où trouver ces données ?</strong>
+        • Trimestres d'assurance : section "Durée d'assurance" en haut du relevé<br>
+        • Trimestres liquidables : ligne SRE dans la section "Mes régimes"
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="trimAssuranceReleve">Trimestres d'assurance</label>
+          <input type="number" id="trimAssuranceReleve" min="0" max="200" step="1" value="0" />
+        </div>
+        <div class="field">
+          <label for="joursAssuranceReleve">Jours résiduels</label>
+          <input type="number" id="joursAssuranceReleve" min="0" max="89" step="1" value="0" />
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="trimLiquidablesReleve">Trimestres liquidables</label>
+          <input type="number" id="trimLiquidablesReleve" min="0" max="200" step="1" value="0" />
+        </div>
+        <div class="field">
+          <label for="joursLiquidablesReleve">Jours résiduels</label>
+          <input type="number" id="joursLiquidablesReleve" min="0" max="89" step="1" value="0" />
+        </div>
+      </div>
+      <div id="err-2" class="validation-error"></div>
+    </div>
+    <div class="step-nav">
+      <button class="btn btn-secondary" onclick="allerEtape(1)">← Précédent</button>
+      <button class="btn btn-primary" onclick="allerEtape(3)">Suivant →</button>
+    </div>
+  </div>
+
+  <!-- ÉTAPE 3 — RÉMUNÉRATION -->
+  <div class="step-card" id="step-3">
+    <div class="step-header">
+      <h2>💰 Étape 3 — Rémunération actuelle</h2>
+      <p>Indice majoré visible sur votre bulletin de paie (ligne traitement brut).</p>
+    </div>
+    <div class="step-body">
+      <div class="warn-box">⚠️ <strong>Règle des 6 mois (SRE)</strong> : une augmentation d'indice doit avoir été obtenue depuis au moins 6 mois avant le départ.</div>
+      <div class="field">
+        <label for="indice">Indice majoré (IM)</label>
+        <input type="number" id="indice" min="200" max="1200" step="1" value="" placeholder="Ex : 478" />
+      </div>
+      <div class="field">
+        <label for="valeurPoint">Valeur du point d'indice (€)</label>
+        <input type="number" id="valeurPoint" min="4" max="6" step="0.0001" value="4.92278" />
+        <small>Valeur officielle au 1er juillet 2023 : 4,92278 €</small>
+      </div>
+      <div id="traitement-preview" style="display:none;background:var(--vert-clair);border:1px solid #86efac;border-radius:7px;padding:10px 13px;margin-top:4px;">
+        <span style="font-size:.8rem;color:var(--gris-txt);">Traitement mensuel brut estimé</span>
+        <div style="font-size:1.2rem;font-weight:800;color:var(--vert);" id="traitement-preview-val">—</div>
+      </div>
+      <div id="err-3" class="validation-error"></div>
+    </div>
+    <div class="step-nav">
+      <button class="btn btn-secondary" onclick="allerEtape(2)">← Précédent</button>
+      <button class="btn btn-primary" onclick="allerEtape(4)">Suivant →</button>
+    </div>
+  </div>
+
+  <!-- ÉTAPE 4 — PLANNING -->
+  <div class="step-card" id="step-4">
+    <div class="step-header">
+      <h2>📅 Étape 4 — Planning de retraite</h2>
+      <p>Dates et quotité de votre période de retraite progressive.</p>
+    </div>
+    <div class="step-body">
+      <div class="info-box"><strong>Conditions minimales</strong> 60 ans minimum + 150 trimestres d'assurance au départ progressif.</div>
+      <div class="field-row">
+        <div class="field">
+          <label for="dateDebut">Départ retraite progressive</label>
+          <input type="date" id="dateDebut" value="" />
+        </div>
+        <div class="field">
+          <label for="dateFin">Départ retraite définitive</label>
+          <input type="date" id="dateFin" value="" />
+        </div>
+      </div>
+      <div class="field">
+        <label for="quotite">Quotité pendant la retraite progressive</label>
+        <select id="quotite">
+          <option value="0.50">50 %</option>
+          <option value="0.60">60 %</option>
+          <option value="0.70">70 %</option>
+          <option value="0.80" selected>80 %</option>
+          <option value="0.90">90 %</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="quotiteAvant">Quotité entre le relevé et le départ progressif</label>
+        <select id="quotiteAvant">
+          <option value="1.00" selected>100 % (temps plein)</option>
+          <option value="0.90">90 %</option>
+          <option value="0.80">80 %</option>
+          <option value="0.70">70 %</option>
+          <option value="0.60">60 %</option>
+          <option value="0.50">50 %</option>
+        </select>
+        <small>Si vous êtes déjà à temps partiel avant votre retraite progressive</small>
+      </div>
+      <div class="check-field">
+        <input type="checkbox" id="appliquerDecret1982" checked />
+        <div class="check-label">
+          <strong>Appliquer le Décret n°82-624</strong>
+          <span>80% → 6/7ème (85,71%) · 90% → 32/35ème (91,43%) — vérifiez sur votre bulletin de paie</span>
+        </div>
+      </div>
+      <div id="err-4" class="validation-error"></div>
+    </div>
+    <div class="step-nav">
+      <button class="btn btn-secondary" onclick="allerEtape(3)">← Précédent</button>
+      <button class="btn btn-primary" onclick="allerEtape(5)">Suivant →</button>
+    </div>
+  </div>
+
+  <!-- ÉTAPE 5 — OPTIONS -->
+  <div class="step-card" id="step-5">
+    <div class="step-header">
+      <h2>⚙️ Étape 5 — Options (facultatif)</h2>
+      <p>Passez directement à l'étape suivante si ces options ne s'appliquent pas.</p>
+    </div>
+    <div class="step-body">
+      <h4 style="font-size:.86rem;color:var(--gris-txt);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">Surcotisation</h4>
+      <div id="surcotPlafondAtteint" style="display:none;background:#fee2e2;border-left:3px solid var(--rouge);padding:8px 12px;border-radius:6px;margin-bottom:8px;font-size:.81rem;color:#991b1b;">
+        ⛔ Plafond atteint — 4 trimestres déjà utilisés (Art. L11 bis CPCMR).
+      </div>
+      <div class="check-field">
+        <input type="checkbox" id="surcotisation" onchange="mettreAJourTauxSurcotisation()" />
+        <div class="check-label">
+          <strong>Surcotisation pendant la période progressive</strong>
+          <span>Les liquidables comptent à 100% — analyse de rentabilité incluse</span>
+        </div>
+      </div>
+      <div id="tauxSurcotisationContainer" style="display:none;background:var(--gris-fond);border:1px solid var(--gris-bord);border-radius:7px;padding:13px;margin-bottom:14px;">
+        <div style="background:#fff3cd;border-left:3px solid var(--orange);padding:9px;border-radius:6px;margin-bottom:9px;font-size:.81rem;">
+          <label for="trimSurcotDejaUtilises"><strong>Trimestres déjà utilisés</strong></label>
+          <input id="trimSurcotDejaUtilises" type="number" min="0" max="4" step="1" value="0" style="max-width:75px;margin-top:5px;padding:6px;border:1px solid var(--gris-bord);border-radius:6px;" oninput="mettreAJourCompteurSurcot()" />
+          <small>Art. L11 bis CPCMR : max 4 trimestres sur toute la carrière. Disponibles : <span id="trimSurcotDisponibles" style="font-weight:700;color:var(--vert);">4</span></small>
+        </div>
+        <label style="font-size:.81rem;font-weight:600;">Taux de surcotisation (%)</label>
+        <input id="tauxSurcotisation" type="number" step="0.1" value="16.2" readonly style="background:var(--gris-fond);cursor:not-allowed;width:100%;padding:7px;border:1px solid var(--gris-bord);border-radius:6px;margin-top:3px;" />
+        <div style="margin-top:7px;background:var(--vert-clair);padding:7px;border-radius:6px;font-size:.78rem;">
+          ℹ️ Comparaison automatique : Livret A 1,7% · Assurance-vie 3,5% · PEA ETF 5%
+        </div>
+      </div>
+
+      <h4 style="font-size:.86rem;color:var(--gris-txt);text-transform:uppercase;letter-spacing:.05em;margin:14px 0 10px;">Droits liés aux enfants</h4>
+      <div class="check-field">
+        <input type="checkbox" id="conditionsEnfantsAvant2004" onchange="toggleEnfantsAvant2004()" />
+        <div class="check-label">
+          <strong>Bonification — enfants nés/adoptés avant 2004</strong>
+          <span>+4 trimestres liquidables ET assurance par enfant (conditions : interruption ≥ 2 mois, enfant élevé ≥ 9 ans)</span>
+        </div>
+      </div>
+      <div id="nbEnfantsAvant2004Container" style="display:none;margin:0 0 10px 28px;">
+        <label style="font-size:.81rem;font-weight:600;">Nombre d'enfants</label>
+        <input id="nbEnfantsAvant2004" type="number" min="1" max="10" value="1" style="max-width:75px;padding:7px;border:1px solid var(--gris-bord);border-radius:6px;display:block;margin-top:4px;" />
+      </div>
+
+      <div class="check-field">
+        <input type="checkbox" id="conditionsEnfantsApres2003" onchange="toggleEnfantsApres2003()" />
+        <div class="check-label">
+          <strong>Majoration — enfants nés/adoptés à partir de 2004</strong>
+          <span>+2 trimestres d'assurance par enfant (naissance après recrutement dans la FP)</span>
+        </div>
+      </div>
+      <div id="nbEnfantsApres2003Container" style="display:none;margin:0 0 10px 28px;">
+        <label style="font-size:.81rem;font-weight:600;">Nombre d'enfants</label>
+        <input id="nbEnfantsApres2003" type="number" min="1" max="10" value="1" style="max-width:75px;padding:7px;border:1px solid var(--gris-bord);border-radius:6px;display:block;margin-top:4px;" />
+      </div>
+
+      <div class="check-field">
+        <input type="checkbox" id="majorationFamilialeCheck" onchange="toggleMajorationFamiliale()" />
+        <div class="check-label">
+          <strong>Majoration familiale (Art. L18)</strong>
+          <span>3 enfants élevés minimum — +10% par tranche</span>
+        </div>
+      </div>
+      <div id="nbEnfantsMajorationContainer" style="display:none;margin:0 0 10px 28px;">
+        <label style="font-size:.81rem;font-weight:600;">Nombre total d'enfants élevés</label>
+        <input id="nbEnfantsMajoration" type="number" min="3" max="15" value="3" style="max-width:75px;padding:7px;border:1px solid var(--gris-bord);border-radius:6px;display:block;margin-top:4px;" />
+      </div>
+    </div>
+    <div class="step-nav">
+      <button class="btn btn-secondary" onclick="allerEtape(4)">← Précédent</button>
+      <button class="btn btn-primary" onclick="allerEtape(6)">Suivant →</button>
+    </div>
+  </div>
+
+  <!-- ÉTAPE 6 — RÉCAPITULATIF -->
+  <div class="step-card" id="step-6">
+    <div class="step-header">
+      <h2>✅ Étape 6 — Récapitulatif</h2>
+      <p>Vérifiez vos données avant de lancer la simulation.</p>
+    </div>
+    <div class="step-body">
+      <div class="recap-grid" id="recap-grid"></div>
+      <div style="text-align:center;margin-top:10px;">
+        <button class="btn btn-success" onclick="lancerCalcul()">🚀 Calculer ma simulation</button>
+      </div>
+      <div id="err-6" class="validation-error" style="margin-top:10px;"></div>
+    </div>
+    <div class="step-nav">
+      <button class="btn btn-secondary" onclick="allerEtape(5)">← Précédent</button>
+      <span style="font-size:.78rem;color:var(--gris-txt);">Aucune donnée transmise</span>
+    </div>
+  </div>
+
+  <!-- RÉSULTATS -->
+  <div class="results-section" id="results-section">
+    <div id="resultat"></div>
+    <div id="tableau-comparaison" style="margin-top:14px;"></div>
+    <div style="text-align:center;margin-top:14px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-secondary" onclick="modifierSimulation()">✏️ Modifier mes données</button>
+      <a class="btn btn-secondary" href="simulateur_retraite_progressive_V06_expert.html" target="_blank">🔧 Accéder au Mode Expert</a>
+    </div>
+  </div>
+
+  <!-- AVERTISSEMENT -->
+  <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:var(--radius);padding:12px 15px;margin-top:20px;font-size:.78rem;color:#92400e;">
+    ⚠️ <strong>Outil éducatif NON OFFICIEL.</strong>
+    Pour votre estimation officielle, consultez <a href="https://www.info-retraite.fr" target="_blank" style="color:var(--bleu);">info-retraite.fr</a>
+    ou le SRE via <a href="https://ensap.gouv.fr" target="_blank" style="color:var(--bleu);">ensap.gouv.fr</a>.
+    Aucune donnée saisie n'est transmise.
+  </div>
+
+  <!-- CHAMPS CACHÉS DE COMPATIBILITÉ -->
+  <div id="compat-zone" style="display:none;">
+    <input type="number"   id="enfantsAvant2004"   value="0" />
+    <input type="number"   id="enfantsApres2003"   value="0" />
+    <input type="number"   id="totalEnfantsEleves" value="0" />
+    <input type="number"   id="majorationFamiliale" value="0" />
+    <input type="checkbox" id="bonifEnfants" />
+    <input type="checkbox" id="majorationEnfants" />
+    <select id="trimestresRequis"><option value="170" selected>170</option></select>
+  </div>
+
+</div>
+
+<footer>
+  <strong>Assistant Simulateur de Retraite Progressive</strong><br>
+  Suspension réforme 2023 (LFSS 2026, art. 105) — Développé bénévolement par J34NMY<br>
+  <a href="simulateur_retraite_progressive_V06_expert.html" target="_blank">Accéder au Mode Expert (V06)</a> ·
+  <a href="https://www.info-retraite.fr" target="_blank">info-retraite.fr</a>
+</footer>
+
+<script>
+
+  let chart;
+  let chartDefinitive;
+
+  function switchTab(tabName) {
+    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+    document.getElementById('tab-' + tabName).classList.add('active');
+    document.querySelector('[onclick="switchTab(\'' + tabName + '\')"]').classList.add('active');
+  }
+
+  const baremeSurcotisation = {
+    "0.50": 23.85, "0.60": 21.30, "0.70": 18.75, "0.80": 16.20, "0.90": 13.65
+  };
+
+  const donneesActuarielles = {
+    esperanceVie: { femmes: 24.4, hommes: 21.0 },
+    tauxActualisation: 0.01,
+    coefficientRevalorisation: 1.008,
+    tauxLivretA: 0.03
+  };
+
+  const coefficientsRachatFonctionPublique = {
+    taux_seul: { 20: 0.25, 25: 0.26, 30: 0.28, 35: 0.31, 40: 0.35, 45: 0.42, 50: 0.48, 55: 0.65, 60: 0.85, 62: 0.90 },
+    taux_duree: { 20: 0.45, 25: 0.47, 30: 0.50, 35: 0.55, 40: 0.62, 45: 0.74, 50: 0.85, 55: 1.15, 60: 1.50, 62: 1.60 }
+  };
+
+  // ============================================
+  // SURCOTISATION RÉTROACTIVE — Art. L11 bis CPCMR + Décret n°2004-678
+  // Formule : (11,10% × QT + 80% × (11,10% + 37,65%) × QNT) × traitement plein
+  // QT = quotité travaillée, QNT = quotité non travaillée = (1 - QT)
+  // Taux employeur 2026 : 37,65%
+  // ============================================
+  function calculerCoutSurcotisationRetroactive(quotite, traitementPlein) {
+    const tauxRetenue = 11.10 / 100;
+    const tauxEmployeur = 37.65 / 100;
+    const QT = quotite;
+    const QNT = 1 - quotite;
+    // Taux surcotisé selon Décret 2004-678
+    const tauxSurcot = (tauxRetenue * QT) + (0.80 * (tauxRetenue + tauxEmployeur) * QNT);
+    // Coût mensuel = différence entre surcotisation et retenue normale
+    const coutMensuel = (tauxSurcot * traitementPlein) - (tauxRetenue * QT * traitementPlein);
+    // Durée pour 1 trimestre supplémentaire selon quotité (en mois)
+    // À 80% : 1 trim perdu tous les 5 ans → 5 ans = 60 mois pour 1 trimestre
+    const gainTrimParMois = (1 - quotite) / 3; // trimestres gagnés par mois de surcotisation
+    const moisPour1Trim = gainTrimParMois > 0 ? 1 / gainTrimParMois : Infinity;
+    return { tauxSurcot, coutMensuel, moisPour1Trim };
+  }
+
+  function mettreAJourTypeRachat() {
+    const type = document.getElementById('rachat-typeRachat').value;
+    const optionContainer = document.getElementById('rachat-optionContainer');
+    const surcotContainer = document.getElementById('rachat-surcotContainer');
+    if (type === 'surcotisation_retroactive') {
+      optionContainer.style.display = 'none';
+      surcotContainer.style.display = 'block';
+    } else {
+      optionContainer.style.display = 'block';
+      surcotContainer.style.display = 'none';
+    }
+    // Vider les résultats pour forcer un nouveau calcul
+    document.getElementById('resultat-rachat').innerHTML =
+      '<div class="info" style="text-align:center;padding:20px;"><p>Paramètres modifiés — cliquez sur <strong>"Analyser la rentabilité"</strong> pour recalculer.</p></div>';
+  }
+
+  function getCoefficientRachat(age, option) {
+    const coefficients = coefficientsRachatFonctionPublique[option];
+    const ages = Object.keys(coefficients).map(Number).sort((a, b) => a - b);
+    if (age <= ages[0]) return coefficients[ages[0]];
+    if (age >= ages[ages.length - 1]) return coefficients[ages[ages.length - 1]];
+    for (let i = 0; i < ages.length - 1; i++) {
+      if (age >= ages[i] && age <= ages[i + 1]) {
+        const ratio = (age - ages[i]) / (ages[i + 1] - ages[i]);
+        return coefficients[ages[i]] + ratio * (coefficients[ages[i + 1]] - coefficients[ages[i]]);
+      }
+    }
+    return coefficients[40];
+  }
+
+  function getCoutRachatParTrimestre(age, option, traitementIndiciaire) {
+    // Calcule le coût brut d'un trimestre racheté selon l'âge et l'option choisie
+    // Formule SRE : Traitement × Coefficient d'âge
+    const coefficient = getCoefficientRachat(age, option);
+    return traitementIndiciaire * coefficient;
+  }
+
+  function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+  function formatEuro(x){ return (isFinite(x)?x:0).toFixed(2) + ' €'; }
+
+  function arrondirTrimestresLiquidables(totalJours) {
+    const trimestresComplets = Math.floor(totalJours / 90);
+    const joursRestants = totalJours % 90;
+    return trimestresComplets + (joursRestants >= 45 ? 1 : 0);
+  }
+
+  function calculerDureeAssurance(totalJours) {
+    return { trimestres: Math.floor(totalJours / 90), jours: totalJours % 90, total: totalJours };
+  }
+
+  function calculerPeriodesServiceSRE(dateDebut, dateFin) {
+    if (!(dateDebut instanceof Date) || !(dateFin instanceof Date) || isNaN(dateDebut) || isNaN(dateFin)) return 0;
+    let annees = dateFin.getFullYear() - dateDebut.getFullYear();
+    let mois = dateFin.getMonth() - dateDebut.getMonth();
+    let jours = dateFin.getDate() - dateDebut.getDate();
+    if (jours < 0) { mois--; jours += 30; }
+    if (mois < 0) { annees--; mois += 12; }
+    return Math.max(0, (annees * 360) + (mois * 30) + jours);
+  }
+
+  function diffDetaillee(d1,d2){
+    const totalJours = calculerPeriodesServiceSRE(d1, d2);
+    const annees = Math.floor(totalJours / 360);
+    const resteApresAns = totalJours - Math.floor(annees * 360);
+    const mois = Math.floor(resteApresAns / 30);
+    const jours = Math.max(0, Math.floor(resteApresAns - mois * 30));
+    return { annees, mois, jours, totalJours, anneesDec: totalJours/360, moisApprox: totalJours/30 };
+  }
+
+  // Barème trimestres requis GEL 2026
+  // Source : LFSS 2026 + Décret n°2026-344 du 8 mai 2026
+  // ============================================
+  // CALCUL RENTABILITÉ SURCOTISATION
+  // Compare le gain de pension avec 3 scénarios de placement
+  // Correction : rente mensuelle = intérêts / 12 (pas intérêts × taux / 12)
+  // Scénarios fixes : Livret A 1,7% / Assurance-vie 3,5% / PEA ETF 5%
+  // ============================================
+  function calculerRentabiliteSurcotisation(pensionSansSurcote, pensionAvecSurcote, coutTotalSurcotisation, sexe, ageDepartDefinitif, coutMensuelSurcotisation, dureePeriodeProgressive) {
+    const esperanceVie = sexe === 'F' ? donneesActuarielles.esperanceVie.femmes : donneesActuarielles.esperanceVie.hommes;
+    const ajustementAge = Math.max(0, (ageDepartDefinitif - 62) * 0.5);
+    const esperanceVieAjustee = Math.max(15, esperanceVie - ajustementAge);
+
+    const gainMensuel = Math.max(0, pensionAvecSurcote - pensionSansSurcote);
+    const gainAnnuel = gainMensuel * 12;
+
+    let valeurActualiseGains = 0;
+    for (let annee = 1; annee <= esperanceVieAjustee; annee++) {
+      const gainActualise = gainAnnuel / Math.pow(1 + donneesActuarielles.tauxActualisation, annee);
+      valeurActualiseGains += gainActualise * Math.pow(donneesActuarielles.coefficientRevalorisation, annee);
+    }
+
+    const dureePeriodeAnnees = dureePeriodeProgressive / 12;
+
+    // Trois scénarios de placement fixes
+    // Rente mensuelle corrigée : intérêts / 12 (les intérêts sont déjà le gain annuel)
+    const scenarios = [
+      { taux: 0.017, label: "Livret A", detail: "1,7% — garanti, disponible, variable", couleur: "#3b82f6" },
+      { taux: 0.035, label: "Assurance-vie", detail: "3,5% — garanti, fonds euros", couleur: "#8b5cf6" },
+      { taux: 0.050, label: "PEA ETF MSCI World", detail: "5% — non garanti, long terme", couleur: "#f59e0b" }
+    ].map(s => {
+      const capital = coutTotalSurcotisation * Math.pow(1 + s.taux, dureePeriodeAnnees);
+      const interets = capital - coutTotalSurcotisation;
+      // CORRECTION : rente mensuelle = intérêts générés / 12
+      const renteMensuelle = interets / 12;
+      return { ...s, capital, interets, renteMensuelle };
+    });
+
+    // Comparaison basée sur le Livret A (scénario le plus conservateur)
+    const scenarioRef = scenarios[0];
+    const renteMensuelleRef = scenarioRef.renteMensuelle;
+
+    const pointMort = gainAnnuel > 0 ? coutTotalSurcotisation / gainAnnuel : Infinity;
+
+    let strategieOptimale = gainMensuel >= renteMensuelleRef ? "surcotisation" : "placement";
+    let avantageComparatif = Math.abs(gainMensuel - renteMensuelleRef);
+
+    let evaluation, couleur, recommandation;
+    if (strategieOptimale === "placement") {
+      evaluation = "défavorable";
+      couleur = "#dc2626";
+      recommandation = "Le placement semble plus avantageux que la surcotisation, même sur le Livret A.";
+    } else if (pointMort < esperanceVieAjustee * 0.5) {
+      evaluation = "favorable";
+      couleur = "#16a34a";
+      recommandation = "La surcotisation est rentable : elle génère plus qu'un placement et se rentabilise rapidement.";
+    } else {
+      evaluation = "neutre";
+      couleur = "#ca8a04";
+      recommandation = "La surcotisation génère plus qu'un Livret A mais la durée de rentabilisation est longue. À évaluer selon votre situation.";
+    }
+
+    return {
+      gainMensuel, gainAnnuel, valeurActualiseGains, pointMort,
+      esperanceVie: esperanceVieAjustee, evaluation, couleur, recommandation,
+      coutTotal: coutTotalSurcotisation, sexeAnalyse: sexe === 'F' ? 'Femme' : 'Homme',
+      strategieOptimale, avantageComparatif, dureePeriodeAnnees, scenarios
+    };
+  }
+
+  // ============================================
+  // AFFICHAGE ANALYSE RENTABILITÉ — TABLEAU 3 SCÉNARIOS
+  // Terminologie officielle CPCMR : "supplément de pension"
+  // Sans jugement : l'utilisateur compare et décide
+  // ============================================
+  function afficherAnalyseRentabilite(analyse) {
+    const pointMortAffichage = analyse.pointMort === Infinity ? "Jamais récupéré" : analyse.pointMort.toFixed(1) + " ans";
+
+    // Tableau comparatif 3 scénarios — sans colonne "meilleur choix"
+    const lignesTableau = analyse.scenarios.map(s => `
+      <tr>
+        <td style="padding:8px;border:1px solid #e5e7eb;">
+          <strong style="color:${s.couleur};">${s.label}</strong><br>
+          <small style="color:#6b7280;">${s.detail}</small>
+        </td>
+        <td style="padding:8px;border:1px solid #e5e7eb;text-align:right;">${formatEuro(s.capital)}</td>
+        <td style="padding:8px;border:1px solid #e5e7eb;text-align:right;">${formatEuro(s.interets)}</td>
+        <td style="padding:8px;border:1px solid #e5e7eb;text-align:right;font-weight:bold;">${formatEuro(s.renteMensuelle)}/mois</td>
+        <td style="padding:8px;border:1px solid #e5e7eb;text-align:center;color:#16a34a;font-size:0.8rem;">Conserve / transmissible</td>
+      </tr>`).join('');
+
+    return `
+      <div class="info" style="margin-top:15px;border-left-color:${analyse.couleur};background:#f8fafc;">
+        <h4 style="color:${analyse.couleur};margin-top:0;">Analyse de rentabilité actuarielle (données INSEE 2024)</h4>
+
+        <div style="background:#f1f5f9;padding:12px;border-radius:6px;margin-bottom:12px;">
+          <strong>Surcotisation :</strong><br>
+          • Coût total : <strong>${formatEuro(analyse.coutTotal)}</strong><br>
+          • Supplément de pension mensuel : <strong style="color:#16a34a;">+${formatEuro(analyse.gainMensuel)}/mois à vie</strong><br>
+          • Supplément de pension annuel : <strong style="color:#16a34a;">+${formatEuro(analyse.gainAnnuel)}/an</strong><br>
+          • Durée pour récupérer le coût : <strong>${pointMortAffichage}</strong>
+          <small style="display:block;color:#6b7280;margin-top:4px;">(années de retraite nécessaires pour récupérer le coût de la surcotisation — capital non conservé)</small>
+        </div>
+
+        <strong>Comparaison avec des placements alternatifs :</strong>
+        <small style="display:block;color:#6b7280;margin-bottom:8px;">
+          Taux indicatifs 2026. Le Livret A varie régulièrement ; le PEA dépend des marchés financiers.<br>
+          Le revenu mensuel indiqué correspond aux intérêts générés divisés par 12 — le capital reste disponible et transmissible.
+        </small>
+        <div style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;font-size:0.88rem;margin:8px 0;">
+            <thead>
+              <tr style="background:#e2e8f0;">
+                <th style="padding:8px;border:1px solid #e5e7eb;text-align:left;">Placement</th>
+                <th style="padding:8px;border:1px solid #e5e7eb;text-align:right;">Capital après ${analyse.dureePeriodeAnnees.toFixed(1)} ans</th>
+                <th style="padding:8px;border:1px solid #e5e7eb;text-align:right;">Intérêts générés</th>
+                <th style="padding:8px;border:1px solid #e5e7eb;text-align:right;">Revenu mensuel sur intérêts</th>
+                <th style="padding:8px;border:1px solid #e5e7eb;text-align:center;">Capital</th>
+              </tr>
+            </thead>
+            <tbody>${lignesTableau}</tbody>
+            <tfoot>
+              <tr style="background:#eff6ff;border-top:2px solid #3b82f6;">
+                <td style="padding:8px;border:1px solid #e5e7eb;font-weight:bold;">Surcotisation<br><small style="color:#6b7280;font-weight:normal;">supplément de pension (Art. L11 bis CPCMR)</small></td>
+                <td style="padding:8px;border:1px solid #e5e7eb;text-align:right;color:#6b7280;">—</td>
+                <td style="padding:8px;border:1px solid #e5e7eb;text-align:right;color:#6b7280;">—</td>
+                <td style="padding:8px;border:1px solid #e5e7eb;text-align:right;font-weight:bold;color:#16a34a;">+${formatEuro(analyse.gainMensuel)}/mois à vie</td>
+                <td style="padding:8px;border:1px solid #e5e7eb;text-align:center;color:#dc2626;font-size:0.8rem;">non conservé</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <div style="padding:12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;margin:10px 0;font-size:0.88rem;">
+          <strong>📊 Pour vous aider à décider :</strong><br>
+          • La surcotisation vous coûte <strong>${formatEuro(analyse.coutTotal)}</strong> et vous rapporte <strong>+${formatEuro(analyse.gainMensuel)}/mois à vie</strong> (supplément de pension — capital non récupérable).<br>
+          • Le même montant placé génère un revenu mensuel variable selon le support, avec le capital <strong>conservé et transmissible</strong>.<br>
+          • La durée de récupération du coût de la surcotisation est de <strong>${pointMortAffichage}</strong> de retraite.<br>
+          <small style="color:#6b7280;">Ce tableau est informatif. La décision dépend de votre situation personnelle, fiscale et patrimoniale.</small>
+        </div>
+      </div>
+    `;
+  }
+
+  const trimestresParAnnee = [
+    { min: 1958, max: 1960, trimestres: 168 },
+    { min: 1961, max: 1962, trimestres: 169 },
+    { min: 1963, max: 1965, trimestres: 170 },
+    { min: 1966, max: 1966, trimestres: 171 },
+    { min: 1967, max: 1967, trimestres: 171 },
+    { min: 1968, max: 2100, trimestres: 172 }
+  ];
+
+  // Âge légal de surcote classique – GEL 2026
+  function calculerAgeSurcote(dateNaissance) {
+    if (!(dateNaissance instanceof Date) || isNaN(dateNaissance)) return 62;
+    const anneeNaissance = dateNaissance.getFullYear();
+    const moisNaissance = dateNaissance.getMonth();
+    if (anneeNaissance < 1961 || (anneeNaissance === 1961 && moisNaissance < 8)) return 62;
+    if (anneeNaissance === 1961) return 62.25;
+    const agesParAnnee = {
+      1962: 62.5,
+      1963: 62.75,
+      1964: 62.75,  // gel : 62 ans 9 mois
+      1965: 62.75,  // gel pour 1er trim. 1965
+      1966: 63.25,
+      1967: 63.5
+    };
+    if (anneeNaissance === 1965 && moisNaissance >= 3) return 63.0;
+    if (anneeNaissance >= 1968) return 64;
+    return agesParAnnee[anneeNaissance] || 62;
+  }
+
+  // SURCOTE PARENTALE – GEL 2026
+  // Génération 1964 et 1er trim. 1965 NON ÉLIGIBLES (âge légal 62T3 < 63 ans requis)
+  // Source : retraitesdeletat.gouv.fr + ENSAP
+  function calculerSurcoteParentaleSRE(dateNaissance, trimestresRequis, assuranceFinale, bonifEnfantsTr, majorationsApres2003Tr, quotiteProgressive) {
+    if (!(dateNaissance instanceof Date) || isNaN(dateNaissance)) return { applicable: false };
+    const anneeNaissance = dateNaissance.getFullYear();
+    const moisNaissance = dateNaissance.getMonth();
+    const ageLegal = calculerAgeSurcote(dateNaissance);
+    if (anneeNaissance < 1964) return { applicable: false };
+    if (anneeNaissance === 1964) return { applicable: false };
+    if (anneeNaissance === 1965 && moisNaissance < 3) return { applicable: false };
+    const trimestresEnfants = bonifEnfantsTr + majorationsApres2003Tr;
+    if (trimestresEnfants < 1) return { applicable: false };
+    if (assuranceFinale < trimestresRequis) return { applicable: false };
+    const trimestresLiquidablesCotisesAnneeAvantAgeLegal = quotiteProgressive * 4;
+    const trimestresRetenus = Math.floor(trimestresLiquidablesCotisesAnneeAvantAgeLegal);
+    const trimestresMax = Math.min(4, trimestresRetenus);
+    if (trimestresMax <= 0) return { applicable: false };
+    const tauxSurcote = trimestresMax * 1.25;
+    return {
+      applicable: true,
+      tauxSurcote: tauxSurcote,
+      trimestresEnfants: trimestresEnfants,
+      trimestresRetenus: trimestresMax,
+      ageLegal: ageLegal,
+      quotiteProgressive: quotiteProgressive,
+      explication: `Quotité ${(quotiteProgressive*100).toFixed(0)}% x 4 = ${trimestresLiquidablesCotisesAnneeAvantAgeLegal.toFixed(1)} -> ${trimestresMax} trimestres retenus`
+    };
+  }
+
+  function autoRemplirTrimestres(dateNaissance) {
+    if (!(dateNaissance instanceof Date) || isNaN(dateNaissance)) return '';
+    const annee = dateNaissance.getFullYear();
+    for (const r of trimestresParAnnee) {
+      if (annee >= r.min && annee <= r.max) return r.trimestres;
+    }
+    return '';
+  }
+
+  // ============================================
+  // VALIDATION DES DONNÉES SAISIES – V.06 GEL 2026
+  // Vérifie la cohérence de toutes les données avant calcul
+  // 9 règles de validation (dates, trimestres, indices, quotités, enfants)
+  // ============================================
+  function validerParametres() {
+    const erreurs = [];
+    const dateReleve = new Date(document.getElementById('dateReleve').value);
+    const dateDepart = new Date(document.getElementById('dateDebut').value);
+    const dateDepartDefinitif = new Date(document.getElementById('dateFin').value);
+    const dateNaissance = new Date(document.getElementById('dateNaissance').value);
+    const today = new Date();
+    const ageActuel = (today - dateNaissance) / (365.25 * 24 * 60 * 60 * 1000);
+    const ageDepart = (dateDepart - dateNaissance) / (365.25 * 24 * 60 * 60 * 1000);
+    const ageDepartDefinitif = (dateDepartDefinitif - dateNaissance) / (365.25 * 24 * 60 * 60 * 1000);
+
+    // === VALIDATION 1 : Date de naissance ===
+    if (!document.getElementById('dateNaissance').value) {
+      erreurs.push('La date de naissance est obligatoire');
+    } else if (dateNaissance >= today) {
+      erreurs.push('La date de naissance ne peut pas être dans le futur');
+    } else {
+      if (ageActuel < 18) erreurs.push('Vous devez avoir au moins 18 ans');
+      if (dateNaissance < new Date('1900-01-01')) erreurs.push(`❌ Date de naissance irréaliste (\${dateNaissance.getFullYear()}). Veuillez vérifier.`);
+      if (ageActuel > 80) erreurs.push(`⚠️ Âge actuel inhabituel (\${ageActuel.toFixed(0)} ans). La RP concerne généralement les 60-67 ans.`);
+      if (ageActuel < 40) erreurs.push(`⚠️ Âge actuel très jeune (\${ageActuel.toFixed(0)} ans). La RP est accessible à partir de 60 ans.`);
+    }
+
+    // === VALIDATION 2 : Date de relevé ===
+    if (!document.getElementById('dateReleve').value) {
+      erreurs.push('La date du relevé de carrière est obligatoire');
+    } else if (dateReleve > today) {
+      erreurs.push('La date du relevé de carrière ne peut pas être dans le futur');
+    } else if (dateReleve < dateNaissance) {
+      erreurs.push('La date du relevé ne peut pas être antérieure à votre naissance');
+    }
+
+    // === VALIDATION 3 : Date de départ progressif ===
+    // GEL 2026 : âge légal maintenu à 62 ans pour la génération 1964
+    if (!document.getElementById('dateDebut').value) {
+      erreurs.push('La date de départ en retraite progressive est obligatoire');
+    } else if (dateDepart <= dateReleve) {
+      erreurs.push('❌ La date de départ progressif doit être APRÈS la date du relevé de carrière');
+    } else {
+      const anneesAvantDepart = (dateDepart - today) / (365.25 * 24 * 60 * 60 * 1000);
+      if (anneesAvantDepart > 20) erreurs.push(`❌ Date de départ progressif irréaliste (\${dateDepart.getFullYear()}). Vérifiez votre saisie.`);
+      if (ageDepart > 80) erreurs.push(`❌ Âge au départ progressif irréaliste (\${ageDepart.toFixed(0)} ans). Maximum : 70 ans.`);
+      else if (ageDepart < 60) erreurs.push('Vous devez avoir au moins 60 ans pour partir en retraite progressive');
+      else if (ageDepart > 67 && ageDepart <= 70) erreurs.push('⚠️ Départ après 67 ans : prolongation d\'activité requise auprès de votre employeur');
+      else if (ageDepart > 70) erreurs.push('❌ Départ après 70 ans impossible : limite d\'âge maximale dépassée');
+    }
+
+    // === VALIDATION 4 : Date de départ définitif ===
+    // GEL 2026 : avertissement si départ > 01/01/2028 (fin du gel)
+    if (!document.getElementById('dateFin').value) {
+      erreurs.push('La date de départ définitif est obligatoire');
+    } else if (dateDepartDefinitif <= dateDepart) {
+      erreurs.push('❌ La date de départ définitif doit être APRÈS la date de départ progressif');
+    } else {
+      const anneesAvantDefin = (dateDepartDefinitif - today) / (365.25 * 24 * 60 * 60 * 1000);
+      if (anneesAvantDefin > 25) erreurs.push(`❌ Date de départ définitif irréaliste (\${dateDepartDefinitif.getFullYear()}). Vérifiez votre saisie.`);
+      if (ageDepartDefinitif > 80) erreurs.push(`❌ Âge au départ définitif irréaliste (\${ageDepartDefinitif.toFixed(0)} ans). Maximum : 70 ans.`);
+      else if (ageDepartDefinitif > 67 && ageDepartDefinitif <= 70) erreurs.push('⚠️ Départ définitif après 67 ans : prolongation d\'activité requise');
+      else if (ageDepartDefinitif > 70) erreurs.push('❌ Départ définitif après 70 ans impossible : limite d\'âge maximale dépassée');
+    }
+
+    // === VALIDATION 5 : Durée de la période progressive ===
+    const dureePeriodeMois = (dateDepartDefinitif - dateDepart) / (30.44 * 24 * 60 * 60 * 1000);
+    if (dureePeriodeMois < 1) erreurs.push('⚠️ Période de retraite progressive très courte (moins d\'1 mois)');
+
+    // === VALIDATION 6 : Trimestres et jours ===
+    const trimAssurance = parseInt(document.getElementById('trimAssuranceReleve').value) || 0;
+    const trimLiquidables = parseInt(document.getElementById('trimLiquidablesReleve').value) || 0;
+    const joursAssurance = parseInt(document.getElementById('joursAssuranceReleve').value) || 0;
+    const joursLiquidables = parseInt(document.getElementById('joursLiquidablesReleve').value) || 0;
+    if (trimAssurance < 0) erreurs.push('Le nombre de trimestres d\'assurance ne peut pas être négatif');
+    if (trimLiquidables < 0) erreurs.push('Le nombre de trimestres liquidables ne peut pas être négatif');
+    if (joursAssurance < 0) erreurs.push('❌ Les jours d\'assurance ne peuvent pas être négatifs');
+    if (joursAssurance >= 90) erreurs.push('❌ Les jours d\'assurance doivent être inférieurs à 90 (90 jours = 1 trimestre)');
+    if (joursLiquidables < 0) erreurs.push('❌ Les jours liquidables ne peuvent pas être négatifs');
+    if (joursLiquidables >= 90) erreurs.push('❌ Les jours liquidables doivent être inférieurs à 90 (90 jours = 1 trimestre)');
+    const anneesCarriere = (dateReleve - dateNaissance) / (365.25 * 24 * 60 * 60 * 1000) - 18;
+    const trimestresMaxTheoriques = Math.ceil(anneesCarriere * 4);
+    if (trimAssurance > trimestresMaxTheoriques + 20) {
+      erreurs.push(`❌ Incohérence : \${trimAssurance} trimestres d'assurance pour ~\${Math.floor(anneesCarriere)} ans de carrière (max théorique : ~\${trimestresMaxTheoriques} trimestres)`);
+    }
+    if (trimAssurance < 150) erreurs.push('Vous devez avoir au moins 150 trimestres pour bénéficier de la retraite progressive');
+
+    // === VALIDATION 7 : Indices et valeurs ===
+    const indice = parseFloat(document.getElementById('indice').value) || 0;
+    const valeurPoint = parseFloat(document.getElementById('valeurPoint').value) || 0;
+    if (indice <= 0) erreurs.push('L\'indice majoré doit être supérieur à 0');
+    if (valeurPoint <= 0) erreurs.push('La valeur du point d\'indice doit être supérieure à 0');
+    if (indice < 350 || indice > 900) erreurs.push(`⚠️ Indice majoré inhabituel (\${indice}). Plage normale FP État : 350-900.`);
+    if (valeurPoint < 4.5 || valeurPoint > 5.5) erreurs.push(`⚠️ Valeur du point inhabituelle (\${valeurPoint.toFixed(5)} €). Valeur officielle 2025 : 4,92278 €.`);
+    const trimestresRequis = parseInt(document.getElementById('trimestresRequis').value) || 0;
+    if (trimestresRequis < 150 || trimestresRequis > 180) erreurs.push(`❌ Trimestres requis incorrects (\${trimestresRequis}). Plage normale : 150-180 trimestres.`);
+
+    // === VALIDATION 8 : Quotités ===
+    const quotiteAvant = parseFloat(document.getElementById('quotiteAvant').value) || 0;
+    const quotitePendant = parseFloat(document.getElementById('quotite').value) || 0;
+    if (quotiteAvant <= 0 || quotiteAvant > 1) erreurs.push('La quotité avant retraite progressive doit être entre 0 et 1 (ex: 0.8 pour 80%)');
+    if (quotitePendant < 0.5 || quotitePendant > 0.9) erreurs.push('La quotité pendant la retraite progressive doit être entre 50% et 90%');
+
+    // === VALIDATION 9 : Enfants ===
+    const bonifEnfantsChecked = document.getElementById('bonifEnfants').checked;
+    const majorationEnfantsChecked = document.getElementById('majorationEnfants').checked;
+    const nbEnfantsAvant2004 = parseInt(document.getElementById('enfantsAvant2004').value) || 0;
+    const nbEnfantsApres2003 = parseInt(document.getElementById('enfantsApres2003').value) || 0;
+    const nbEnfantsTotal = parseInt(document.getElementById('totalEnfantsEleves').value) || 0;
+    if (nbEnfantsAvant2004 > 0 && !bonifEnfantsChecked) erreurs.push('❌ Enfants avant 2004 saisis mais la case "Bonification" n\'est pas cochée');
+    if (nbEnfantsApres2003 > 0 && !majorationEnfantsChecked) erreurs.push('❌ Enfants après 2003 saisis mais la case "Majoration" n\'est pas cochée');
+    if (bonifEnfantsChecked && nbEnfantsAvant2004 === 0) erreurs.push('❌ Case "Bonification enfants avant 2004" cochée mais aucun enfant saisi');
+    if (majorationEnfantsChecked && nbEnfantsApres2003 === 0) erreurs.push('❌ Case "Majoration enfants après 2003" cochée mais aucun enfant saisi');
+    if (nbEnfantsAvant2004 < 0 || nbEnfantsApres2003 < 0 || nbEnfantsTotal < 0) erreurs.push('Le nombre d\'enfants ne peut pas être négatif');
+    const sommeEnfants = nbEnfantsAvant2004 + nbEnfantsApres2003;
+    if (nbEnfantsTotal !== sommeEnfants) erreurs.push(`❌ Incohérence : total enfants (\${nbEnfantsTotal}) ≠ somme des enfants saisis (\${sommeEnfants})`);
+
+    return erreurs;
+  }
+
+  function calcTraitementPlein(indice, valeurPoint){ return indice * valeurPoint; }
+
+  function calcTraitementTP(traitementPlein, quotite, appliquerDecret1982){
+    if (appliquerDecret1982) {
+      if (Math.abs(quotite - 0.80) < 1e-9) return traitementPlein * (6/7);
+      if (Math.abs(quotite - 0.90) < 1e-9) return traitementPlein * (32/35);
+    }
+    return traitementPlein * quotite;
+  }
+
+  function lireInputs() {
+    const indice = parseFloat(document.getElementById('indice').value) || 0;
+    const valeurPoint = parseFloat(document.getElementById('valeurPoint').value) || 0;
+    const tauxSurcotisation = parseFloat(document.getElementById('tauxSurcotisation').value) / 100 || 0.162;
+    const dateReleve = new Date(document.getElementById('dateReleve').value);
+    const trimAssuranceReleve = parseFloat(document.getElementById('trimAssuranceReleve').value) || 0;
+    const joursAssuranceReleve = parseFloat(document.getElementById('joursAssuranceReleve').value) || 0;
+    const trimLiquidablesReleve = parseFloat(document.getElementById('trimLiquidablesReleve').value) || 0;
+    const joursLiquidablesReleve = parseFloat(document.getElementById('joursLiquidablesReleve').value) || 0;
+    const sexe = document.getElementById('sexe').value || 'H';
+    let trimestresRequis = parseFloat(document.getElementById('trimestresRequis').value);
+    if (!trimestresRequis) {
+      const dateNaissance = new Date(document.getElementById('dateNaissance').value);
+      trimestresRequis = autoRemplirTrimestres(dateNaissance) || 0;
+    }
+    const dateDebut = new Date(document.getElementById('dateDebut').value);
+    const dateFin = new Date(document.getElementById('dateFin').value);
+    const quotiteAvant = parseFloat(document.getElementById('quotiteAvant').value);
+    const quotite = parseFloat(document.getElementById('quotite').value);
+    const surcotisation = document.getElementById('surcotisation').checked;
+    // Art. L11 bis CPCMR : limite 4 trimestres de surcotisation sur toute la carrière
+    const trimSurcotDejaUtilises = parseInt(document.getElementById('trimSurcotDejaUtilises').value) || 0;
+    const trimSurcotDisponibles = Math.max(0, 4 - trimSurcotDejaUtilises);
+    const bonifEnfants = document.getElementById('bonifEnfants').checked;
+    const majorationEnfants = document.getElementById('majorationEnfants').checked;
+    const nbEnfantsAvant2004 = parseInt(document.getElementById('enfantsAvant2004').value || '0', 10);
+    const nbEnfantsApres2003 = parseInt(document.getElementById('enfantsApres2003').value || '0', 10);
+    const totalEnfantsEleves = parseInt(document.getElementById('totalEnfantsEleves').value || '0', 10);
+    const dateNaissance = new Date(document.getElementById('dateNaissance').value);
+    const appliquerDecret1982 = document.getElementById('appliquerDecret1982').checked;
+    return {
+      indice, valeurPoint, tauxSurcotisation, dateReleve, trimAssuranceReleve, joursAssuranceReleve,
+      trimLiquidablesReleve, joursLiquidablesReleve, trimestresRequis, dateDebut, dateFin,
+      quotiteAvant, quotite, surcotisation, nbEnfantsAvant2004, nbEnfantsApres2003, totalEnfantsEleves,
+      conditionsEnfantsAvant2004: bonifEnfants, conditionsEnfantsApres2003: majorationEnfants,
+      dateNaissance, sexe, appliquerDecret1982
+    };
+  }
+
+  function mettreAJourTotalEnfants() {
+    const e1 = parseInt(document.getElementById('enfantsAvant2004').value || '0', 10);
+    const e2 = parseInt(document.getElementById('enfantsApres2003').value || '0', 10);
+    document.getElementById('totalEnfantsEleves').value = e1 + e2;
+  }
+
+  function mettreAJourCompteurSurcot() {
+    const deja = parseInt(document.getElementById('trimSurcotDejaUtilises').value) || 0;
+    const disponibles = Math.max(0, 4 - deja);
+    const span = document.getElementById('trimSurcotDisponibles');
+    if (span) {
+      span.textContent = disponibles;
+      span.style.color = disponibles === 0 ? '#dc2626' : disponibles <= 2 ? '#f59e0b' : '#16a34a';
+      span.style.fontWeight = 'bold';
+    }
+    const container = document.getElementById('tauxSurcotisationContainer');
+    if (disponibles === 0) {
+      document.getElementById('surcotisation').checked = false;
+      document.getElementById('surcotisation').disabled = true;
+      if (container) container.style.display = 'none';
+      const warn = document.getElementById('surcotPlafondAtteint');
+      if (warn) warn.style.display = 'block';
+    } else {
+      document.getElementById('surcotisation').disabled = false;
+      const warn = document.getElementById('surcotPlafondAtteint');
+      if (warn) warn.style.display = 'none';
+    }
+  }
+
+  function mettreAJourTauxSurcotisation() {
+    const quotite = document.getElementById('quotite').value;
+    const checked = document.getElementById('surcotisation').checked;
+    const container = document.getElementById('tauxSurcotisationContainer');
+    if (container) container.style.display = checked ? 'block' : 'none';
+    if (checked && baremeSurcotisation[quotite]) {
+      document.getElementById('tauxSurcotisation').value = baremeSurcotisation[quotite];
+    }
+  }
+
+  function accepterConditions() {
+    localStorage.setItem('simulateur_consent', 'accepted');
+    document.getElementById('consent-banner').style.display = 'none';
+  }
+
+  // ============================================
+  // CALCUL PRINCIPAL DE LA SIMULATION – GEL 2026
+  // Applique la méthode SRE (base 360 jours/an)
+  // Règles spécifiques gel 2026 (LFSS 2026, art. 105) :
+  //   - Âge légal 62 ans pour génération 1964
+  //   - Trimestres requis 1964 : 170 (au lieu de 171 réforme 2023)
+  //   - Majoration excédentaire suspendue
+  //   - Surcote parentale non applicable générations 1964 et 1er trim. 1965
+  //   - Surcote classique jusqu'à 70 ans (confirmé ENSAP)
+  //   - Plafond L13 : 100% du traitement (confirmé ENSAP)
+  // ============================================
+  function calculer() {
+    // VALIDATION — compatible V07 (validerParametres retourne {erreurs, warnings})
+    const validation = validerParametres();
+    const erreurs = Array.isArray(validation) ? validation : (validation.erreurs || []);
+
+    if (erreurs.length > 0) {
+      document.getElementById('resultat').innerHTML =
+        '<div class="warn"><h4>⚠️ Données invalides</h4>' +
+        '<ul>' + erreurs.map(e => '<li>' + e + '</li>').join('') + '</ul></div>';
+      return;
+    }
+
+    const I = lireInputs();
+
+    if (isNaN(I.dateReleve) || isNaN(I.dateDebut) || isNaN(I.dateFin) || I.dateDebut <= I.dateReleve || I.dateFin <= I.dateDebut) {
+      document.getElementById('resultat').innerHTML = '<p class="warn"><strong>Vérifiez les dates :</strong> relevé &lt; départ progressif &lt; départ définitif.</p>';
+      return;
+    }
+
+    const val = autoRemplirTrimestres(I.dateNaissance);
+    if (val) {
+      const trSelect = document.getElementById('trimestresRequis');
+      trSelect.innerHTML = '<option value="' + val + '" selected>' + val + '</option>';
+    }
+    const TR = val || I.trimestresRequis;
+
+    // CALCUL DES DURÉES – MÉTHODE SRE (base 360 jours/an, 1 trimestre = 90 jours)
+    // Source : Code des pensions civiles et militaires de retraite, Article L13
+    const joursAssuranceReleveBrut = (I.trimAssuranceReleve * 90) + I.joursAssuranceReleve;
+    const joursLiquidablesReleveBrut = (I.trimLiquidablesReleve * 90) + I.joursLiquidablesReleve;
+
+    const P1 = diffDetaillee(I.dateReleve, I.dateDebut);
+    const P2 = diffDetaillee(I.dateDebut, I.dateFin);
+
+    const joursAssReleve = joursAssuranceReleveBrut;
+    const joursLiqReleve = joursLiquidablesReleveBrut;
+    const joursLiqP1 = Math.floor(P1.totalJours * (I.quotiteAvant || 1));
+
+    // BONIFICATIONS ENFANTS (Article L12 du CPCMR)
+    // Avant 2004 : 4 trimestres liquidables par enfant (avec conditions)
+    // Après 2003 : 2 trimestres d'assurance par enfant (Article L12 bis)
+    const bonifEnfantsJours = I.conditionsEnfantsAvant2004 ? I.nbEnfantsAvant2004 * 4 * 90 : 0;
+    const bonifEnfantsTr = bonifEnfantsJours / 90;
+    const majorationsApres2003Jours = I.conditionsEnfantsApres2003 ? I.nbEnfantsApres2003 * 2 * 90 : 0;
+    const majorationsApres2003Tr = majorationsApres2003Jours / 90;
+    // Art. L11 bis CPCMR : la surcotisation est limitée à 4 trimestres sur toute la carrière
+    // On calcule la durée utile de surcotisation selon les trimestres encore disponibles
+    let joursLiqP2;
+    if (I.surcotisation && I.trimSurcotDisponibles > 0) {
+      const gainTrimParJour = (1 - I.quotite) / 90;
+      const joursUtiles = gainTrimParJour > 0
+        ? Math.min(P2.totalJours, Math.floor(I.trimSurcotDisponibles / gainTrimParJour))
+        : 0;
+      const joursApresLimite = P2.totalJours - joursUtiles;
+      joursLiqP2 = Math.floor(joursUtiles * 1) + Math.floor(joursApresLimite * I.quotite);
+    } else {
+      joursLiqP2 = Math.floor(P2.totalJours * (I.surcotisation ? 1 : I.quotite));
+    }
+
+    const totalJoursAssurance = joursAssReleve + P1.totalJours + P2.totalJours + bonifEnfantsJours + majorationsApres2003Jours;
+    const assuranceFinale = calculerDureeAssurance(totalJoursAssurance).trimestres;
+
+    const totalJoursLiquidables = joursLiqReleve + joursLiqP1 + bonifEnfantsJours + joursLiqP2;
+    const liquidablesFinale = arrondirTrimestresLiquidables(totalJoursLiquidables);
+
+    const totalJoursAssuranceDepart = joursAssReleve + P1.totalJours + bonifEnfantsJours + majorationsApres2003Jours;
+    const assuranceDepart = calculerDureeAssurance(totalJoursAssuranceDepart).trimestres;
+    const totalJoursLiquidablesDepart = joursLiqReleve + joursLiqP1 + bonifEnfantsJours;
+    const liquidablesDepart = arrondirTrimestresLiquidables(totalJoursLiquidablesDepart);
+
+    // CALCUL DE LA PENSION – Article L13 CPCMR
+    // Formule : Pension = Traitement × 75% × (Liquidables / Requis)
+    // Plafond : 100% du traitement indiciaire (confirmé ENSAP simulation 70 ans)
+    const traitementFin = I.indice * I.valeurPoint;
+    const ratioFin = clamp(liquidablesFinale / TR, 0, 1);
+    let tauxFinal = 0.75 * ratioFin;
+
+    // DÉCOTE – Article L14 CPCMR
+    // Si trimestres d'assurance < requis : 1,25% par trimestre manquant
+    // MÉTHODE SRE : application MULTIPLICATIVE (pas soustractive)
+    // Exemple : taux 68% avec 2 trimestres manquants → 68% × (1 - 2,5%) = 66,3%
+    if (assuranceFinale < TR) {
+      const trimestresManquants = TR - assuranceFinale;
+      const coefficientDecote = trimestresManquants * 1.25 / 100;
+      tauxFinal = (0.75 * ratioFin) * (1 - coefficientDecote);
+    }
+
+    const ageDepartDefinitif = (I.dateFin - I.dateNaissance) / (1000 * 60 * 60 * 24 * 365.25);
+    const ageSurcoteRequis = calculerAgeSurcote(I.dateNaissance);
+    let tauxSurcoteClassique = 0, tauxSurcoteParentale = 0, tauxMajorationExcedentaire = 0;
+    let surcoteAppliquee = false;
+    let trimestresSurcotes = 0;
+
+    // SURCOTES – Article L14 CPCMR + Décret n°2023-799
+    // GEL 2026 : seule la surcote classique est applicable
+    //   - Surcote classique : 1,25% par trimestre au-delà de l'âge légal (jusqu'à 70 ans)
+    //   - Surcote parentale : NON applicable générations 1964 et 1er trimestre 1965
+    //     (âge légal 62T3 < 63 ans requis – source : retraitesdeletat.gouv.fr)
+    //   - Majoration excédentaire : SUSPENDUE (LFSS 2026, art. 105)
+    const trimestresExcedentaires = Math.max(0, assuranceFinale - TR);
+    let trimestresExcedentairesRestants = trimestresExcedentaires;
+
+    const surcoteParentale = calculerSurcoteParentaleSRE(
+      I.dateNaissance, TR, assuranceFinale, bonifEnfantsTr, majorationsApres2003Tr, I.quotite
+    );
+    if (surcoteParentale.applicable) {
+      tauxSurcoteParentale = surcoteParentale.tauxSurcote;
+      surcoteAppliquee = true;
+      trimestresExcedentairesRestants = Math.max(0, trimestresExcedentairesRestants - surcoteParentale.trimestresRetenus);
+    }
+
+    // CORRECTION GEL 2026 : surcote classique de l'âge légal jusqu'à 70 ans.
+    // Utilise min(ageDepartDefinitif, 70) pour couvrir les départs à exactement 70 ans.
+    // Confirmation ENSAP (01/07/2034, né 25/06/1964) : +36,25% (29 trimestres).
+    if (assuranceFinale >= TR && ageDepartDefinitif >= ageSurcoteRequis) {
+      const ageEffectifSurcote = Math.min(ageDepartDefinitif, 70);
+      trimestresSurcotes = Math.floor((ageEffectifSurcote - ageSurcoteRequis) * 4);
+      if (trimestresSurcotes > 0) {
+        tauxSurcoteClassique = trimestresSurcotes * 1.25;
+        surcoteAppliquee = true;
+        trimestresExcedentairesRestants = Math.max(0, trimestresExcedentairesRestants - trimestresSurcotes);
+      }
+    }
+
+    // GEL 2026 : la majoration excédentaire est suspendue.
+    // Confirmation ENSAP : majoration totale = surcote classique uniquement.
+    // if (trimestresExcedentairesRestants > 0) {
+    //   tauxMajorationExcedentaire = trimestresExcedentairesRestants * 1.25;
+    //   surcoteAppliquee = true;
+    // }
+
+    let tauxSurcoteFinale = tauxSurcoteClassique + tauxSurcoteParentale + tauxMajorationExcedentaire;
+    let typesSurcoteAppliquees = [];
+    if (tauxSurcoteClassique > 0) typesSurcoteAppliquees.push("classique");
+    if (tauxSurcoteParentale > 0) typesSurcoteAppliquees.push("parentale");
+    if (tauxMajorationExcedentaire > 0) typesSurcoteAppliquees.push("excédentaire");
+
+    if (surcoteAppliquee && tauxSurcoteFinale > 0) {
+      tauxFinal = (0.75 * ratioFin) * (1 + tauxSurcoteFinale / 100);
+    }
+
+    let majorationFamiliale = 0;
+    if (I.totalEnfantsEleves >= 3) {
+      majorationFamiliale = 10 + Math.max(0, I.totalEnfantsEleves - 3) * 5;
+    }
+
+    // CORRECTION : Plafond légal Article L13 – pension ≤ 100% du traitement indiciaire.
+    // Confirmation ENSAP (70 ans, né 25/06/1964) : pension plafonnée à 2353,09€ = traitement.
+    // La majoration familiale (Article L18) peut dépasser ce plafond.
+    const pensionBrute = traitementFin * tauxFinal;
+    const plafondL13Atteint = pensionBrute > traitementFin;
+    const pensionDefinitive = Math.min(pensionBrute, traitementFin);
+    const pensionAvecMajorationFamiliale = pensionDefinitive * (1 + majorationFamiliale / 100);
+
+    // Calcul revenus progressifs
+    const traitementPleinDepart = I.indice * I.valeurPoint;
+    let tauxReferenceDepart = 0.75 * (liquidablesDepart / TR);
+    if (assuranceDepart < TR) {
+      const coeffDecoteDepart = (TR - assuranceDepart) * 1.25 / 100;
+      tauxReferenceDepart = tauxReferenceDepart * (1 - coeffDecoteDepart);
+    }
+    const montantReferenceDepart = traitementPleinDepart * tauxReferenceDepart;
+    const traitementTPDepart = calcTraitementTP(traitementPleinDepart, I.quotite, I.appliquerDecret1982);
+    const pensionProvisoireDepart = montantReferenceDepart * (1 - I.quotite);
+    const totalBrutMensuel = traitementTPDepart + pensionProvisoireDepart;
+
+    // Construction HTML résultats
+    let resultHTML = '<div class="result-section">';
+    resultHTML += '<h3>Durées et trimestres (méthode SRE – base 360j/an)</h3>';
+    resultHTML += '<p><strong>Entre relevé et départ progressif :</strong> ' + P1.annees + ' an(s), ' + P1.mois + ' mois, ' + P1.jours + ' jours</p>';
+    resultHTML += '<p><strong>Entre départ progressif et départ définitif :</strong> ' + P2.annees + ' an(s), ' + P2.mois + ' mois, ' + P2.jours + ' jours</p>';
+    resultHTML += '</div>';
+
+    resultHTML += '<div class="result-section">';
+    resultHTML += '<h3>Compteurs au départ progressif</h3>';
+    resultHTML += '<p><strong>Assurance au relevé :</strong> ' + (joursAssuranceReleveBrut / 90).toFixed(2) + ' trimestres</p>';
+    resultHTML += '<p><strong>Liquidables au relevé :</strong> ' + (joursLiquidablesReleveBrut / 90).toFixed(2) + ' trimestres</p>';
+    if (I.conditionsEnfantsAvant2004 && I.nbEnfantsAvant2004 > 0) resultHTML += '<p><strong>Bonification enfants (avant 2004) :</strong> ' + bonifEnfantsTr.toFixed(2) + ' trimestres</p>';
+    if (I.conditionsEnfantsApres2003 && I.nbEnfantsApres2003 > 0) resultHTML += '<p><strong>Majoration assurance (après 2003) :</strong> ' + majorationsApres2003Tr.toFixed(2) + ' trimestres</p>';
+    resultHTML += '<p><strong>Assurance au départ :</strong> ' + assuranceDepart + ' / ' + TR + '</p>';
+    resultHTML += '<p><strong>Liquidables au départ :</strong> ' + liquidablesDepart + ' / ' + TR + '</p>';
+    resultHTML += '</div>';
+
+    // Bloc surcotisation : calcul et analyse de rentabilité
+    let blocSurcotisation = '';
+    if (I.surcotisation) {
+      const traitementPlein = calcTraitementPlein(I.indice, I.valeurPoint);
+      const tauxRetenueSurcotisation = I.tauxSurcotisation * 100;
+      const tauxRetenueNormal = 11.10;
+      const montantSurcotisationMensuel = (tauxRetenueSurcotisation / 100 * traitementPlein) - (tauxRetenueNormal / 100 * I.quotite * traitementPlein);
+      const montantSurcotisationTotalPeriode = montantSurcotisationMensuel * (P2.totalJours / 30);
+
+      blocSurcotisation = '<div class="info" style="margin-top:15px;"><strong>Surcotisation : ' + formatEuro(montantSurcotisationTotalPeriode) + '</strong></div>';
+
+      const joursLiqP2SansSurcotisation = Math.floor(P2.totalJours * I.quotite);
+      const totalJoursLiquidablesSansSurcotisation = joursLiqReleve + joursLiqP1 + bonifEnfantsJours + joursLiqP2SansSurcotisation;
+      const liquidablesFinalesSansSurcotisation = arrondirTrimestresLiquidables(totalJoursLiquidablesSansSurcotisation);
+      const ratioFinSansSurcotisation = clamp(liquidablesFinalesSansSurcotisation / TR, 0, 1);
+
+      let tauxFinalSansSurcotisation = 0.75 * ratioFinSansSurcotisation;
+      let tauxFinalAvecSurcotisation = 0.75 * ratioFin;
+
+      if (surcoteAppliquee && tauxSurcoteFinale > 0) {
+        const coefficientSurcote = 1 + (tauxSurcoteFinale / 100);
+        tauxFinalSansSurcotisation = (0.75 * ratioFinSansSurcotisation) * coefficientSurcote;
+        tauxFinalAvecSurcotisation = (0.75 * ratioFin) * coefficientSurcote;
+      }
+
+      if (assuranceFinale < TR) {
+        const trimestresManquants = TR - assuranceFinale;
+        const coefficientDecote = (trimestresManquants * 1.25) / 100;
+        tauxFinalSansSurcotisation = (0.75 * ratioFinSansSurcotisation) * (1 - coefficientDecote);
+        tauxFinalAvecSurcotisation = (0.75 * ratioFin) * (1 - coefficientDecote);
+      }
+
+      const pensionSansSurcotisation = traitementFin * tauxFinalSansSurcotisation;
+      const pensionAvecSurcotisation = traitementFin * tauxFinalAvecSurcotisation;
+
+      // Art. L11 bis CPCMR — calcul avec 3 scénarios de placement (taux unique supprimé)
+      const analyseRentabilite = calculerRentabiliteSurcotisation(
+        pensionSansSurcotisation,
+        pensionAvecSurcotisation,
+        montantSurcotisationTotalPeriode,
+        I.sexe,
+        ageDepartDefinitif,
+        montantSurcotisationMensuel,
+        P2.moisApprox
+      );
+
+      blocSurcotisation += afficherAnalyseRentabilite(analyseRentabilite);
+    }
+
+    resultHTML += blocSurcotisation;
+
+    resultHTML += '<div class="result-section">';
+    resultHTML += '<h3>Revenus pendant la retraite progressive</h3>';
+    resultHTML += '<p><strong>Traitement plein temps :</strong> ' + formatEuro(traitementPleinDepart) + '</p>';
+    resultHTML += '<p><strong>Traitement à la quotité :</strong> ' + formatEuro(traitementTPDepart) + '</p>';
+    if (I.appliquerDecret1982 && (Math.abs(I.quotite - 0.80) < 1e-9 || Math.abs(I.quotite - 0.90) < 1e-9)) {
+      const frac = Math.abs(I.quotite - 0.80) < 1e-9 ? '6/7ème' : '32/35ème';
+      resultHTML += '<p style="font-size:0.9rem;color:#ea580c;"><em>Décret n°82-624 appliqué : ' + (I.quotite*100).toFixed(0) + '% -> ' + frac + '</em></p>';
+    }
+    resultHTML += '<p><strong>Pension provisoire :</strong> ' + formatEuro(pensionProvisoireDepart) + '</p>';
+    resultHTML += '<p style="font-size:0.85rem;color:#6b7280;"><em>Si vous changez de quotité, la pension provisoire s\'ajustera automatiquement</em></p>';
+    resultHTML += '<p><strong>Total brut mensuel :</strong> ' + formatEuro(totalBrutMensuel) + '</p>';
+
+    let coutSurcotisationMensuel = 0;
+    if (I.surcotisation) {
+      const tauxRetenueSurcotisation = I.tauxSurcotisation * 100;
+      const tauxRetenueNormal = 11.10;
+      coutSurcotisationMensuel = (tauxRetenueSurcotisation / 100 * traitementPleinDepart) - (tauxRetenueNormal / 100 * I.quotite * traitementPleinDepart);
+      const totalNetMensuelAvecSurcotisation = totalBrutMensuel - coutSurcotisationMensuel;
+      resultHTML += '<p style="color:#d97706;"><strong>- Coût surcotisation mensuel :</strong> -' + formatEuro(coutSurcotisationMensuel) + '</p>';
+      resultHTML += '<p style="color:#10b981;font-weight:bold;"><strong>= Revenu net après surcotisation :</strong> ' + formatEuro(totalNetMensuelAvecSurcotisation) + '</p>';
+    }
+    resultHTML += '</div>';
+
+    resultHTML += '<div class="result-section">';
+    resultHTML += '<h3>Situation en fin de période</h3>';
+    resultHTML += '<p><strong>Assurance finale :</strong> ' + assuranceFinale + ' trimestres / ' + TR + '</p>';
+    resultHTML += '<p><strong>Liquidables finaux :</strong> ' + liquidablesFinale + ' / ' + TR + '</p>';
+    resultHTML += '<p><strong>Taux de liquidation estimé :</strong> ' + (tauxFinal*100).toFixed(2) + ' %</p>';
+    resultHTML += '<p><strong>Traitement plein temps estimé :</strong> ' + formatEuro(traitementFin) + '</p>';
+    resultHTML += '</div>';
+
+    // Plafond L13
+    if (plafondL13Atteint) {
+      resultHTML += '<div class="info" style="margin-top:15px;background:#fef3c7;border-left-color:#f59e0b;border-width:3px;">';
+      resultHTML += '<h4 style="margin-top:0;color:#92400e;">⚠️ Plafond légal Article L13 atteint</h4>';
+      resultHTML += '<p>Pension calculée : <strong>' + formatEuro(pensionBrute) + '</strong> -> plafonnée à <strong>' + formatEuro(traitementFin) + '</strong> (100% du traitement indiciaire).<br>';
+      resultHTML += '<small>La majoration familiale (Article L18) s\'applique au-delà de ce plafond.</small></p>';
+      resultHTML += '</div>';
+    }
+
+    resultHTML += '<div class="highlight-result">';
+    resultHTML += '<h3>Pension définitive estimée</h3>';
+    resultHTML += '<p style="font-size:1.3em;font-weight:bold;color:var(--pri);">' + formatEuro(pensionDefinitive) + '</p>';
+    if (plafondL13Atteint) {
+      resultHTML += '<p style="font-size:0.9rem;color:#92400e;"><em>Plafonnée à 100% du traitement (Art. L13) – Brut calculé : ' + formatEuro(pensionBrute) + '</em></p>';
+    }
+    if (majorationFamiliale > 0) {
+      resultHTML += '<p><strong>Avec majoration familiale (+' + majorationFamiliale + '%) :</strong><br><span style="font-size:1.2em;font-weight:bold;">' + formatEuro(pensionAvecMajorationFamiliale) + '</span></p>';
+    }
+    resultHTML += '</div>';
+
+    // Bloc décote
+    if (assuranceFinale < TR) {
+      const tm = TR - assuranceFinale;
+      const cd = tm * 1.25 / 100;
+      const tad = (0.75 * ratioFin * 100).toFixed(4);
+      resultHTML += '<div class="warn" style="margin-top:15px;"><strong>Décote :</strong> ' + tm + ' trimestres manquants – Coefficient : ' + (cd*100).toFixed(2) + '% – Taux avant décote : ' + tad + '%</div>';
+    }
+
+    // Bloc surcotes
+    if (surcoteAppliquee && tauxSurcoteFinale > 0) {
+      resultHTML += '<div class="ok" style="margin-top:15px;">';
+      resultHTML += '<strong>Majorations SRE appliquées :</strong><br>';
+      resultHTML += '<div style="margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 6px;">';
+      resultHTML += '<strong>Trimestres excédentaires totaux : ' + trimestresExcedentaires + '</strong><br>';
+      if (tauxSurcoteParentale > 0) resultHTML += '• <strong>Surcote parentale :</strong> +' + tauxSurcoteParentale.toFixed(2) + '%<br>';
+      if (tauxSurcoteClassique > 0) resultHTML += '• <strong>Surcote classique :</strong> +' + tauxSurcoteClassique.toFixed(2) + '% (' + trimestresSurcotes + ' trim. × 1,25%)<br>';
+      if (tauxMajorationExcedentaire > 0) resultHTML += '• <strong>Majoration excédentaire :</strong> +' + tauxMajorationExcedentaire.toFixed(2) + '%<br>';
+      resultHTML += '</div>';
+      resultHTML += '<strong>Majoration totale cumulée : +' + tauxSurcoteFinale.toFixed(2) + '%</strong><br>';
+      resultHTML += '<div class="ok" style="margin-top:10px;font-size:0.9rem;"><strong>CALCUL MÉTHODE SRE :</strong><br>';
+      resultHTML += '• Taux base x ratio = ' + (0.75 * ratioFin * 100).toFixed(2) + '%<br>';
+      resultHTML += '• x Coefficient (1 + ' + tauxSurcoteFinale.toFixed(2) + '%) = ' + (pensionBrute / traitementFin * 100).toFixed(2) + '% (brut)';
+      if (plafondL13Atteint) resultHTML += ' -> plafonné à 100% (Art. L13)';
+      resultHTML += '</div>';
+      resultHTML += '</div>';
+    } else {
+      const anneeN = I.dateNaissance.getFullYear();
+      const moisN = I.dateNaissance.getMonth();
+      if ((anneeN === 1964) || (anneeN === 1965 && moisN < 3)) {
+        resultHTML += '<div class="info" style="margin-top:15px;background:#fef3c7;border-left-color:#f59e0b;">';
+        resultHTML += '<strong>ℹ️ Surcote parentale – Suspension réforme 2023 :</strong><br>';
+        resultHTML += 'La génération 1964 et le 1er trimestre 1965 ne sont plus éligibles à la surcote parentale.<br>';
+        resultHTML += '<small>Âge légal 62T3 &lt; 63 ans requis. Source : retraitesdeletat.gouv.fr</small>';
+        resultHTML += '</div>';
+      }
+    }
+
+    if (majorationFamiliale > 0) {
+      resultHTML += '<div class="info" style="margin-top:15px;background:#f3e8ff;border-left-color:#9333ea;"><strong>Majoration familiale : +' + majorationFamiliale + '%</strong></div>';
+    }
+
+    // Avertissement post-2028
+    const dateFinGel = new Date('2028-01-01');
+    if (I.dateFin >= dateFinGel) {
+      resultHTML += '<div class="warn" style="margin-top:15px;background:#fef2f2;border-left-color:#dc2626;border-width:3px;">';
+      resultHTML += '<h4 style="margin-top:0;color:#991b1b;">⚠️ Date hors périmètre de la suspension 2026</h4>';
+      resultHTML += '<p>Votre date de départ définitif (<strong>' + I.dateFin.toLocaleDateString("fr-FR") + '</strong>) est après le 01/01/2028.</p>';
+      resultHTML += '<p>La suspension de la réforme 2023 (LFSS 2026, art. 105) s\'applique jusqu\'au <strong>01/01/2028</strong>. ';
+      resultHTML += 'Les paramètres après cette date dépendront de la reprise de la réforme 2023 ou d\'une nouvelle réforme.</p>';
+      resultHTML += '<p><strong>Résultats affichés au-delà du 31/12/2027 : indicatifs uniquement, basés sur les règles de la suspension 2026.</strong></p>';
+      resultHTML += '</div>';
+    }
+
+    resultHTML += '<div class="warn" style="margin-top:20px;"><h4 style="margin-top:0;">Avertissement</h4>';
+    resultHTML += '<p>Simulateur éducatif NON OFFICIEL. Pour votre estimation officielle : <a href="https://www.info-retraite.fr" target="_blank">info-retraite.fr</a></p>';
+    resultHTML += '</div>';
+
+    resultHTML += '<p class="muted" style="margin-top:20px;">V.06 – Juin 2026</p>';
+
+    document.getElementById('resultat').innerHTML = resultHTML;
+
+    // Bouton export PDF résultats RP
+    document.getElementById('resultat').innerHTML +=
+      '<div style="text-align:center;margin-top:20px;"><button onclick="exporterResultatsPDF()" class="primary">Télécharger les résultats en PDF</button></div>';
+
+
+    updateChart(I, liquidablesDepart, TR, assuranceDepart);
+  }
+
+  // updateChart remplacée par afficherTableauComparaison dans le JS wizard V07
+  function updateChart(inputs, liquidablesDepart, trimestresRequis, assuranceDepart) {
+    // Dans la V07, le tableau de comparaison est généré par afficherTableauComparaison()
+    // Cette fonction est gardée vide pour compatibilité avec l'appel dans calculer()
+  }
+
+  
+function exporterResultatsPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      
+      const inputs = lireInputs();
+      let yPos = 20;
+      const leftMargin = 20;
+      const rightMargin = 190;
+      
+      // En-tête avec encadré
+      doc.setFillColor(34, 197, 94);
+      doc.rect(0, 0, 210, 35, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(18);
+      doc.setFont(undefined, 'bold');
+      doc.text('SIMULATEUR DE RETRAITE PROGRESSIVE', 105, 15, { align: 'center' });
+      doc.setFontSize(11);
+      doc.setFont(undefined, 'normal');
+      doc.text('Fonctionnaire d\'État – Gel 2026 (LFSS 2026, art. 105)', 105, 23, { align: 'center' });
+      doc.setFontSize(9);
+      doc.text('Document généré le ' + new Date().toLocaleDateString('fr-FR'), 105, 30, { align: 'center' });
+      
+      yPos = 45;
+      doc.setTextColor(0, 0, 0);
+      
+      // AVERTISSEMENT RENFORCÉ EN PREMIÈRE PAGE
+      doc.setFillColor(255, 244, 230);
+      doc.rect(leftMargin - 5, yPos - 3, 170, 45, 'F');
+      doc.setFontSize(11);
+      doc.setFont(undefined, 'bold');
+      doc.setTextColor(194, 65, 12);
+      doc.text('AVERTISSEMENT - DOCUMENT NON OFFICIEL', 105, yPos, { align: 'center' });
+      yPos += 7;
+      doc.setFontSize(8);
+      doc.setFont(undefined, 'normal');
+      doc.setTextColor(0, 0, 0);
+      const avertissements = [
+        'Ce document est généré par un simulateur éducatif GRATUIT et NON OFFICIEL.',
+        'Résultats validés par comparaison avec le simulateur M@rel (info-retraite.fr).',
+        'avec le calcul officiel du SRE (règles internes non documentées).',
+        '',
+        'CE SIMULATEUR NE REMPLACE EN AUCUN CAS LES OUTILS OFFICIELS DE L\'ÉTAT.',
+        'Pour votre estimation officielle, consultez le simulateur M@rel sur info-retraite.fr.',
+        '',
+        'Pour votre estimation officielle : info-retraite.fr (simulateur M@rel)',
+        '',
+        'L\'éditeur décline toute responsabilité en cas de décision prise',
+        'sur la base de ces estimations.'
+      ];
+      avertissements.forEach(line => {
+        doc.text(line, 105, yPos, { align: 'center' });
+        yPos += 4;
+      });
+      yPos += 10;
+      
+      // Section Paramètres
+      doc.setFillColor(249, 250, 251);
+      doc.rect(leftMargin - 5, yPos - 5, 170, 8, 'F');
+      doc.setFontSize(12);
+      doc.setFont(undefined, 'bold');
+      doc.text('PARAMETRES DE SIMULATION', leftMargin, yPos);
+      yPos += 10;
+      
+      doc.setFontSize(9);
+      doc.setFont(undefined, 'normal');
+      doc.text('Date de naissance : ' + new Date(inputs.dateNaissance).toLocaleDateString('fr-FR'), leftMargin, yPos);
+      yPos += 5;
+      doc.text('Indice majoré : ' + inputs.indice, leftMargin, yPos);
+      yPos += 5;
+      doc.text('Traitement actuel : ' + (inputs.indice * inputs.valeurPoint).toFixed(2) + ' EUR', leftMargin, yPos);
+      yPos += 5;
+      doc.text('Date départ progressif : ' + new Date(inputs.dateDebut).toLocaleDateString('fr-FR'), leftMargin, yPos);
+      yPos += 5;
+      doc.text('Date départ définitif : ' + new Date(inputs.dateFin).toLocaleDateString('fr-FR'), leftMargin, yPos);
+      yPos += 5;
+      doc.text('Quotité travail : ' + (inputs.quotite * 100).toFixed(0) + ' %', leftMargin, yPos);
+      yPos += 12;
+      
+      // Section Résultats - extraction des données clés
+      const resultatDiv = document.getElementById('resultat');
+      const resultSections = resultatDiv.querySelectorAll('.result-section, .highlight-result, .info, .warn, .ok');
+      
+      doc.setFillColor(249, 250, 251);
+      doc.rect(leftMargin - 5, yPos - 5, 170, 8, 'F');
+      doc.setFontSize(12);
+      doc.setFont(undefined, 'bold');
+      doc.text('RESULTATS DE LA SIMULATION', leftMargin, yPos);
+      yPos += 10;
+      
+      doc.setFontSize(9);
+      doc.setFont(undefined, 'normal');
+      
+      // Extraction intelligente du contenu
+      resultSections.forEach(section => {
+        const title = section.querySelector('h3');
+        const paragraphs = Array.from(section.querySelectorAll('p, small')).filter(el => !el.closest('table'));
+        
+        if (yPos > 260) {
+          doc.addPage();
+          yPos = 20;
+        }
+        
+        if (title) {
+          doc.setFont(undefined, 'bold');
+          doc.setFontSize(10);
+          doc.text(title.textContent.trim(), leftMargin, yPos);
+          yPos += 6;
+          doc.setFont(undefined, 'normal');
+          doc.setFontSize(9);
+        }
+        
+        paragraphs.forEach(p => {
+          if (yPos > 270) {
+            doc.addPage();
+            yPos = 20;
+          }
+          
+          let text = p.textContent.trim();
+          text = text.replace(/\s+/g, ' ');
+          
+          if (text.length > 0 && !text.includes('Télécharger') && !text.includes('PDF')) {
+            const lines = doc.splitTextToSize(text, rightMargin - leftMargin);
+            lines.forEach(line => {
+              if (yPos > 270) {
+                doc.addPage();
+                yPos = 20;
+              }
+              doc.text(line, leftMargin, yPos);
+              yPos += 4.5;
+            });
+            yPos += 1;
+          }
+        });
+
+        // Extraction des tableaux (ex: comparaison 3 placements) en colonnes alignées
+        section.querySelectorAll('table').forEach(table => {
+          if (yPos > 250) {
+            doc.addPage();
+            yPos = 20;
+          }
+          const lignesTab = extraireLignesTableau(table);
+          yPos = dessinerTableauPDF(doc, lignesTab, leftMargin, rightMargin, yPos);
+          yPos += 2;
+        });
+
+        yPos += 3;
+      });
+      
+      
+      // Pied de page
+      const totalPages = doc.internal.getNumberOfPages();
+      for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setFont(undefined, 'italic');
+        doc.setTextColor(128, 128, 128);
+        doc.text('Page ' + i + ' / ' + totalPages, 105, 290, { align: 'center' });
+        doc.text('Simulation non contractuelle - Consulter info-retraite.fr', 105, 285, { align: 'center' });
+      }
+      
+      doc.save('simulation_retraite_progressive_' + new Date().toISOString().slice(0,10) + '.pdf');
+    }
+
+  // ============================================
+  // EXPORT PDF – RETRAITE DÉFINITIVE
+  // ============================================
+  
+
+  // ============================================
+  // WIZARD V07 — JS spécifique
+  // ============================================
+  const NOMS_ETAPES = ['Identité','Relevé de carrière','Rémunération','Planning','Options','Récapitulatif'];
+  let etapeActuelle = 1;
+
+  function allerEtape(cible) {
+    document.querySelectorAll('.validation-error').forEach(e => e.classList.remove('show'));
+    if (cible > etapeActuelle && !validerEtapeWizard(etapeActuelle)) return;
+    if (cible < etapeActuelle) document.getElementById('results-section').classList.remove('active');
+    document.getElementById('step-' + etapeActuelle).classList.remove('active');
+    const dotActuel = document.getElementById('dot-' + etapeActuelle);
+    if (dotActuel) { dotActuel.classList.remove('active'); dotActuel.classList.add('done'); dotActuel.textContent = '✓'; }
+    const line = document.getElementById('line-' + etapeActuelle);
+    if (line) line.classList.add('done');
+    etapeActuelle = cible;
+    const stepCard = document.getElementById('step-' + etapeActuelle);
+    if (stepCard) stepCard.classList.add('active');
+    const dotCible = document.getElementById('dot-' + etapeActuelle);
+    if (dotCible) { dotCible.classList.remove('done'); dotCible.classList.add('active'); dotCible.textContent = etapeActuelle; }
+    document.getElementById('step-current').textContent = etapeActuelle;
+    document.getElementById('step-name').textContent = NOMS_ETAPES[etapeActuelle - 1];
+    document.getElementById('progress-fill').style.width = ((etapeActuelle / 6) * 100) + '%';
+    if (etapeActuelle === 6) construireRecap();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function validerEtapeWizard(num) {
+    const err = document.getElementById('err-' + num);
+    if (!err) return true;
+    err.classList.remove('show');
+    if (num === 1 && !document.getElementById('dateNaissance').value) {
+      err.textContent = 'Date de naissance obligatoire.'; err.classList.add('show'); return false;
+    }
+    if (num === 2 && !document.getElementById('dateReleve').value) {
+      err.textContent = 'Date du relevé obligatoire.'; err.classList.add('show'); return false;
+    }
+    if (num === 3 && !document.getElementById('indice').value) {
+      err.textContent = 'Indice majoré obligatoire.'; err.classList.add('show'); return false;
+    }
+    if (num === 4 && (!document.getElementById('dateDebut').value || !document.getElementById('dateFin').value)) {
+      err.textContent = 'Les deux dates de départ sont obligatoires.'; err.classList.add('show'); return false;
+    }
+    return true;
+  }
+
+  function construireRecap() {
+    const dn = document.getElementById('dateNaissance').value;
+    const dr = document.getElementById('dateReleve').value;
+    const dd = document.getElementById('dateDebut').value;
+    const df = document.getElementById('dateFin').value;
+    const indice = document.getElementById('indice').value;
+    const valPt = parseFloat(document.getElementById('valeurPoint').value);
+    const traitement = (indice && valPt) ? formatEuro(parseFloat(indice) * valPt) : '—';
+    const q = document.getElementById('quotite').value;
+    const items = [
+      { label: 'Date de naissance', val: dn ? new Date(dn).toLocaleDateString('fr-FR') : '⚠️ Manquante' },
+      { label: 'Sexe', val: document.getElementById('sexe').value === 'F' ? 'Femme' : 'Homme' },
+      { label: 'Date du relevé', val: dr ? new Date(dr).toLocaleDateString('fr-FR') : '⚠️ Manquante' },
+      { label: 'Assurance au relevé', val: document.getElementById('trimAssuranceReleve').value + ' trim.' },
+      { label: 'Liquidables au relevé', val: document.getElementById('trimLiquidablesReleve').value + ' trim.' },
+      { label: 'Indice majoré', val: indice || '—' },
+      { label: 'Traitement estimé', val: traitement },
+      { label: 'Départ progressif', val: dd ? new Date(dd).toLocaleDateString('fr-FR') : '⚠️ Manquante' },
+      { label: 'Départ définitif', val: df ? new Date(df).toLocaleDateString('fr-FR') : '⚠️ Manquante' },
+      { label: 'Quotité RP', val: (parseFloat(q)*100).toFixed(0) + ' %' },
+      { label: 'Surcotisation', val: document.getElementById('surcotisation').checked ? '✓ Oui' : 'Non' },
+      { label: 'Trimestres requis', val: document.getElementById('trimestresRequis').value || '—' },
+    ];
+    document.getElementById('recap-grid').innerHTML = items.map(i =>
+      '<div class="recap-item"><div class="recap-label">' + i.label + '</div><div class="recap-val">' + i.val + '</div></div>'
+    ).join('');
+  }
+
+  function lancerCalcul() {
+    document.getElementById('err-6').classList.remove('show');
+    document.getElementById('resultat').innerHTML = '<div class="info">⏳ Calcul en cours...</div>';
+    document.getElementById('tableau-comparaison').innerHTML = '';
+    document.getElementById('results-section').classList.add('active');
+    document.getElementById('results-section').scrollIntoView({ behavior: 'smooth' });
+    setTimeout(() => {
+      calculer();
+      afficherTableauComparaison();
+    }, 50);
+  }
+
+  function afficherTableauComparaison() {
+    const I = lireInputs();
+    if (!I || isNaN(I.dateReleve)) return;
+    const traitementPlein = I.indice * I.valeurPoint;
+    const P1 = diffDetaillee(I.dateReleve, I.dateDebut);
+    const joursLiqReleve = (I.trimLiquidablesReleve * 90) + I.joursLiquidablesReleve;
+    const joursAssReleve = (I.trimAssuranceReleve * 90) + I.joursAssuranceReleve;
+    const bonifEnfantsJours = I.conditionsEnfantsAvant2004 ? I.nbEnfantsAvant2004 * 4 * 90 : 0;
+    const joursLiqDepart = joursLiqReleve + Math.floor(P1.totalJours * I.quotiteAvant) + bonifEnfantsJours;
+    const joursAssDepart = joursAssReleve + P1.totalJours + bonifEnfantsJours;
+    const liqDepart = arrondirTrimestresLiquidables(joursLiqDepart);
+    const assDepart = calculerDureeAssurance(joursAssDepart).trimestres;
+    const TR = I.trimestresRequis;
+    let tauxRef = 0.75 * clamp(liqDepart / TR, 0, 1);
+    if (assDepart < TR) tauxRef = tauxRef * (1 - (TR - assDepart) * 1.25 / 100);
+    const montantRef = traitementPlein * tauxRef;
+    const quotites = [0.50, 0.60, 0.70, 0.80, 0.90];
+    const lignes = quotites.map(q => {
+      const ttp = calcTraitementTP(traitementPlein, q, I.appliquerDecret1982);
+      const pension = montantRef * (1 - q);
+      const total = ttp + pension;
+      const estChoisi = Math.abs(q - I.quotite) < 0.01;
+      return { q, ttp, pension, total, estChoisi };
+    });
+    const maxTotal = Math.max(...lignes.map(l => l.total));
+    const tableau = '<div class="result-section"><h3>📊 Comparaison des revenus par quotité</h3>' +
+      '<p style="font-size:.78rem;color:var(--gris-txt);margin-bottom:10px;">Traitement + pension provisoire pendant la RP — pas la pension définitive.</p>' +
+      '<table style="width:100%;border-collapse:collapse;font-size:.84rem;">' +
+      '<thead><tr style="background:var(--bleu);color:#fff;">' +
+      '<th style="padding:8px;text-align:center;">Quotité</th>' +
+      '<th style="padding:8px;text-align:right;">Traitement</th>' +
+      '<th style="padding:8px;text-align:right;">Pension provisoire</th>' +
+      '<th style="padding:8px;text-align:right;">Total brut</th>' +
+      '<th style="padding:8px;text-align:left;">Répartition</th>' +
+      '</tr></thead><tbody>' +
+      lignes.map(l =>
+        '<tr style="background:' + (l.estChoisi ? '#eff6ff' : '#fff') + ';border-bottom:1px solid var(--gris-bord);">' +
+        '<td style="padding:8px;text-align:center;font-weight:' + (l.estChoisi ? '700' : '400') + ';color:' + (l.estChoisi ? 'var(--bleu)' : 'inherit') + ';">' +
+        (l.q*100).toFixed(0) + ' %' + (l.estChoisi ? ' ◀' : '') + '</td>' +
+        '<td style="padding:8px;text-align:right;">' + formatEuro(l.ttp) + '</td>' +
+        '<td style="padding:8px;text-align:right;">' + formatEuro(l.pension) + '</td>' +
+        '<td style="padding:8px;text-align:right;font-weight:700;color:' + (l.estChoisi ? 'var(--bleu)' : 'var(--vert)') + ';">' + formatEuro(l.total) + '</td>' +
+        '<td style="padding:8px;"><div style="background:var(--gris-bord);border-radius:3px;height:10px;">' +
+        '<div style="background:' + (l.estChoisi ? 'var(--bleu)' : 'var(--vert)') + ';border-radius:3px;height:10px;width:' + (l.total/maxTotal*100).toFixed(1) + '%;"></div></div></td>' +
+        '</tr>'
+      ).join('') +
+      '</tbody></table>' +
+      '<p style="font-size:.74rem;color:var(--gris-txt);margin-top:6px;">Pour la retraite définitive et l\'analyse rachat : ' +
+      '<a href="simulateur_retraite_progressive_V06_expert.html" target="_blank">Mode Expert V06</a>.</p></div>';
+    document.getElementById('tableau-comparaison').innerHTML = tableau;
+  }
+
+  function modifierSimulation() {
+    document.getElementById('results-section').classList.remove('active');
+    allerEtape(1);
+  }
+
+  function toggleEnfantsAvant2004() {
+    const checked = document.getElementById('conditionsEnfantsAvant2004').checked;
+    document.getElementById('nbEnfantsAvant2004Container').style.display = checked ? 'block' : 'none';
+    document.getElementById('bonifEnfants').checked = checked;
+    syncEnfants();
+  }
+  function toggleEnfantsApres2003() {
+    document.getElementById('nbEnfantsApres2003Container').style.display =
+      document.getElementById('conditionsEnfantsApres2003').checked ? 'block' : 'none';
+    syncEnfants();
+  }
+  function toggleMajorationFamiliale() {
+    const checked = document.getElementById('majorationFamilialeCheck').checked;
+    document.getElementById('nbEnfantsMajorationContainer').style.display = checked ? 'block' : 'none';
+    document.getElementById('majorationEnfants').checked = checked;
+    syncEnfants();
+  }
+  function syncEnfants() {
+    const avant = document.getElementById('conditionsEnfantsAvant2004').checked
+      ? (parseInt(document.getElementById('nbEnfantsAvant2004').value) || 0) : 0;
+    const apres = document.getElementById('conditionsEnfantsApres2003').checked
+      ? (parseInt(document.getElementById('nbEnfantsApres2003').value) || 0) : 0;
+    const maj = document.getElementById('majorationFamilialeCheck').checked
+      ? (parseInt(document.getElementById('nbEnfantsMajoration').value) || 0) : 0;
+    document.getElementById('enfantsAvant2004').value = avant;
+    document.getElementById('enfantsApres2003').value = apres;
+    document.getElementById('totalEnfantsEleves').value = avant + apres + maj;
+    document.getElementById('majorationEnfants').checked = document.getElementById('majorationFamilialeCheck').checked;
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    ['indice','valeurPoint'].forEach(id => {
+      document.getElementById(id).addEventListener('input', function() {
+        const i = parseFloat(document.getElementById('indice').value);
+        const v = parseFloat(document.getElementById('valeurPoint').value);
+        const preview = document.getElementById('traitement-preview');
+        if (i && v) { preview.style.display = 'block'; document.getElementById('traitement-preview-val').textContent = formatEuro(i * v); }
+        else preview.style.display = 'none';
+      });
+    });
+
+    document.getElementById('dateNaissance').addEventListener('change', function() {
+      if (!this.value) return;
+      const annee = new Date(this.value).getFullYear();
+      let tr = 172;
+      if (annee <= 1960) tr = 168;
+      else if (annee === 1961) tr = 168;
+      else if (annee === 1962) tr = 169;
+      else if (annee <= 1965) tr = 170;
+      else if (annee <= 1967) tr = 171;
+      document.getElementById('trimestresRequis').innerHTML = '<option value="' + tr + '" selected>' + tr + '</option>';
+      document.getElementById('trimRequisAffichage').textContent = tr + ' trimestres';
+      document.getElementById('field-trimRequis').style.display = 'block';
+      mettreAJourTauxSurcotisation();
+    });
+
+    document.getElementById('surcotisation').addEventListener('change', mettreAJourTauxSurcotisation);
+    document.getElementById('quotite').addEventListener('change', mettreAJourTauxSurcotisation);
+    document.getElementById('trimSurcotDejaUtilises').addEventListener('input', mettreAJourCompteurSurcot);
+    ['nbEnfantsAvant2004','nbEnfantsApres2003','nbEnfantsMajoration'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('input', syncEnfants);
+    });
+  });
+
+</script>
+</body>
+</html>
