@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Fond bleu marine -->
+  <rect width="32" height="32" rx="6" fill="#1e40af"/>
+  <!-- Fronton (triangle) -->
+  <polygon points="16,4 28,11 4,11" fill="#ffffff"/>
+  <!-- Corps du bâtiment -->
+  <rect x="6" y="11" width="20" height="2" fill="#ffffff"/>
+  <!-- 3 colonnes -->
+  <rect x="8"  y="13" width="3" height="12" fill="#ffffff"/>
+  <rect x="14" y="13" width="3" height="12" fill="#ffffff"/>
+  <rect x="20" y="13" width="3" height="12" fill="#ffffff"/>
+  <!-- Socle -->
+  <rect x="5" y="25" width="22" height="3" rx="1" fill="#ffffff"/>
+</svg>
