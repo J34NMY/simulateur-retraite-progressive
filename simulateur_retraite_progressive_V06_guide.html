@@ -527,7 +527,7 @@
     const nET=parseInt(document.getElementById('totalEnfantsEleves').value)||0;
     if(bE&&nE1===0)erreurs.push('Case bonification cochee mais aucun enfant saisi');
     if(mE&&nE2===0)erreurs.push('Case majoration cochee mais aucun enfant saisi');
-    if(nET!==nE1+nE2)erreurs.push('Incoherence total enfants ('+nET+') vs somme ('+（nE1+nE2）+')');
+    if(nET!==nE1+nE2)erreurs.push('Incoherence total enfants ('+nET+') vs somme ('+(nE1+nE2)+')');
 
     return erreurs;
   }
