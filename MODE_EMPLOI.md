@@ -17,14 +17,28 @@
 
 ## 📂 Quelle version utiliser ?
 
-| Version | Cadre réglementaire |
-|---|---|
-| **V04.2.8** | Réforme 2023 — Décret n°2023-799 du 21 août 2023 |
-| **V06** ⭐ | Suspension de la réforme 2023 au 01/09/2026 — LFSS 2026, art. 105 |
+| Version | Cadre réglementaire | Public cible |
+|---|---|---|
+| **V04.2.8** | Réforme 2023 — Décret n°2023-799 du 21 août 2023 | Départ prévu à partir de 2028 |
+| **V06 — Mode Expert** ⭐ | Suspension réforme 2023 — LFSS 2026, art. 105 | Utilisateurs à l'aise avec les formulaires |
+| **V06 — Assistant Guidé** ✨ | Suspension réforme 2023 — LFSS 2026, art. 105 | Découverte · Première utilisation |
+
+### 🧭 Expert ou Guidé ?
+
+| | Assistant Guidé | Mode Expert |
+|---|---|---|
+| **Saisie** | Pas à pas, 6 étapes | Formulaire complet |
+| **Résultats** | Retraite Progressive + tableau comparatif | RP + Définitive + Rachat + Graphiques + PDF |
+| **Validation** | Immédiate à chaque étape | À la soumission |
+| **Pour qui ?** | Première utilisation | Simulation avancée |
+
+> 💡 L'Assistant Guidé dispose d'un bouton **"Mode Expert"** pour basculer vers la version complète à tout moment.
 
 ---
 
 ## 1️⃣ Onglet Paramètres
+
+⚠️ Les valeurs qui s'affichent a l'ouverture sont des valeurs d'exemples a modifier selon vos données.
 
 ### Données du relevé de carrière
 
