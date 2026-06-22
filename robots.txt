@@ -1,2 +1,4 @@
 User-agent: *
-Disallow: /
+Allow: /
+
+Sitemap: https://j34nmy.github.io/simulateur-retraite-progressive/
