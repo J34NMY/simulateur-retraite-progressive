@@ -2122,174 +2122,292 @@
   }
 
   function exporterResultatsPDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      
-      const inputs = lireInputs();
-      let yPos = 20;
-      const leftMargin = 20;
-      const rightMargin = 190;
-      
-      // En-tête avec encadré
-      doc.setFillColor(34, 197, 94);
-      doc.rect(0, 0, 210, 35, 'F');
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(18);
-      doc.setFont(undefined, 'bold');
-      doc.text('SIMULATEUR DE RETRAITE PROGRESSIVE', 105, 15, { align: 'center' });
-      doc.setFontSize(11);
-      doc.setFont(undefined, 'normal');
-      doc.text('Fonctionnaire d\'État – V.06 Suspension réforme 2023', 105, 23, { align: 'center' });
-      doc.setFontSize(9);
-      doc.text('Document généré le ' + new Date().toLocaleDateString('fr-FR'), 105, 30, { align: 'center' });
-      
-      yPos = 45;
-      doc.setTextColor(0, 0, 0);
-      
-      // AVERTISSEMENT RENFORCÉ EN PREMIÈRE PAGE
-      doc.setFillColor(255, 244, 230);
-      doc.rect(leftMargin - 5, yPos - 3, 170, 45, 'F');
-      doc.setFontSize(11);
-      doc.setFont(undefined, 'bold');
-      doc.setTextColor(194, 65, 12);
-      doc.text('AVERTISSEMENT - DOCUMENT NON OFFICIEL', 105, yPos, { align: 'center' });
-      yPos += 7;
-      doc.setFontSize(8);
-      doc.setFont(undefined, 'normal');
-      doc.setTextColor(0, 0, 0);
-      const avertissements = [
-        'Ce document est généré par un simulateur éducatif GRATUIT et NON OFFICIEL.',
-        'Résultats validés par comparaison avec le simulateur M@rel (info-retraite.fr).',
-        'avec le calcul officiel du SRE (règles internes non documentées).',
-        '',
-        'CE SIMULATEUR NE REMPLACE EN AUCUN CAS LES OUTILS OFFICIELS DE L\'ÉTAT.',
-        'Pour votre estimation officielle, consultez le simulateur M@rel sur info-retraite.fr.',
-        '',
-        'Pour votre estimation officielle : info-retraite.fr (simulateur M@rel)',
-        '',
-        'L\'éditeur décline toute responsabilité en cas de décision prise',
-        'sur la base de ces estimations.'
-      ];
-      avertissements.forEach(line => {
-        doc.text(line, 105, yPos, { align: 'center' });
-        yPos += 4;
-      });
-      yPos += 10;
-      
-      // Section Paramètres
-      doc.setFillColor(249, 250, 251);
-      doc.rect(leftMargin - 5, yPos - 5, 170, 8, 'F');
-      doc.setFontSize(12);
-      doc.setFont(undefined, 'bold');
-      doc.text('PARAMETRES DE SIMULATION', leftMargin, yPos);
-      yPos += 10;
-      
-      doc.setFontSize(9);
-      doc.setFont(undefined, 'normal');
-      doc.text('Date de naissance : ' + new Date(inputs.dateNaissance).toLocaleDateString('fr-FR'), leftMargin, yPos);
-      yPos += 5;
-      doc.text('Indice majoré : ' + inputs.indice, leftMargin, yPos);
-      yPos += 5;
-      doc.text('Traitement actuel : ' + (inputs.indice * inputs.valeurPoint).toFixed(2) + ' EUR', leftMargin, yPos);
-      yPos += 5;
-      doc.text('Date départ progressif : ' + new Date(inputs.dateDebut).toLocaleDateString('fr-FR'), leftMargin, yPos);
-      yPos += 5;
-      doc.text('Date départ définitif : ' + new Date(inputs.dateFin).toLocaleDateString('fr-FR'), leftMargin, yPos);
-      yPos += 5;
-      doc.text('Quotité travail : ' + (inputs.quotite * 100).toFixed(0) + ' %', leftMargin, yPos);
-      yPos += 12;
-      
-      // Nettoyage caracteres Unicode incompatibles jsPDF
-      function nettoyerPDF(t) {
-        return t
-          .replace(/\u2192/g,'->').replace(/\u2190/g,'<-')
-          .replace(/\u2212/g,'-').replace(/\u2014/g,'-').replace(/\u2013/g,'-')
-          .replace(/\u00B7/g,'.').replace(/\u2022/g,'-').replace(/\u00D7/g,'x')
-          .replace(/\u2713/g,'OK').replace(/\u274C/g,'X').replace(/\u26A0/g,'!')
-          .replace(/\uFE0F/g,'').replace(/\u2264/g,'<=').replace(/\u2265/g,'>=')
-          .replace(/\u2260/g,'!=').replace(/\u00AB/g,'<<').replace(/\u00BB/g,'>>')
-          .replace(/[\u0080-\u009F]/g,'').replace(/[\uF000-\uFFFF]/g,'');
-      }
+    const{jsPDF}=window.jspdf;
+    const doc=new jsPDF();
+    const I=lireInputs();
+    let y=0;
+    const lm=15,rm=195,pw=rm-lm;
 
-      // Extraction DOM structuree — sans dependance aux classes CSS
-      function collecterBlocsPDFExpert(container) {
-        const blocs = [];
-        const interdit = ['Telecharger','Télécharger','PDF','cliquer'];
-        const dejaVus = new Set();
-        function extraireBloc(el) {
-          if (!el) return;
-          const tag = (el.tagName||'').toLowerCase();
-          if (['script','button','style'].includes(tag)) return;
-          if (tag === 'hr') { blocs.push({sep:true}); return; }
-          if (tag === 'table') { blocs.push({table:el}); return; }
-          if (['p','span'].includes(tag)) {
-            const txt = nettoyerPDF((el.textContent||'').trim().replace(/\s+/g,' '));
-            if (txt.length > 1 && !interdit.some(m=>txt.includes(m)) && !dejaVus.has(txt)) {
-              dejaVus.add(txt);
-              const st = el.style||{};
-              const bold = ['500','bold','700'].includes(st.fontWeight);
-              const size = st.fontSize==='20px'||st.fontSize==='28px'||st.fontSize==='18px' ? 10
-                         : st.fontSize==='12px'||st.fontSize==='11px' ? 8 : 9;
-              blocs.push({text:txt, bold, size});
-            }
-            return;
-          }
-          for (const child of el.children||[]) extraireBloc(child);
-        }
-        for (const child of container.children||[]) extraireBloc(child);
-        return blocs;
-      }
+    const BLEU=[30,64,175],VERT=[21,128,61],GRIS=[249,250,251],
+          GRISD=[100,116,139],BLANC=[255,255,255],NOIR=[15,23,42];
 
-      function ecrireBlocsExpert(blocs, lm, rm) {
-        blocs.forEach(b => {
-          if (b.sep) { yPos += 5; return; }
-          if (b.table) {
-            if (yPos > 250) { doc.addPage(); yPos = 20; }
-            yPos = dessinerTableauPDF(doc, extraireLignesTableau(b.table), lm, rm, yPos);
-            yPos += 4; return;
-          }
-          if (b.text) {
-            if (yPos > 268) { doc.addPage(); yPos = 20; }
-            doc.setFontSize(b.size||9);
-            doc.setFont(undefined, b.bold ? 'bold' : 'normal');
-            const lignes = doc.splitTextToSize(b.text, rm - lm);
-            lignes.forEach(l => {
-              if (yPos > 268) { doc.addPage(); yPos = 20; }
-              doc.text(l, lm, yPos);
-              yPos += (b.size||9) >= 10 ? 5.5 : 4.5;
-            });
-            yPos += 1;
-          }
-        });
-      }
+    function sautPage(){doc.addPage();y=15;}
+    function checkY(h){if(y+h>278)sautPage();}
 
-      const resultatDiv = document.getElementById('resultat');
-
-      doc.setFillColor(249, 250, 251);
-      doc.rect(leftMargin - 5, yPos - 5, 170, 8, 'F');
-      doc.setFontSize(12);
-      doc.setFont(undefined, 'bold');
-      doc.text('RESULTATS DE LA SIMULATION', leftMargin, yPos);
-      yPos += 10;
-
-      if (resultatDiv) {
-        ecrireBlocsExpert(collecterBlocsPDFExpert(resultatDiv), leftMargin, rightMargin);
-      }
-      
-      
-      // Pied de page
-      const totalPages = doc.internal.getNumberOfPages();
-      for (let i = 1; i <= totalPages; i++) {
-        doc.setPage(i);
-        doc.setFontSize(8);
-        doc.setFont(undefined, 'italic');
-        doc.setTextColor(128, 128, 128);
-        doc.text('Page ' + i + ' / ' + totalPages, 105, 290, { align: 'center' });
-        doc.text('Simulation non contractuelle - Consulter info-retraite.fr', 105, 285, { align: 'center' });
-      }
-      
-      doc.save('simulation_retraite_progressive_' + new Date().toISOString().slice(0,10) + '.pdf');
+    function nettoyer(t){
+      return (t||'').replace(/→/g,'->').replace(/←/g,'<-')
+        .replace(/−/g,'-').replace(/—/g,'-').replace(/–/g,'-')
+        .replace(/·/g,'.').replace(/•/g,'-').replace(/×/g,'x')
+        .replace(/✓/g,'v').replace(/❌/g,'x').replace(/⚠/g,'!')
+        .replace(/️/g,'').replace(/≤/g,'<=').replace(/≥/g,'>=')
+        .replace(/[-]/g,'').replace(/[ -￿]/g,'');
     }
+
+    function ligne(c){
+      doc.setDrawColor(...(c||[226,232,240]));doc.setLineWidth(0.3);
+      doc.line(lm,y,rm,y);y+=3;
+    }
+
+    function titreSec(txt,r,g,b){
+      checkY(12);
+      doc.setFillColor(r,g,b);doc.rect(lm-2,y-4,pw+4,10,'F');
+      doc.setTextColor(255,255,255);doc.setFontSize(9);doc.setFont(undefined,'bold');
+      doc.text(txt,lm,y);doc.setTextColor(...NOIR);y+=9;
+    }
+
+    function cartesDuo(g1,v1,g2,v2){
+      checkY(18);
+      const w=(pw-4)/2;
+      doc.setFillColor(...GRIS);doc.rect(lm,y,w,16,'F');
+      doc.setFontSize(7.5);doc.setFont(undefined,'normal');doc.setTextColor(...GRISD);
+      doc.text(nettoyer(g1),lm+3,y+5);
+      doc.setFontSize(10);doc.setFont(undefined,'bold');doc.setTextColor(...NOIR);
+      doc.text(nettoyer(v1),lm+3,y+12);
+      const x2=lm+w+4;
+      doc.setFillColor(...GRIS);doc.rect(x2,y,w,16,'F');
+      doc.setFontSize(7.5);doc.setFont(undefined,'normal');doc.setTextColor(...GRISD);
+      doc.text(nettoyer(g2),x2+3,y+5);
+      doc.setFontSize(10);doc.setFont(undefined,'bold');doc.setTextColor(...NOIR);
+      doc.text(nettoyer(v2),x2+3,y+12);
+      y+=20;
+    }
+
+    function cartesTrio(g1,v1,s1,g2,v2,s2,g3,v3,s3){
+      checkY(22);
+      const w=(pw-6)/3;
+      [[g1,v1,s1,lm],[g2,v2,s2,lm+w+3],[g3,v3,s3,lm+2*(w+3)]].forEach(([g,v,s,x])=>{
+        doc.setFillColor(...GRIS);doc.rect(x,y,w,20,'F');
+        doc.setFontSize(7);doc.setFont(undefined,'normal');doc.setTextColor(...GRISD);
+        doc.text(nettoyer(g),x+2,y+5);
+        doc.setFontSize(9.5);doc.setFont(undefined,'bold');doc.setTextColor(...NOIR);
+        doc.text(nettoyer(v),x+2,y+12);
+        doc.setFontSize(6.5);doc.setFont(undefined,'normal');doc.setTextColor(...GRISD);
+        if(s)doc.text(nettoyer(s),x+2,y+17);
+      });
+      y+=24;
+    }
+
+    function banniere(label,valeur,sousTitre,r,g,b){
+      checkY(22);
+      doc.setFillColor(r,g,b);doc.rect(lm-2,y-2,pw+4,20,'F');
+      doc.setFontSize(8);doc.setFont(undefined,'normal');doc.setTextColor(200,220,255);
+      doc.text(nettoyer(label),lm,y+4);
+      doc.setFontSize(7);doc.setTextColor(150,190,255);
+      if(sousTitre)doc.text(nettoyer(sousTitre),lm,y+9);
+      doc.setFontSize(14);doc.setFont(undefined,'bold');doc.setTextColor(255,255,255);
+      doc.text(nettoyer(valeur),rm-2,y+13,{align:'right'});
+      doc.setTextColor(...NOIR);y+=23;
+    }
+
+    function barreProgress(label,valeur,total,ok){
+      checkY(12);
+      const pct=Math.min(100,valeur/total*100);
+      doc.setFontSize(8);doc.setFont(undefined,'normal');doc.setTextColor(...GRISD);
+      doc.text(nettoyer(label),lm,y);
+      doc.setFont(undefined,'bold');doc.setTextColor(...NOIR);
+      doc.text(valeur+' / '+total+(ok?' (taux plein)':''),rm-2,y,{align:'right'});
+      y+=3;
+      doc.setFillColor(226,232,240);doc.rect(lm,y,pw,3,'F');
+      doc.setFillColor(...(ok?VERT:BLEU));doc.rect(lm,y,pw*pct/100,3,'F');
+      y+=6;
+    }
+
+    function note(txt){
+      checkY(8);
+      doc.setFontSize(7.5);doc.setFont(undefined,'italic');doc.setTextColor(...GRISD);
+      doc.splitTextToSize(nettoyer(txt),pw).forEach(l=>{checkY(5);doc.text(l,lm,y);y+=4;});
+      doc.setFont(undefined,'normal');doc.setTextColor(...NOIR);y+=2;
+    }
+
+    // ═══ EN-TÊTE ═══
+    doc.setFillColor(...BLEU);doc.rect(0,0,210,30,'F');
+    doc.setTextColor(255,255,255);
+    doc.setFontSize(14);doc.setFont(undefined,'bold');
+    doc.text('SIMULATEUR RETRAITE PROGRESSIVE',105,12,{align:'center'});
+    doc.setFontSize(9);doc.setFont(undefined,'normal');
+    doc.text("Fonctionnaire d'Etat - Gel 2026 (LFSS 2026, art. 105)",105,20,{align:'center'});
+    doc.setFontSize(7.5);
+    doc.text('Document genere le '+new Date().toLocaleDateString('fr-FR')+'  |  Outil educatif NON OFFICIEL - info-retraite.fr pour estimation officielle',105,27,{align:'center'});
+    y=38;
+
+    // ═══ PARAMÈTRES ═══
+    titreSec('PARAMETRES DE SIMULATION',...BLEU);
+    const dn=I.dateNaissance instanceof Date&&!isNaN(I.dateNaissance)?I.dateNaissance.toLocaleDateString('fr-FR'):'—';
+    const dd=I.dateDebut instanceof Date&&!isNaN(I.dateDebut)?I.dateDebut.toLocaleDateString('fr-FR'):'—';
+    const df=I.dateFin instanceof Date&&!isNaN(I.dateFin)?I.dateFin.toLocaleDateString('fr-FR'):'—';
+    const traitement=(I.indice*I.valeurPoint).toFixed(2)+' EUR';
+    checkY(30);
+    const col1=[['Naissance',dn],['Depart progressif',dd],['Quotite RP',(I.quotite*100).toFixed(0)+' %']];
+    const col2=[['Indice majore',''+I.indice],['Depart definitif',df],['Traitement brut',traitement]];
+    const cw=(pw-6)/2;
+    col1.forEach(([k,v],i)=>{
+      const ry=y+i*9;
+      doc.setFontSize(7.5);doc.setFont(undefined,'normal');doc.setTextColor(...GRISD);
+      doc.text(k,lm,ry);
+      doc.setFont(undefined,'bold');doc.setTextColor(...NOIR);
+      doc.text(v,lm+cw,ry,{align:'right'});
+      doc.setFontSize(7.5);doc.setFont(undefined,'normal');doc.setTextColor(...GRISD);
+      doc.text(col2[i][0],lm+cw+6,ry);
+      doc.setFont(undefined,'bold');doc.setTextColor(...NOIR);
+      doc.text(col2[i][1],rm,ry,{align:'right'});
+    });
+    y+=32;ligne();
+
+    // ═══ PERIODE RP ═══
+    const divRes=document.getElementById('resultat');
+    // Lire les durées depuis les cartes du HTML
+    const cartesFond=divRes?Array.from(divRes.querySelectorAll('div[style*="background:#f8fafc"][style*="border-radius:7px"]')):[];
+    let dureeP1='—',dureeP2='—';
+    if(cartesFond.length>=2){
+      dureeP1=nettoyer((cartesFond[0].querySelector('strong')||{textContent:''}).textContent);
+      dureeP2=nettoyer((cartesFond[1].querySelector('strong')||{textContent:''}).textContent);
+    }
+    const dateDebutFmt=I.dateDebut instanceof Date&&!isNaN(I.dateDebut)?I.dateDebut.toLocaleDateString('fr-FR',{month:'short',year:'numeric'}):'';
+    const dateFinFmt=I.dateFin instanceof Date&&!isNaN(I.dateFin)?I.dateFin.toLocaleDateString('fr-FR',{month:'short',year:'numeric'}):'';
+    const libelleQ=(I.quotite*100).toFixed(0)+'%'+(I.appliquerDecret1982&&Math.abs(I.quotite-0.80)<1e-9?' (6/7e)':I.appliquerDecret1982&&Math.abs(I.quotite-0.90)<1e-9?' (32/35e)':'');
+
+    titreSec('PERIODE DE RETRAITE PROGRESSIVE - '+libelleQ+' - '+dateDebutFmt.toUpperCase()+' -> '+dateFinFmt.toUpperCase(),...VERT);
+    checkY(10);
+    doc.setFontSize(8);doc.setFont(undefined,'normal');doc.setTextColor(...GRISD);
+    doc.text('Releve -> Depart progressif : '+dureeP1,lm,y);y+=5;
+    doc.text('Periode progressive : '+dureeP2,lm,y);y+=8;
+
+    // ═══ REVENUS RP ═══
+    const traitementPleinPDF=I.indice*I.valeurPoint;
+    let ttpPDF=traitementPleinPDF*I.quotite;
+    if(I.appliquerDecret1982){
+      if(Math.abs(I.quotite-0.80)<1e-9)ttpPDF=traitementPleinPDF*(6/7);
+      if(Math.abs(I.quotite-0.90)<1e-9)ttpPDF=traitementPleinPDF*(32/35);
+    }
+    const ttp=ttpPDF.toFixed(2)+' EUR';
+
+    // Pension provisoire depuis le DOM
+    let pension='—',surcotCout='—';
+    const cartesRevenu=divRes?Array.from(divRes.querySelectorAll('div[style*="border-radius:8px"]')):[];
+    cartesRevenu.forEach(c=>{
+      const ps=c.querySelectorAll('p');
+      if(ps.length>=2){
+        const lab=(ps[0].textContent||'').toLowerCase();
+        const val=nettoyer((ps[1].textContent||'').trim());
+        if(lab.includes('pension provisoire'))pension=val;
+        else if(lab.includes('cout'))surcotCout=val;
+      }
+    });
+
+    const banniereEl=divRes?divRes.querySelector('div[style*="border:2px solid #86efac"]'):null;
+    let totalBrut='—';
+    if(banniereEl){const sp=banniereEl.querySelector('span');if(sp)totalBrut=nettoyer(sp.textContent);}
+
+    checkY(10);
+    doc.setFontSize(9);doc.setFont(undefined,'bold');doc.setTextColor(...NOIR);
+    doc.text('Revenus pendant la retraite progressive',lm,y);y+=7;
+
+    if(I.surcotisation){
+      cartesTrio('Traitement a la quotite',ttp,'Part travaillee',
+                 'Pension provisoire SRE',pension,'Part non travaillee',
+                 'Cout surcotisation',surcotCout,'');
+    } else {
+      cartesDuo('Traitement a la quotite',ttp,'Pension provisoire SRE',pension);
+    }
+    banniere('Total brut mensuel pendant la RP',totalBrut,'Traitement + pension provisoire - avant impot',...VERT);
+    y+=2;
+
+    // Bloc surcotisation si présent
+    const surcotDiv=divRes?divRes.querySelector('div[style*="background:#fefce8"]'):null;
+    if(surcotDiv){
+      checkY(10);
+      doc.setFontSize(8);doc.setFont(undefined,'bold');doc.setTextColor(146,64,14);
+      doc.text('Analyse surcotisation',lm,y);y+=5;
+      doc.setFont(undefined,'normal');doc.setTextColor(...NOIR);
+      const ptxt=nettoyer(surcotDiv.textContent.replace(/\s+/g,' ').trim()).substring(0,300);
+      doc.splitTextToSize(ptxt,pw).slice(0,8).forEach(l=>{checkY(5);doc.text(l,lm,y);y+=4.5;});
+      y+=3;
+    }
+
+    // ═══ TRIMESTRES ═══
+    const TR=I.trimestresRequis||172;
+    const flexDivs=divRes?Array.from(divRes.querySelectorAll('div[style*="display:flex;justify-content:space-between"]')):[];
+    let assVal=0,liqVal=0,tauxLiq='—',traitRef='—';
+    flexDivs.forEach(d=>{
+      const spans=d.querySelectorAll('span');
+      if(spans.length>=2){
+        const lab=(spans[0].textContent||'').toLowerCase();
+        const val=nettoyer((spans[1].textContent||'').trim());
+        if(lab.includes('assurance')){const m=val.match(/^(\d+)/);if(m)assVal=parseInt(m[1]);}
+        if(lab.includes('liquidable')){const m=val.match(/^(\d+)/);if(m)liqVal=parseInt(m[1]);}
+      }
+    });
+    const statsCards=divRes?Array.from(divRes.querySelectorAll('div[style*="padding:10px 12px;font-size:12px"]')):[];
+    statsCards.forEach(c=>{
+      const lab=(c.querySelector('span')||{textContent:''}).textContent.toLowerCase();
+      const val=nettoyer((c.querySelector('strong')||{textContent:''}).textContent);
+      if(lab.includes('taux'))tauxLiq=val;
+      if(lab.includes('traitement'))traitRef=val;
+    });
+
+    ligne([226,232,240]);
+    checkY(10);
+    doc.setFontSize(9);doc.setFont(undefined,'bold');doc.setTextColor(...NOIR);
+    doc.text('Trimestres acquis en fin de periode',lm,y);y+=7;
+    barreProgress('Assurance',assVal,TR,assVal>=TR);
+    barreProgress('Liquidables',liqVal,TR,false);
+    y+=2;
+    cartesDuo('Taux de liquidation',tauxLiq,'Traitement plein temps ref.',traitRef);
+
+    // Surcotes / décote
+    const okDiv=divRes?divRes.querySelector('div[style*="border-left:3px solid #15803d"]'):null;
+    if(okDiv){
+      checkY(10);
+      doc.setFontSize(8);doc.setFont(undefined,'bold');doc.setTextColor(21,128,61);
+      doc.text('Majorations SRE appliquees :',lm,y);y+=5;
+      doc.setFont(undefined,'normal');doc.setTextColor(...NOIR);
+      const ptxt=nettoyer(okDiv.textContent.replace(/Majorations SRE appliquees/g,'').replace(/\s+/g,' ').trim());
+      doc.splitTextToSize(ptxt,pw).forEach(l=>{checkY(5);doc.text(l,lm,y);y+=4.5;});
+      y+=3;
+    }
+    const warnDiv=divRes?divRes.querySelector('div[style*="border-left:3px solid #f59e0b"][style*="padding:10px"]'):null;
+    if(warnDiv){
+      checkY(8);
+      doc.setFontSize(8);doc.setFont(undefined,'normal');doc.setTextColor(146,64,14);
+      doc.text(nettoyer(warnDiv.textContent.replace(/\s+/g,' ').trim()),lm,y);y+=6;
+      doc.setTextColor(...NOIR);
+    }
+
+    // ═══ PENSION DÉFINITIVE ═══
+    const traitRefPDF=I.indice*I.valeurPoint;
+    const strongEls=divRes?Array.from(divRes.querySelectorAll('strong')):[];
+    let tauxLiqNum=0;
+    strongEls.forEach(s=>{
+      const t=(s.textContent||'').trim();
+      const m=t.match(/^([\d,\.]+)\s*%$/);
+      if(m&&!t.includes('+')){
+        const v=parseFloat(t.replace(',','.'));
+        if(v>50&&v<100)tauxLiqNum=v;
+      }
+    });
+    const pensionDefNum=tauxLiqNum>0?Math.min(traitRefPDF*tauxLiqNum/100,traitRefPDF):0;
+    const pensionDef=pensionDefNum>0?pensionDefNum.toFixed(2)+' EUR':'—';
+    const tauxRempl=pensionDefNum>0?(pensionDefNum/traitRefPDF*100).toFixed(1)+' %':'—';
+
+    ligne();
+    checkY(10);
+    doc.setFontSize(8);doc.setFont(undefined,'bold');doc.setTextColor(...GRISD);
+    doc.text('A PARTIR DE VOTRE RETRAITE DEFINITIVE - '+dateFinFmt.toUpperCase(),lm,y);y+=5;
+    banniere('Pension de retraite mensuelle',pensionDef,'Votre revenu a la retraite complete - brut avant impot',...BLEU);
+    note('La pension remplace votre salaire a partir du depart definitif. Elle est versee a vie par le SRE et revalorisee chaque annee. Montant brut avant CSG/CRDS.');
+    y+=2;
+    cartesDuo('Traitement de reference',traitRefPDF.toFixed(2)+' EUR','Taux de remplacement',tauxRempl);
+
+    // ═══ PIED DE PAGE ═══
+    const totalPages=doc.internal.getNumberOfPages();
+    for(let i=1;i<=totalPages;i++){
+      doc.setPage(i);
+      doc.setFontSize(7);doc.setFont(undefined,'italic');doc.setTextColor(150,150,150);
+      doc.text('Page '+i+' / '+totalPages+' - Simulation non contractuelle - info-retraite.fr pour estimation officielle',105,292,{align:'center'});
+      doc.setDrawColor(200,200,200);doc.setLineWidth(0.2);doc.line(lm,288,rm,288);
+    }
+    doc.save('simulation_retraite_progressive_'+new Date().toISOString().slice(0,10)+'.pdf');
+  }
 
   // ============================================
   // EXPORT PDF – RETRAITE DÉFINITIVE
