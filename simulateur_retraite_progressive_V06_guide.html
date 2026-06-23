@@ -1204,29 +1204,38 @@
       doc.setFontSize(8);doc.setFont(undefined,'bold');doc.setTextColor(21,128,61);
       doc.text('Majorations SRE appliquees :',lm,y);y+=5;
       doc.setFont(undefined,'normal');doc.setTextColor(...NOIR);
-      const ptxt=nettoyer(okDiv.textContent.replace(/\s+/g,' ').trim());
+      // Supprimer le titre répété dans le textContent
+      const ptxt=nettoyer(okDiv.textContent.replace(/Majorations SRE appliquees/g,'').replace(/\s+/g,' ').trim());
       const ls=doc.splitTextToSize(ptxt,pw);
       ls.forEach(l=>{checkY(5);doc.text(l,lm,y);y+=4.5;});
       y+=3;
     }
 
-    // ═══ PENSION DÉFINITIVE ═══
-    const pensionBanEl=divRes?divRes.querySelector('div[style*="background:#1e40af"]'):null;
-    let pensionDef='—',tauxRempl='—',traitDef='—';
-    if(pensionBanEl){
-      const sp=pensionBanEl.querySelector('span');
-      if(sp)pensionDef=nettoyer(sp.textContent);
-    }
-    const cartesDef=divRes?Array.from(divRes.querySelectorAll('div[style*="padding:12px 14px"]')):[];
-    cartesDef.forEach(c=>{
-      const ps=c.querySelectorAll('p');
-      if(ps.length>=2){
-        const lab=(ps[0].textContent||'').toLowerCase();
-        const val=nettoyer((ps[1].textContent||'').trim());
-        if(lab.includes('remplacement'))tauxRempl=val;
-        if(lab.includes('reference'))traitDef=val;
+    // ═══ PENSION DÉFINITIVE — calculée directement depuis les inputs ═══
+    // Recalcul local pour éviter la dépendance au DOM
+    const TR_pdf = I.trimestresRequis || 170;
+    const traitRef_pdf = I.indice * I.valeurPoint;
+    // On lit les valeurs depuis les cartes de stats (taux liquidation) pour recalculer
+    // En lisant directement les spans du bloc résultat
+    let tauxLiqPDF = 0, pensionDefPDF = 0;
+    const statsSpans = divRes ? Array.from(divRes.querySelectorAll('strong')) : [];
+    statsSpans.forEach(s => {
+      const t = (s.textContent||'').trim();
+      const m = t.match(/^([\d,\.]+)\s*%$/);
+      if (m && !t.includes('+')) {
+        const v = parseFloat(t.replace(',','.'));
+        if (v > 50 && v < 100) tauxLiqPDF = v;
       }
     });
+    // Calculer la pension depuis le taux lu
+    if (tauxLiqPDF > 0) {
+      pensionDefPDF = traitRef_pdf * tauxLiqPDF / 100;
+      // Appliquer plafond L13
+      if (pensionDefPDF > traitRef_pdf) pensionDefPDF = traitRef_pdf;
+    }
+    const pensionDef = pensionDefPDF > 0 ? pensionDefPDF.toFixed(2)+' EUR' : '—';
+    const traitDef = traitRef_pdf.toFixed(2)+' EUR';
+    const tauxRempl = pensionDefPDF > 0 ? (pensionDefPDF/traitRef_pdf*100).toFixed(1)+' %' : '—';
 
     ligne();
     checkY(28);
