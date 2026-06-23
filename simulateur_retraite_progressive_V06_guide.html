@@ -734,86 +734,161 @@
     const ppD=montRefD*(1-I.quotite);
     const totBrut=ttpD+ppD;
 
-    let html='<div class="result-section"><h3>Durees et trimestres (methode SRE - base 360j/an)</h3>';
-    html+='<p><strong>Entre releve et depart progressif :</strong> '+P1.annees+' an(s), '+P1.mois+' mois, '+P1.jours+' jours</p>';
-    html+='<p><strong>Entre depart progressif et definitif :</strong> '+P2.annees+' an(s), '+P2.mois+' mois, '+P2.jours+' jours</p></div>';
+    // Construction HTML résultats — nouveau visuel
+    const dateDebutFmt = I.dateDebut instanceof Date && !isNaN(I.dateDebut)
+      ? I.dateDebut.toLocaleDateString('fr-FR',{month:'short',year:'numeric'}) : '';
+    const dateFinFmt = I.dateFin instanceof Date && !isNaN(I.dateFin)
+      ? I.dateFin.toLocaleDateString('fr-FR',{month:'short',year:'numeric'}) : '';
 
-    html+='<div class="result-section"><h3>Compteurs au depart progressif</h3>';
-    html+='<p><strong>Assurance au releve :</strong> '+(jAR/90).toFixed(2)+' trimestres</p>';
-    html+='<p><strong>Liquidables au releve :</strong> '+(jLR/90).toFixed(2)+' trimestres</p>';
-    if(I.conditionsEnfantsAvant2004&&I.nbEnfantsAvant2004>0)html+='<p><strong>Bonification enfants (avant 2004) :</strong> '+bETr.toFixed(2)+' trimestres</p>';
-    if(I.conditionsEnfantsApres2003&&I.nbEnfantsApres2003>0)html+='<p><strong>Majoration assurance (apres 2003) :</strong> '+mA3Tr.toFixed(2)+' trimestres</p>';
-    html+='<p><strong>Assurance au depart :</strong> '+assD+' / '+TR+'</p>';
-    html+='<p><strong>Liquidables au depart :</strong> '+liqD+' / '+TR+'</p></div>';
+    const tauxRemplacement = tF > 0 ? (pDef/tF*100).toFixed(1) : '—';
+    const progAss = Math.min(100, assF/TR*100).toFixed(1);
+    const progLiq = Math.min(100, liqF/TR*100).toFixed(1);
+    const tauxPlein = assF >= TR;
+    const couleurAss = tauxPlein ? '#15803d' : '#1e40af';
 
+    let libelleQuotite = (I.quotite*100).toFixed(0)+' %';
+    if(I.appliquerDecret1982){
+      if(Math.abs(I.quotite-0.80)<1e-9) libelleQuotite += ' (6/7e = 85,71 %)';
+      if(Math.abs(I.quotite-0.90)<1e-9) libelleQuotite += ' (32/35e = 91,43 %)';
+    }
+
+    let coutSurcotMensuel = 0;
+    let htmlSurcotCard = '';
     if(I.surcotisation){
-      const tRS=I.tauxSurcotisation*100,tN=11.10;
-      const cM=(tRS/100*tpD)-(tN/100*I.quotite*tpD);
-      const cT=cM*(P2.totalJours/30);
-      html+='<div class="info" style="margin-top:15px;"><strong>Surcotisation : '+formatEuro(cT)+'</strong></div>';
+      const tRS=I.tauxSurcotisation*100;
+      coutSurcotMensuel=(tRS/100*tpD)-(11.10/100*I.quotite*tpD);
+      htmlSurcotCard=`<div style="background:#fff7ed;border:0.5px solid #fed7aa;border-radius:8px;padding:12px 14px;"><p style="font-size:12px;color:#92400e;margin:0 0 4px;">Cout surcotisation</p><p style="font-size:20px;font-weight:500;color:#d97706;margin:0;">- ${formatEuro(coutSurcotMensuel)}</p><p style="font-size:11px;color:#b45309;margin:3px 0 0;">Taux ${(I.tauxSurcotisation*100).toFixed(2)} %</p></div>`;
+    }
+
+    let htmlDecote='';
+    if(assF<TR){const tm=TR-assF;htmlDecote=`<div style="background:#fff7ed;border-left:3px solid #f59e0b;padding:10px 12px;margin-bottom:16px;font-size:13px;"><strong>Decote :</strong> ${tm} trimestre(s) manquant(s) — coefficient ${(tm*1.25).toFixed(2)} %</div>`;}
+
+    let htmlSurcotes='';
+    if(surcoteOk&&tSF>0){
+      htmlSurcotes=`<div style="background:#f0fdf4;border-left:3px solid #15803d;padding:10px 12px;margin-bottom:16px;font-size:13px;"><strong style="color:#14532d;">Majorations SRE appliquees</strong><br>${tSP>0?'+ Surcote parentale : <strong>+'+tSP.toFixed(2)+' %</strong><br>':''}${tSC>0?'+ Surcote classique : <strong>+'+tSC.toFixed(2)+' % ('+trimSC+' trim. x 1,25 %)</strong><br>':''}<strong>Total : +${tSF.toFixed(2)} %</strong></div>`;
+    }
+
+    let htmlPlafond='';
+    if(plafL13){htmlPlafond=`<div style="background:#fef3c7;border-left:3px solid #f59e0b;padding:10px 12px;margin-bottom:12px;font-size:12px;"><strong>Plafond Art. L13 atteint</strong> — Pension calculee : ${formatEuro(pBrute)} → plafonnee a ${formatEuro(tF)} (100 % traitement)</div>`;}
+
+    let htmlMajFam='';
+    if(majF>0){htmlMajFam=`<div style="background:#f5f3ff;border-left:3px solid #9333ea;padding:10px 12px;margin-bottom:12px;font-size:13px;"><strong style="color:#7c3aed;">Majoration familiale +${majF} % (Art. L18)</strong><br>Pension avec majoration : <strong>${formatEuro(pMaj)}</strong></div>`;}
+
+    let htmlPost2028='';
+    if(I.dateFin>=new Date('2028-01-01')){htmlPost2028=`<div style="background:#fef2f2;border-left:3px solid #dc2626;padding:10px 12px;margin-bottom:16px;font-size:12px;"><strong style="color:#991b1b;">Date hors perimetre du gel 2026</strong><br>Votre depart definitif (${I.dateFin.toLocaleDateString('fr-FR')}) est apres le 01/01/2028. Resultats indicatifs uniquement.</div>`;}
+
+    let blocSurcotisationGuide='';
+    if(I.surcotisation){
+      const cT=coutSurcotMensuel*(P2.totalJours/30);
       const jLP2s=Math.floor(P2.totalJours*I.quotite);
       const lFs=arrondirTrimestresLiquidables(jLR+jLP1+bEJ+jLP2s);
       let tSans=0.75*clamp(lFs/TR,0,1),tAvec=0.75*rF;
       if(surcoteOk&&tSF>0){tSans*=(1+tSF/100);tAvec*=(1+tSF/100);}
       if(assF<TR){const c=(TR-assF)*1.25/100;tSans=(0.75*clamp(lFs/TR,0,1))*(1-c);tAvec=(0.75*rF)*(1-c);}
-      const ar=calculerRentabiliteSurcotisation(tF*tSans,tF*tAvec,cT,I.sexe,ageD,cM,P2.moisApprox);
-      html+=afficherAnalyseRentabilite(ar);
+      const ar=calculerRentabiliteSurcotisation(tF*tSans,tF*tAvec,cT,I.sexe,ageD,coutSurcotMensuel,P2.moisApprox);
+      blocSurcotisationGuide='<div class="info" style="margin-top:0;margin-bottom:16px;"><strong>Cout total surcotisation : '+formatEuro(cT)+'</strong></div>'+afficherAnalyseRentabilite(ar);
     }
 
-    html+='<div class="result-section"><h3>Revenus pendant la retraite progressive</h3>';
-    html+='<p><strong>Traitement plein temps :</strong> '+formatEuro(tpD)+'</p>';
-    html+='<p><strong>Traitement a la quotite :</strong> '+formatEuro(ttpD)+'</p>';
-    if(I.appliquerDecret1982&&(Math.abs(I.quotite-0.80)<1e-9||Math.abs(I.quotite-0.90)<1e-9)){
-      const fr=Math.abs(I.quotite-0.80)<1e-9?'6/7eme':'32/35eme';
-      html+='<p style="font-size:0.9rem;color:#ea580c;"><em>Decret 82-624 applique : '+(I.quotite*100).toFixed(0)+'% -> '+fr+'</em></p>';
-    }
-    html+='<p><strong>Pension provisoire :</strong> '+formatEuro(ppD)+'</p>';
-    html+='<p><strong>Total brut mensuel :</strong> '+formatEuro(totBrut)+'</p>';
-    if(I.surcotisation){
-      const tRS=I.tauxSurcotisation*100,tN=11.10;
-      const cM=(tRS/100*tpD)-(tN/100*I.quotite*tpD);
-      html+='<p style="color:#d97706;"><strong>- Cout surcotisation mensuel :</strong> -'+formatEuro(cM)+'</p>';
-      html+='<p style="color:#10b981;font-weight:bold;"><strong>= Revenu net apres surcotisation :</strong> '+formatEuro(totBrut-cM)+'</p>';
-    }
-    html+='</div>';
-
-    html+='<div class="result-section"><h3>Situation en fin de periode</h3>';
-    html+='<p><strong>Assurance finale :</strong> '+assF+' trimestres / '+TR+'</p>';
-    html+='<p><strong>Liquidables finaux :</strong> '+liqF+' / '+TR+'</p>';
-    html+='<p><strong>Taux de liquidation estime :</strong> '+(taux*100).toFixed(2)+' %</p>';
-    html+='<p><strong>Traitement plein temps estime :</strong> '+formatEuro(tF)+'</p></div>';
-
-    if(plafL13){
-      html+='<div class="info" style="margin-top:15px;background:#fef3c7;border-left-color:#f59e0b;border-width:3px;"><h4 style="margin-top:0;color:#92400e;">Plafond legal Article L13 atteint</h4>';
-      html+='<p>Pension calculee : <strong>'+formatEuro(pBrute)+'</strong> -> plafonnee a <strong>'+formatEuro(tF)+'</strong> (100% du traitement indiciaire).</p></div>';
-    }
-
-    html+='<div class="highlight-result"><h3>Pension definitive estimee</h3>';
-    html+='<p style="font-size:1.3em;font-weight:bold;">'+formatEuro(pDef)+'</p>';
-    if(plafL13)html+='<p style="font-size:0.9rem;color:#92400e;"><em>Plafonnee a 100% du traitement (Art. L13)</em></p>';
-    if(majF>0)html+='<p><strong>Avec majoration familiale (+'+majF+'%) :</strong><br><span style="font-size:1.2em;font-weight:bold;">'+formatEuro(pMaj)+'</span></p>';
-    html+='</div>';
-
-    if(assF<TR){
-      const tm=TR-assF;
-      html+='<div class="warn" style="margin-top:15px;"><strong>Decote :</strong> '+tm+' trimestres manquants - Coefficient : '+(tm*1.25).toFixed(2)+'%</div>';
-    }
-    if(surcoteOk&&tSF>0){
-      html+='<div class="ok" style="margin-top:15px;"><strong>Majorations SRE :</strong><br>';
-      if(tSP>0)html+='- Surcote parentale : +'+tSP.toFixed(2)+'%<br>';
-      if(tSC>0)html+='- Surcote classique : +'+tSC.toFixed(2)+'% ('+trimSC+' trim. x 1,25%)<br>';
-      html+='<strong>Total : +'+tSF.toFixed(2)+'%</strong></div>';
-    }
-    if(majF>0)html+='<div class="info" style="margin-top:15px;background:#f3e8ff;border-left-color:#9333ea;"><strong>Majoration familiale : +'+majF+'%</strong></div>';
-
-    const dFG=new Date('2028-01-01');
-    if(I.dateFin>=dFG){
-      html+='<div class="warn" style="margin-top:15px;background:#fef2f2;border-left-color:#dc2626;border-width:3px;"><h4 style="margin-top:0;color:#991b1b;">Date hors perimetre de la suspension 2026</h4>';
-      html+='<p>Votre date de depart definitif est apres le 01/01/2028. Resultats indicatifs uniquement.</p></div>';
-    }
-
-    html+='<div class="warn" style="margin-top:20px;"><h4 style="margin-top:0;">Avertissement</h4><p>Simulateur educatif NON OFFICIEL. Pour votre estimation officielle : <a href="https://www.info-retraite.fr" target="_blank">info-retraite.fr</a></p></div>';
-    html+='<p style="margin-top:20px;color:#6b7280;font-size:.8rem;">V.06 - Juin 2026</p>';
+    const html = `
+      <p style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:#6b7280;margin:0 0 10px;">
+        Periode de retraite progressive · ${libelleQuotite} · ${dateDebutFmt} → ${dateFinFmt}
+      </p>
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:10px;">
+        <div style="font-size:11px;color:#6b7280;background:#f8fafc;border-radius:7px;padding:8px 12px;">
+          <span style="display:block;margin-bottom:1px;">Releve → Depart progressif</span>
+          <strong style="color:#0f172a;">${P1.annees} an(s), ${P1.mois} mois, ${P1.jours} j</strong>
+        </div>
+        <div style="font-size:11px;color:#6b7280;background:#f8fafc;border-radius:7px;padding:8px 12px;">
+          <span style="display:block;margin-bottom:1px;">Periode progressive</span>
+          <strong style="color:#0f172a;">${P2.annees} an(s), ${P2.mois} mois, ${P2.jours} j</strong>
+        </div>
+      </div>
+      <p style="font-size:13px;font-weight:500;color:#0f172a;margin:16px 0 8px;">Revenus pendant la retraite progressive</p>
+      <div style="display:grid;grid-template-columns:repeat(${I.surcotisation?'3':'2'},minmax(0,1fr));gap:8px;margin-bottom:12px;">
+        <div style="background:#f8fafc;border-radius:8px;padding:12px 14px;">
+          <p style="font-size:12px;color:#6b7280;margin:0 0 4px;">Traitement a la quotite</p>
+          <p style="font-size:20px;font-weight:500;color:#0f172a;margin:0;">${formatEuro(ttpD)}</p>
+          <p style="font-size:11px;color:#94a3b8;margin:3px 0 0;">Part travaillee · salaire brut</p>
+        </div>
+        <div style="background:#eff6ff;border:0.5px solid #bfdbfe;border-radius:8px;padding:12px 14px;">
+          <p style="font-size:12px;color:#1e40af;margin:0 0 4px;">Pension provisoire SRE</p>
+          <p style="font-size:20px;font-weight:500;color:#1e40af;margin:0;">${formatEuro(ppD)}</p>
+          <p style="font-size:11px;color:#3b82f6;margin:3px 0 0;">Part non travaillee (${(100-I.quotite*100).toFixed(0)} %)</p>
+        </div>
+        ${htmlSurcotCard}
+      </div>
+      <div style="background:#f0fdf4;border:2px solid #86efac;border-radius:10px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <div>
+          <p style="font-size:12px;color:#15803d;margin:0 0 2px;font-weight:500;">Total brut mensuel pendant la RP</p>
+          <p style="font-size:11px;color:#166534;margin:0;">Traitement + pension provisoire${I.surcotisation?' - surcotisation':''} · avant impot</p>
+        </div>
+        <span style="font-size:28px;font-weight:500;color:#15803d;">${formatEuro(I.surcotisation?totBrut-coutSurcotMensuel:totBrut)}</span>
+      </div>
+      ${blocSurcotisationGuide}
+      <p style="font-size:13px;font-weight:500;color:#0f172a;margin:0 0 8px;">Trimestres acquis en fin de periode</p>
+      <div style="background:#f8fafc;border-radius:8px;padding:12px 14px;margin-bottom:8px;">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;font-size:13px;margin-bottom:4px;">
+          <span style="color:#6b7280;">Assurance</span>
+          <span style="font-weight:500;">${assF} / ${TR} ${tauxPlein?'<span style="color:#15803d;font-size:11px;">OK taux plein</span>':'<span style="color:#f59e0b;font-size:11px;">-'+(TR-assF)+' trim.</span>'}</span>
+        </div>
+        <div style="background:#e2e8f0;border-radius:4px;height:5px;margin-bottom:10px;overflow:hidden;">
+          <div style="background:${couleurAss};height:5px;width:${progAss}%;border-radius:4px;"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;font-size:13px;margin-bottom:4px;">
+          <span style="color:#6b7280;">Liquidables</span>
+          <span style="font-weight:500;">${liqF} / ${TR}</span>
+        </div>
+        <div style="background:#e2e8f0;border-radius:4px;height:5px;overflow:hidden;">
+          <div style="background:#1e40af;height:5px;width:${progLiq}%;border-radius:4px;"></div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:20px;">
+        <div style="background:#f8fafc;border-radius:8px;padding:10px 12px;font-size:12px;">
+          <span style="color:#6b7280;display:block;margin-bottom:2px;">Taux de liquidation</span>
+          <strong style="font-size:16px;color:#0f172a;">${(taux*100).toFixed(2)} %</strong>
+        </div>
+        <div style="background:#f8fafc;border-radius:8px;padding:10px 12px;font-size:12px;">
+          <span style="color:#6b7280;display:block;margin-bottom:2px;">Traitement plein temps ref.</span>
+          <strong style="font-size:16px;color:#0f172a;">${formatEuro(tF)}</strong>
+        </div>
+      </div>
+      ${htmlDecote}
+      ${htmlSurcotes}
+      <hr style="border:none;border-top:0.5px solid #e2e8f0;margin:4px 0 20px;">
+      <p style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:#6b7280;margin:0 0 10px;">
+        A partir de votre retraite definitive · ${dateFinFmt}
+      </p>
+      <div style="background:#1e40af;border-radius:10px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <div>
+          <p style="font-size:12px;color:#bfdbfe;margin:0 0 2px;font-weight:500;">Pension de retraite mensuelle</p>
+          <p style="font-size:11px;color:#93c5fd;margin:0;">Votre revenu a la retraite complete · brut avant impot</p>
+        </div>
+        <span style="font-size:28px;font-weight:500;color:#ffffff;">${formatEuro(pDef)}</span>
+      </div>
+      <div style="border-left:3px solid #1e40af;padding:9px 12px;margin-bottom:16px;font-size:12px;color:#6b7280;">
+        La pension remplace votre salaire a partir du depart definitif. Elle est versee a vie par le SRE et revalorisee chaque annee. Ce montant est brut — deduire la CSG/CRDS apres abattement pour obtenir le net.
+      </div>
+      ${htmlPlafond}
+      ${htmlMajFam}
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:20px;">
+        <div style="background:#f8fafc;border-radius:8px;padding:12px 14px;">
+          <p style="font-size:12px;color:#6b7280;margin:0 0 4px;">Traitement de reference</p>
+          <p style="font-size:18px;font-weight:500;color:#0f172a;margin:0;">${formatEuro(tF)}</p>
+          <p style="font-size:11px;color:#94a3b8;margin:3px 0 0;">Votre dernier salaire brut</p>
+        </div>
+        <div style="background:#f8fafc;border-radius:8px;padding:12px 14px;">
+          <p style="font-size:12px;color:#6b7280;margin:0 0 4px;">Taux de remplacement</p>
+          <p style="font-size:18px;font-weight:500;color:#0f172a;margin:0;">${tauxRemplacement} %</p>
+          <p style="font-size:11px;color:#94a3b8;margin:3px 0 0;">Pension / traitement brut</p>
+        </div>
+      </div>
+      ${htmlPost2028}
+      <div style="background:#fff7ed;border-left:3px solid #f59e0b;padding:10px 12px;margin-bottom:12px;font-size:12px;color:#92400e;">
+        Simulateur educatif NON OFFICIEL. Pour votre estimation officielle :
+        <a href="https://www.info-retraite.fr" target="_blank" style="color:#92400e;font-weight:500;">info-retraite.fr</a>
+      </div>
+      <p style="font-size:11px;color:#94a3b8;margin:0;">V.06 - Juin 2026</p>
+    `;
 
     document.getElementById('resultat').innerHTML=html;
     document.getElementById('resultat').innerHTML+='<div style="text-align:center;margin-top:20px;"><button onclick="exporterResultatsPDF()" class="primary">Telecharger les resultats en PDF</button></div>';
@@ -863,33 +938,111 @@
     doc.setFontSize(12);doc.setFont(undefined,'bold');doc.text('RESULTATS DE LA SIMULATION',lm,y);y+=10;
     doc.setFontSize(9);doc.setFont(undefined,'normal');
 
-    // CORRECTION : scanner #resultat ET #tableau-comparaison
-    const rDiv=document.getElementById('resultat');
-    const tDiv=document.getElementById('tableau-comparaison');
-    const sections=[
-      ...rDiv.querySelectorAll('.result-section,.highlight-result,.info,.warn,.ok'),
-      ...tDiv.querySelectorAll('.result-section,.highlight-result,.info,.warn,.ok')
-    ];
+    // Nettoyage caracteres Unicode incompatibles jsPDF police de base
+    function nettoyerPDF(t) {
+      return t
+        .replace(/\u2192/g, '->').replace(/\u2190/g, '<-')
+        .replace(/\u2212/g, '-').replace(/\u2014/g, '-').replace(/\u2013/g, '-')
+        .replace(/\u00B7/g, '.').replace(/\u00D7/g, 'x')
+        .replace(/\u2022/g, '-').replace(/\u2713/g, 'OK').replace(/\u274C/g, 'X')
+        .replace(/\u26A0/g, '!').replace(/\uFE0F/g, '')
+        .replace(/\u2264/g, '<=').replace(/\u2265/g, '>=').replace(/\u2260/g, '!=')
+        .replace(/\u00AB/g, '<<').replace(/\u00BB/g, '>>')
+        .replace(/[\u0080-\u009F]/g, '').replace(/[\uF000-\uFFFF]/g, '');
+    }
 
-    sections.forEach(section=>{
-      const title=section.querySelector('h3,h4');
-      const paras=Array.from(section.querySelectorAll('p,small')).filter(el=>!el.closest('table'));
-      if(y>260){doc.addPage();y=20;}
-      if(title){doc.setFont(undefined,'bold');doc.setFontSize(10);doc.text(title.textContent.trim(),lm,y);y+=6;doc.setFont(undefined,'normal');doc.setFontSize(9);}
-      paras.forEach(p=>{
-        if(y>270){doc.addPage();y=20;}
-        let t=p.textContent.trim().replace(/\s+/g,' ');
-        if(t.length>0&&!t.includes('Telecharger')&&!t.includes('PDF')){
-          doc.splitTextToSize(t,rm-lm).forEach(l=>{if(y>270){doc.addPage();y=20;}doc.text(l,lm,y);y+=4.5;});
-          y+=1;
+    // Extraction structurée depuis le DOM — collecte de blocs texte
+    function collecterBlocsPDF(container) {
+      const blocs = [];
+      const interdit = ['Telecharger','cliquer','PDF'];
+      const dejaVus = new Set();
+
+      function extraireBloc(el) {
+        if (!el) return;
+        const tag = (el.tagName||'').toLowerCase();
+        if (['script','button','style'].includes(tag)) return;
+
+        if (tag === 'hr') { blocs.push({sep:true}); return; }
+        if (tag === 'table') { blocs.push({table:el}); return; }
+
+        // Blocs de titre (p avec font-size > 12px ou font-weight:500+)
+        const style = el.style || {};
+        const isTitre = tag === 'p' && (style.fontSize === '13px' || style.fontSize === '20px' || style.fontSize === '18px' || style.fontSize === '28px' || style.fontWeight === '500');
+        const isLabel = tag === 'p' && style.fontSize === '12px';
+        const isSmall = tag === 'p' && (style.fontSize === '11px' || style.fontSize === '12px');
+
+        if (['p','span'].includes(tag) || el.nodeType === 3) {
+          const txt = nettoyerPDF((el.textContent||'').trim().replace(/\s+/g,' '));
+          if (txt.length > 1 && !interdit.some(m=>txt.includes(m)) && !dejaVus.has(txt)) {
+            dejaVus.add(txt);
+            const bold = isTitre || style.fontWeight === '500' || style.fontWeight === 'bold' || style.fontWeight === '700';
+            blocs.push({text: txt, bold, size: isTitre ? 10 : isSmall ? 8 : 9});
+          }
+          return;
+        }
+
+        // Récursion sur les enfants
+        for (const child of el.children || []) {
+          extraireBloc(child);
+        }
+      }
+
+      for (const child of container.children || []) {
+        extraireBloc(child);
+      }
+      return blocs;
+    }
+
+    function ecrireBlocs(blocs, doc, lm, rm) {
+      blocs.forEach(b => {
+        if (b.sep) { y += 5; return; }
+        if (b.table) {
+          if (y > 250) { doc.addPage(); y = 20; }
+          y = dessinerTableauPDF(doc, extraireLignesTableau(b.table), lm, rm, y);
+          y += 4; return;
+        }
+        if (b.text) {
+          if (y > 268) { doc.addPage(); y = 20; }
+          doc.setFontSize(b.size || 9);
+          doc.setFont(undefined, b.bold ? 'bold' : 'normal');
+          const lignes = doc.splitTextToSize(b.text, rm - lm);
+          lignes.forEach(l => {
+            if (y > 268) { doc.addPage(); y = 20; }
+            doc.text(l, lm, y);
+            y += (b.size || 9) === 10 ? 5.5 : 4.5;
+          });
+          y += 1;
         }
       });
-      section.querySelectorAll('table').forEach(table=>{
-        if(y>250){doc.addPage();y=20;}
-        y=dessinerTableauPDF(doc,extraireLignesTableau(table),lm,rm,y);y+=2;
+    }
+
+    const rDiv = document.getElementById('resultat');
+    const tDiv = document.getElementById('tableau-comparaison');
+
+    // Section resultats principaux
+    if (rDiv) {
+      doc.setFillColor(249,250,251);doc.rect(lm-5,y-5,170,8,'F');
+      doc.setFontSize(10);doc.setFont(undefined,'bold');
+      doc.text('PERIODE DE RETRAITE PROGRESSIVE',lm,y);y+=10;
+      ecrireBlocs(collecterBlocsPDF(rDiv), doc, lm, rm);
+    }
+
+    // Section tableau comparatif
+    if (tDiv && tDiv.innerHTML.trim()) {
+      if (y > 230) { doc.addPage(); y = 20; }
+      y += 4;
+      doc.setFillColor(249,250,251);doc.rect(lm-5,y-5,170,8,'F');
+      doc.setFontSize(10);doc.setFont(undefined,'bold');
+      doc.text('COMPARAISON DES REVENUS PAR QUOTITE',lm,y);y+=8;
+      doc.setFontSize(8);doc.setFont(undefined,'normal');
+      doc.text('Traitement + pension provisoire pendant la RP.',lm,y);y+=6;
+      const tables = tDiv.querySelectorAll('table');
+      tables.forEach(table => {
+        if (y > 250) { doc.addPage(); y = 20; }
+        y = dessinerTableauPDF(doc, extraireLignesTableau(table), lm, rm, y);
+        y += 3;
       });
-      y+=3;
-    });
+    }
 
     const total=doc.internal.getNumberOfPages();
     for(let i=1;i<=total;i++){
