@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="alternate icon" type="image/x-icon" href="favicon.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mode d'emploi – Simulateur de Retraite Progressive</title>
+  <meta name="description" content="Guide d'utilisation complet du simulateur de retraite progressive pour fonctionnaires d'État. Gel 2026, méthode SRE.">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:        #1B3A5C;
+      --navy-light:  #2A5280;
+      --green:       #15803d;
+      --green-light: #f0fdf4;
+      --cream:       #F7F6F3;
+      --gold:        #C9A84C;
+      --purple:      #7c3aed;
+      --slate:       #6B7280;
+      --white:       #FFFFFF;
+      --border:      #E5E7EB;
+      --blue:        #2563eb;
+      --blue-light:  #dbeafe;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--cream);
+      color: var(--navy);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      background: var(--navy);
+      padding: 56px 24px 48px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 70% 40%, rgba(201,168,76,.12) 0%, transparent 60%),
+                  radial-gradient(ellipse at 20% 80%, rgba(21,128,61,.10) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 14px;
+    }
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.6rem, 4vw, 2.6rem);
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.2;
+      max-width: 680px;
+      margin: 0 auto 12px;
+    }
+    .hero h1 em { font-style: italic; color: var(--gold); }
+    .hero-sub {
+      font-size: .95rem;
+      font-weight: 300;
+      color: rgba(255,255,255,.7);
+      max-width: 520px;
+      margin: 0 auto 32px;
+      line-height: 1.65;
+    }
+    .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-family: 'Inter', sans-serif;
+      font-size: .88rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: transform .15s, opacity .15s;
+    }
+    .btn:hover { transform: translateY(-2px); opacity: .9; }
+    .btn-gold    { background: var(--gold); color: var(--navy); }
+    .btn-purple  { background: var(--purple); color: #fff; }
+    .btn-outline { background: transparent; color: #fff; border: 1.5px solid rgba(255,255,255,.4); }
+    .btn-outline:hover { border-color: rgba(255,255,255,.8); }
+
+    /* ── BREADCRUMB ── */
+    .breadcrumb {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px;
+    }
+    .breadcrumb-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      font-size: .8rem;
+      color: var(--slate);
+    }
+    .breadcrumb-inner a { color: var(--navy); text-decoration: none; font-weight: 500; }
+    .breadcrumb-inner a:hover { text-decoration: underline; }
+    .breadcrumb-inner span { margin: 0 6px; }
+
+    /* ── LAYOUT PRINCIPAL ── */
+    .main-layout {
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 32px;
+      align-items: start;
+    }
+
+    /* ── SIDEBAR NAV ── */
+    .sidebar {
+      position: sticky;
+      top: 24px;
+    }
+    .sidebar-title {
+      font-size: .72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--slate);
+      margin-bottom: 12px;
+    }
+    .sidebar-nav {
+      list-style: none;
+      border-left: 2px solid var(--border);
+    }
+    .sidebar-nav li a {
+      display: block;
+      padding: 6px 12px;
+      font-size: .83rem;
+      color: var(--slate);
+      text-decoration: none;
+      border-left: 2px solid transparent;
+      margin-left: -2px;
+      transition: color .15s, border-color .15s;
+      line-height: 1.4;
+    }
+    .sidebar-nav li a:hover,
+    .sidebar-nav li a.active {
+      color: var(--navy);
+      border-left-color: var(--navy);
+    }
+    .sidebar-nav li a.sub {
+      padding-left: 24px;
+      font-size: .78rem;
+    }
+    .sidebar-back {
+      margin-top: 20px;
+      padding: 10px 14px;
+      background: var(--cream);
+      border-radius: 8px;
+      font-size: .8rem;
+      text-align: center;
+    }
+    .sidebar-back a { color: var(--navy); text-decoration: none; font-weight: 500; }
+
+    /* ── CONTENU ── */
+    .content section {
+      margin-bottom: 48px;
+      scroll-margin-top: 24px;
+    }
+    .section-eyebrow {
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 6px;
+    }
+    .content h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      color: var(--navy);
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--border);
+    }
+    .content h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--navy);
+      margin: 24px 0 10px;
+    }
+    .content p {
+      font-size: .88rem;
+      color: var(--slate);
+      line-height: 1.75;
+      margin-bottom: 12px;
+    }
+    .content ul, .content ol {
+      margin: 8px 0 14px 20px;
+      font-size: .86rem;
+      color: var(--slate);
+      line-height: 1.8;
+    }
+
+    /* ── CARDS INFO ── */
+    .info-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px 22px;
+      margin-bottom: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+    .info-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 4px; height: 100%;
+    }
+    .info-card.blue::before   { background: var(--blue); }
+    .info-card.green::before  { background: var(--green); }
+    .info-card.gold::before   { background: var(--gold); }
+    .info-card.purple::before { background: var(--purple); }
+    .info-card.orange::before { background: #f59e0b; }
+    .info-card h4 {
+      font-size: .9rem;
+      font-weight: 600;
+      color: var(--navy);
+      margin-bottom: 6px;
+    }
+    .info-card p {
+      font-size: .83rem;
+      color: var(--slate);
+      line-height: 1.65;
+      margin: 0;
+    }
+
+    /* ── TABLEAU ── */
+    .table-wrap { overflow-x: auto; margin-bottom: 16px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .83rem;
+      background: var(--white);
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    th {
+      background: var(--navy);
+      color: var(--white);
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 600;
+      font-size: .78rem;
+      letter-spacing: .03em;
+    }
+    td {
+      padding: 9px 14px;
+      border-bottom: 1px solid var(--border);
+      color: var(--slate);
+      vertical-align: top;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:nth-child(even) td { background: var(--cream); }
+    td strong { color: var(--navy); }
+
+    /* ── ÉTAPES ── */
+    .steps { list-style: none; margin: 0 0 16px; }
+    .step-item {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 18px;
+      align-items: flex-start;
+    }
+    .step-num {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--navy);
+      color: #fff;
+      font-size: .82rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .step-content strong { display: block; font-size: .88rem; color: var(--navy); margin-bottom: 2px; }
+    .step-content span { font-size: .82rem; color: var(--slate); line-height: 1.5; }
+
+    /* ── BADGE ── */
+    .badge {
+      display: inline-block;
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-right: 6px;
+    }
+    .badge-guide  { background: #ede9fe; color: var(--purple); }
+    .badge-expert { background: var(--green-light); color: var(--green); }
+    .badge-both   { background: #fef3c7; color: #92400e; }
+
+    /* ── ALERT ── */
+    .alert {
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin-bottom: 16px;
+      font-size: .83rem;
+      line-height: 1.65;
+    }
+    .alert-orange { background: #fff7ed; border-left: 4px solid #f59e0b; color: #92400e; }
+    .alert-blue   { background: #eff6ff; border-left: 4px solid var(--blue); color: #1e40af; }
+    .alert-green  { background: var(--green-light); border-left: 4px solid var(--green); color: #14532d; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--cream);
+      border-top: 1px solid var(--border);
+      padding: 26px 24px;
+      text-align: center;
+      margin-top: 40px;
+    }
+    footer p { font-size: .78rem; color: var(--slate); line-height: 1.7; }
+    footer a  { color: var(--navy); text-decoration: none; font-weight: 500; }
+    footer a:hover { text-decoration: underline; }
+    .disclaimer {
+      max-width: 700px;
+      margin: 14px auto 0;
+      padding: 14px 18px;
+      background: #FFF8E7;
+      border: 1px solid #F0D98A;
+      border-radius: 8px;
+      font-size: .76rem;
+      color: #7A6200;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 680px) {
+      .main-layout { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <p class="hero-eyebrow">Documentation · Simulateur de Retraite Progressive</p>
+  <h1>Mode d'<em>emploi</em></h1>
+  <p class="hero-sub">Guide complet pour utiliser le simulateur — paramètres, résultats, options avancées et export PDF.</p>
+  <div class="btn-group">
+    <a href="simulateur_retraite_progressive_V06_guide.html" class="btn btn-purple" target="_blank">
+      ✨ Mode Guidé
+    </a>
+    <a href="simulateur_retraite_progressive_V06_expert.html" class="btn btn-gold" target="_blank">
+      🔧 Mode Expert
+    </a>
+    <a href="index.html" class="btn btn-outline">
+      ← Accueil
+    </a>
+  </div>
+</section>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb">
+  <div class="breadcrumb-inner">
+    <a href="index.html">Accueil</a>
+    <span>›</span>
+    Mode d'emploi
+  </div>
+</div>
+
+<!-- LAYOUT -->
+<div class="main-layout">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <p class="sidebar-title">Sur cette page</p>
+    <ul class="sidebar-nav">
+      <li><a href="#demarrage">Démarrage rapide</a></li>
+      <li><a href="#versions">Quelle version ?</a></li>
+      <li><a href="#parametres">Paramètres</a></li>
+      <li><a href="#releve" class="sub">→ Relevé de carrière</a></li>
+      <li><a href="#remuneration" class="sub">→ Rémunération</a></li>
+      <li><a href="#planning" class="sub">→ Planning RP</a></li>
+      <li><a href="#options" class="sub">→ Options</a></li>
+      <li><a href="#resultats">Résultats</a></li>
+      <li><a href="#pension-prov" class="sub">→ Pension provisoire</a></li>
+      <li><a href="#pension-def" class="sub">→ Pension définitive</a></li>
+      <li><a href="#surcotisation" class="sub">→ Surcotisation</a></li>
+      <li><a href="#expert">Mode Expert</a></li>
+      <li><a href="#pdf">Export PDF</a></li>
+      <li><a href="#confidentialite">Confidentialité</a></li>
+    </ul>
+    <div class="sidebar-back">
+      <a href="index.html">← Retour à l'accueil</a>
+    </div>
+  </nav>
+
+  <!-- CONTENU -->
+  <div class="content">
+
+    <!-- DÉMARRAGE -->
+    <section id="demarrage">
+      <p class="section-eyebrow">Premiers pas</p>
+      <h2>Démarrage rapide</h2>
+      <ul class="steps">
+        <li class="step-item">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <strong>Choisissez votre version</strong>
+            <span>Mode Guidé (6 étapes) pour une première utilisation, Mode Expert pour une simulation complète avec rachat et graphiques.</span>
+          </div>
+        </li>
+        <li class="step-item">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <strong>Munissez-vous de votre relevé de carrière</strong>
+            <span>Disponible sur <a href="https://www.info-retraite.fr" target="_blank" style="color:var(--navy);font-weight:500;">info-retraite.fr</a> ou via votre espace <a href="https://ensap.gouv.fr" target="_blank" style="color:var(--navy);font-weight:500;">ensap.gouv.fr</a>.</span>
+          </div>
+        </li>
+        <li class="step-item">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <strong>Saisissez vos données et lancez le calcul</strong>
+            <span>Tous les calculs restent dans votre navigateur — aucune donnée n'est transmise.</span>
+          </div>
+        </li>
+        <li class="step-item">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <strong>Téléchargez vos résultats en PDF</strong>
+            <span>Disponible depuis chaque onglet de résultats.</span>
+          </div>
+        </li>
+      </ul>
+      <div class="alert alert-orange">
+        ⚠️ <strong>Outil éducatif non officiel.</strong> Pour votre estimation officielle, consultez le simulateur M@rel sur <a href="https://www.info-retraite.fr" target="_blank" style="color:#92400e;font-weight:600;">info-retraite.fr</a> ou le SRE via <a href="https://ensap.gouv.fr" target="_blank" style="color:#92400e;font-weight:600;">ensap.gouv.fr</a>.
+      </div>
+    </section>
+
+    <!-- VERSIONS -->
+    <section id="versions">
+      <p class="section-eyebrow">Choix du simulateur</p>
+      <h2>Quelle version utiliser ?</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Version</th>
+              <th>Cadre réglementaire</th>
+              <th>Pour qui ?</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>V04.2.8</strong></td>
+              <td>Réforme 2023 — Décret n°2023-799</td>
+              <td>Départ prévu à partir de 2028</td>
+            </tr>
+            <tr>
+              <td><strong>V06 — Mode Expert</strong> ⭐</td>
+              <td>Suspension réforme 2023 — LFSS 2026, art. 105</td>
+              <td>Simulation complète, rachat, graphiques</td>
+            </tr>
+            <tr>
+              <td><strong>V06 — Assistant Guidé</strong> ✨</td>
+              <td>Suspension réforme 2023 — LFSS 2026, art. 105</td>
+              <td>Première utilisation, approche pas à pas</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th></th>
+              <th>Assistant Guidé</th>
+              <th>Mode Expert</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Saisie</strong></td>
+              <td>Pas à pas, 6 étapes</td>
+              <td>Formulaire complet</td>
+            </tr>
+            <tr>
+              <td><strong>Résultats RP</strong></td>
+              <td>Revenus + tableau comparatif</td>
+              <td>Complet + graphique + PDF</td>
+            </tr>
+            <tr>
+              <td><strong>Retraite définitive</strong></td>
+              <td>Affichée dans les résultats</td>
+              <td>Onglet dédié</td>
+            </tr>
+            <tr>
+              <td><strong>Analyse rachat</strong></td>
+              <td>Non</td>
+              <td>Oui — onglet dédié</td>
+            </tr>
+            <tr>
+              <td><strong>Export PDF</strong></td>
+              <td>Résultats RP</td>
+              <td>RP + Définitive + Rachat</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="alert alert-blue">
+        💡 L'Assistant Guidé dispose d'un bouton <strong>Mode Expert</strong> pour basculer à tout moment vers la version complète.
+      </div>
+    </section>
+
+    <!-- PARAMÈTRES -->
+    <section id="parametres">
+      <p class="section-eyebrow">Saisie</p>
+      <h2>Paramètres de simulation</h2>
+      <p>Les valeurs affichées à l'ouverture sont des exemples — modifiez-les selon votre situation réelle.</p>
+
+      <h3 id="releve">Relevé de carrière</h3>
+      <div class="info-card blue">
+        <h4>Où trouver ces données ?</h4>
+        <p>Sur <strong>info-retraite.fr</strong>, dans votre Relevé Individuel de Situation (RIS) :<br>
+        • <strong>Trimestres d'assurance</strong> : section "Durée d'assurance" en haut du relevé (total tous régimes)<br>
+        • <strong>Trimestres liquidables</strong> : ligne SRE dans la section "Mes régimes" — colonne "Total des trimestres"</p>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Champ</th><th>Description</th><th>Impact</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Date du relevé</strong></td><td>Date de votre dernier relevé officiel SRE</td><td>Point de départ du calcul</td></tr>
+            <tr><td><strong>Trimestres d'assurance</strong></td><td>Total tous régimes (haut du relevé)</td><td>Évite la décote si ≥ requis</td></tr>
+            <tr><td><strong>Jours résiduels assurance</strong></td><td>Jours au-delà des trimestres complets (0 à 89)</td><td>Précision du calcul SRE</td></tr>
+            <tr><td><strong>Trimestres liquidables</strong></td><td>Services effectifs SRE uniquement</td><td>Montant de la pension (prorata)</td></tr>
+            <tr><td><strong>Jours résiduels liquidables</strong></td><td>Jours au-delà des trimestres complets (0 à 89)</td><td>Précision du calcul SRE</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="alert alert-orange">
+        ⚠️ <strong>90 jours = 1 trimestre</strong> (méthode SRE, base 360 j/an). Les trimestres et jours sont toujours saisis séparément.
+      </div>
+
+      <h3 id="remuneration">Rémunération</h3>
+      <div class="info-card green">
+        <h4>Indice majoré (IM)</h4>
+        <p>Visible sur votre bulletin de paie, ligne "Traitement brut". Valeur du point officielle : <strong>4,92278 €</strong> depuis le 1er juillet 2023.<br>
+        ⚠️ Règle des 6 mois (SRE) : une augmentation d'indice doit avoir au moins 6 mois d'ancienneté avant le départ pour être prise en compte.</p>
+      </div>
+
+      <h3>Trimestres requis</h3>
+      <p>Calculés automatiquement selon votre année de naissance :</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Génération</th><th>Réforme 2023 (V04.2.8)</th><th>Gel 2026 (V06)</th></tr></thead>
+          <tbody>
+            <tr><td>1958–1960</td><td>168</td><td>168</td></tr>
+            <tr><td>1961–1962</td><td>168–169</td><td>168–169</td></tr>
+            <tr><td>1963</td><td>170</td><td>170</td></tr>
+            <tr><td><strong>1964</strong></td><td><strong>171</strong></td><td><strong>170</strong></td></tr>
+            <tr><td><strong>1965</strong></td><td><strong>172</strong></td><td><strong>170–171</strong></td></tr>
+            <tr><td>1966–1967</td><td>171–172</td><td>171</td></tr>
+            <tr><td>1968+</td><td>172</td><td>172</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 id="planning">Planning de retraite progressive</h3>
+      <div class="info-card gold">
+        <h4>Conditions minimales</h4>
+        <p>60 ans minimum + 150 trimestres d'assurance au départ progressif. Quotité autorisée : 50%, 60%, 70%, 80% ou 90%.</p>
+      </div>
+      <h4 style="font-size:.85rem;color:var(--navy);margin:12px 0 6px;">Décret n°82-624 (coché par défaut)</h4>
+      <p>Pour certains fonctionnaires en temps partiel de droit commun :</p>
+      <ul>
+        <li>80% → rémunération réelle à <strong>6/7ème</strong> (≈ 85,71%)</li>
+        <li>90% → rémunération réelle à <strong>32/35ème</strong> (≈ 91,43%)</li>
+      </ul>
+      <p>Vérifiez sur votre bulletin de paie si ce décret s'applique à votre situation.</p>
+
+      <h4 style="font-size:.85rem;color:var(--navy);margin:12px 0 6px;">Quotité entre relevé et départ progressif</h4>
+      <p>Si vous étiez déjà à temps partiel avant la retraite progressive, indiquez votre quotité réelle. Cette valeur impacte l'accumulation de trimestres liquidables sur cette période.</p>
+
+      <h3 id="options">Options</h3>
+      <div class="info-card purple">
+        <h4>Surcotisation (Art. L11 bis CPCMR)</h4>
+        <p>Permet de cotiser comme si vous travailliez à temps plein pendant la période progressive — les trimestres liquidables comptent alors à 100%.<br>
+        <strong>Limite :</strong> 4 trimestres supplémentaires maximum sur l'ensemble de la carrière.<br>
+        Le taux est calculé automatiquement selon votre quotité (barème 2024).</p>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Quotité</th><th>Taux de surcotisation</th><th>Durée max utile</th></tr></thead>
+          <tbody>
+            <tr><td>50 %</td><td>23,85 %</td><td>~2 ans</td></tr>
+            <tr><td>60 %</td><td>21,30 %</td><td>~2,5 ans</td></tr>
+            <tr><td>70 %</td><td>18,75 %</td><td>~3,3 ans</td></tr>
+            <tr><td><strong>80 %</strong></td><td><strong>16,20 %</strong></td><td><strong>~5 ans</strong></td></tr>
+            <tr><td>90 %</td><td>13,65 %</td><td>~10 ans</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4 style="font-size:.85rem;color:var(--navy);margin:16px 0 6px;">Droits liés aux enfants</h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Type</th><th>Condition</th><th>Gain</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Bonification (avant 2004)</strong></td><td>Interruption ≥ 2 mois + enfant élevé ≥ 9 ans</td><td>+4 trim. liquidables et assurance par enfant</td></tr>
+            <tr><td><strong>Majoration (à partir de 2004)</strong></td><td>Naissance après recrutement dans la FP</td><td>+2 trim. d'assurance par enfant</td></tr>
+            <tr><td><strong>Majoration familiale (Art. L18)</strong></td><td>3 enfants élevés minimum</td><td>+10% puis +5% par enfant supplémentaire</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- RÉSULTATS -->
+    <section id="resultats">
+      <p class="section-eyebrow">Lecture des résultats</p>
+      <h2>Comprendre les résultats</h2>
+
+      <h3 id="pension-prov">Revenus pendant la retraite progressive</h3>
+      <div class="info-card green">
+        <h4>Total brut mensuel pendant la RP</h4>
+        <p>La somme de deux éléments versés simultanément :<br>
+        • <strong>Traitement à la quotité</strong> — votre salaire proportionnel à votre temps de travail, versé par votre employeur<br>
+        • <strong>Pension provisoire SRE</strong> — versée par le Service des Retraites de l'État, calculée sur la part non travaillée</p>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Élément</th><th>Explication</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Calculée au départ</strong></td><td>Sur les droits acquis AVANT le départ progressif uniquement</td></tr>
+            <tr><td><strong>Évolution</strong></td><td>Si vous changez de quotité, la part versée s'ajuste automatiquement</td></tr>
+            <tr><td><strong>Pendant la RP</strong></td><td>Les nouveaux trimestres acquis ne modifient PAS le montant provisoire</td></tr>
+            <tr><td><strong>Retraite définitive</strong></td><td>Tous les droits acquis pendant la RP sont pris en compte au recalcul final</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 id="pension-def">Pension de retraite mensuelle (retraite définitive)</h3>
+      <div class="info-card blue">
+        <h4>Votre revenu à la retraite complète</h4>
+        <p>La pension <strong>remplace votre salaire</strong> à partir du départ définitif. Elle est versée à vie par le SRE et revalorisée chaque année.<br>
+        Ce montant est <strong>brut</strong> — déduire la CSG/CRDS après abattement pour obtenir le net.<br>
+        Le <strong>taux de remplacement</strong> indique le rapport pension / traitement brut.</p>
+      </div>
+      <div class="alert alert-green">
+        ✓ <strong>Plafond légal Art. L13 :</strong> La pension ne peut pas dépasser 100% du traitement indiciaire. La majoration familiale (Art. L18) peut toutefois dépasser ce plafond.
+      </div>
+
+      <h3 id="surcotisation">Analyse de rentabilité de la surcotisation</h3>
+      <p>Quand la surcotisation est activée, le simulateur compare automatiquement le supplément de pension obtenu avec 3 scénarios de placement :</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Placement</th><th>Taux</th><th>Profil</th></tr></thead>
+          <tbody>
+            <tr><td>Livret A</td><td>1,7 %</td><td>Garanti, disponible, variable</td></tr>
+            <tr><td>Assurance-vie fonds euros</td><td>3,5 %</td><td>Garanti, peu risqué</td></tr>
+            <tr><td>PEA ETF MSCI World</td><td>5 %</td><td>Non garanti, long terme</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="alert alert-orange">
+        💡 La surcotisation génère un supplément de pension à vie mais le capital investi est définitivement perdu. Le placement génère un revenu mensuel sur intérêts avec le capital conservé et transmissible. La décision dépend de votre situation patrimoniale et familiale.
+      </div>
+    </section>
+
+    <!-- MODE EXPERT -->
+    <section id="expert">
+      <p class="section-eyebrow">Fonctionnalités avancées</p>
+      <h2>Mode Expert — onglets supplémentaires</h2>
+      <span class="badge badge-expert">Mode Expert uniquement</span>
+
+      <h3>Onglet Retraite Définitive</h3>
+      <p>Simule une retraite définitive sans période progressive. Cliquez sur <strong>↻ Récupérer les données</strong> pour importer vos paramètres, puis choisissez la date de départ et la quotité envisagée.</p>
+
+      <h3>Onglet Graphique</h3>
+      <p>Affiche la courbe des revenus totaux bruts selon la quotité de travail pendant la retraite progressive. Le point rouge indique votre quotité choisie.</p>
+
+      <h3>Onglet Analyse Rachat</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Type de rachat</th><th>Base légale</th></tr></thead>
+          <tbody>
+            <tr><td>Années d'études supérieures</td><td>Art. L9 bis CPCMR</td></tr>
+            <tr><td>Années civiles incomplètes</td><td>Art. L9 bis CPCMR</td></tr>
+            <tr><td><strong>Surcotisation rétroactive</strong></td><td>Art. L11 bis + Décret 2004-678 — récupère des trimestres perdus pendant des périodes à temps partiel depuis le 01/01/2004</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="alert alert-orange">
+        ⚠️ Les coefficients de rachat sont indicatifs (base 2024, catégorie sédentaire). Demandez toujours un devis officiel au SRE via <a href="https://ensap.gouv.fr" target="_blank" style="color:#92400e;font-weight:600;">ensap.gouv.fr</a>.
+      </div>
+
+      <h3>Export / Import de session</h3>
+      <p>Le Mode Expert permet de sauvegarder tous vos paramètres en fichier JSON et de les recharger lors d'une session ultérieure.</p>
+    </section>
+
+    <!-- PDF -->
+    <section id="pdf">
+      <p class="section-eyebrow">Documents</p>
+      <h2>Export PDF</h2>
+      <p>Disponible depuis chaque onglet de résultats via le bouton <strong>Télécharger les résultats en PDF</strong>.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Onglet</th><th>Mode Guidé</th><th>Mode Expert</th></tr></thead>
+          <tbody>
+            <tr><td>Résultats RP</td><td>✓</td><td>✓</td></tr>
+            <tr><td>Retraite définitive</td><td>—</td><td>✓</td></tr>
+            <tr><td>Analyse rachat</td><td>—</td><td>✓</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Le PDF inclut : paramètres de simulation, revenus pendant la RP, trimestres acquis, pension définitive, tableau comparatif par quotité et avertissement non-officiel.</p>
+    </section>
+
+    <!-- CONFIDENTIALITÉ -->
+    <section id="confidentialite">
+      <p class="section-eyebrow">Vie privée</p>
+      <h2>Confidentialité</h2>
+      <div class="info-card green">
+        <h4>100% local — aucune donnée transmise</h4>
+        <p>Toutes les données restent exclusivement dans votre navigateur. Aucune information n'est envoyée à un serveur. Le simulateur fonctionne entièrement hors ligne une fois la page chargée.</p>
+      </div>
+      <p>Ce simulateur est développé bénévolement par <strong>J34NMY</strong> et publié en open source sur <a href="https://github.com/J34NMY/simulateur-retraite-progressive" target="_blank" style="color:var(--navy);font-weight:500;">GitHub</a>. Licence CC BY-NC-SA 4.0.</p>
+    </section>
+
+  </div><!-- /content -->
+</div><!-- /main-layout -->
+
+<footer>
+  <p>
+    <strong>Simulateur de Retraite Progressive</strong> — Suspension réforme 2023 (LFSS 2026, art. 105)<br>
+    Développé bénévolement par <a href="https://github.com/J34NMY" target="_blank">J34NMY</a> ·
+    <a href="index.html">Accueil</a> ·
+    <a href="https://www.info-retraite.fr" target="_blank">info-retraite.fr</a> ·
+    <a href="https://ensap.gouv.fr" target="_blank">ensap.gouv.fr</a>
+  </p>
+  <div class="disclaimer">
+    Outil éducatif non officiel. Ce simulateur ne remplace en aucun cas les outils officiels de l'État.
+    Pour votre estimation officielle, consultez le simulateur M@rel sur info-retraite.fr.
+    L'éditeur décline toute responsabilité en cas de décision prise sur la base de ces estimations.
+  </div>
+</footer>
+
+</body>
+</html>
