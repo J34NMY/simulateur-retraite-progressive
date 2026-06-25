@@ -1541,6 +1541,35 @@ if (nbEnfantsTotal !== sommeEnfants) {
 // Applique la méthode SRE (base 360 jours/an)
 // Gère décote, surcotes (3 types), bonifications
 // ============================================
+
+  // ============================================
+  // FONCTIONS VISUEL RÉSULTATS + PDF
+  // ============================================
+  function extraireLignesTableau(table) {
+    const lignes = [];
+    table.querySelectorAll('tr').forEach(tr => {
+      const cellules = [];
+      tr.querySelectorAll('th,td').forEach(td => cellules.push(td.textContent.trim().replace(/\s+/g,' ')));
+      if (cellules.length > 0) lignes.push(cellules);
+    });
+    return lignes;
+  }
+
+  function dessinerTableauPDF(doc, lignes, lm, rm, yPos) {
+    if (!lignes || lignes.length === 0) return yPos;
+    const larg=rm-lm, nb=lignes[0].length, lc=larg/nb;
+    lignes.forEach((ligne,idx) => {
+      if (yPos > 265) { doc.addPage(); yPos = 20; }
+      if (idx===0) { doc.setFillColor(226,232,240); doc.rect(lm,yPos-4,larg,7,'F'); doc.setFont(undefined,'bold'); }
+      else doc.setFont(undefined,'normal');
+      doc.setFontSize(8);
+      ligne.forEach((cell,ci) => { const x=lm+ci*lc; doc.text((doc.splitTextToSize(cell,lc-2)[0]||''),x+1,yPos); });
+      doc.setDrawColor(200,200,200); doc.line(lm,yPos+2,rm,yPos+2);
+      yPos += 7;
+    });
+    return yPos;
+  }
+
 function calculer() {
   // VALIDATION DES DONNÉES
   const erreurs = validerParametres();
@@ -1857,113 +1886,109 @@ if (erreurs.length > 0) {
     blocMajorationFamiliale = '<div class="info" style="margin-top:15px;background:#f3e8ff;border-left-color:#9333ea;"><strong>Majoration familiale : +' + majorationFamiliale + '%</strong><br>Gain : ' + formatEuro(gainMensuel) + '</div>';
   }
 
-  // CONSTRUCTION DU HTML DES RÉSULTATS
-  let resultHTML = '<div class="result-section">';
-  resultHTML += '<h3>Durées et trimestres (méthode SRE - base 360 jours/an)</h3>';
-  resultHTML += '<p><strong>Entre relevé et départ progressif:</strong> ' + P1.annees + ' an(s), ' + P1.mois + ' mois, ' + P1.jours + ' jours</p>';
-  resultHTML += '<p><strong>Entre départ progressif et départ définitif:</strong> ' + P2.annees + ' an(s), ' + P2.mois + ' mois, ' + P2.jours + ' jours</p>';
-  resultHTML += '</div>';
-  
-  resultHTML += '<div class="result-section">';
-  resultHTML += '<h3>Compteurs au départ progressif</h3>';
-  resultHTML += '<p><strong>Assurance au relevé:</strong> ' + (joursAssuranceReleveBrut / 90).toFixed(2) + ' trimestres</p>';
-  resultHTML += '<p><strong>Liquidables au relevé:</strong> ' + (joursLiquidablesReleveBrut / 90).toFixed(2) + ' trimestres</p>';
-  
-  if (I.conditionsEnfantsAvant2004 && I.nbEnfantsAvant2004 > 0) {
-    resultHTML += '<p><strong>Bonification pour enfants (avant 2004):</strong> ' + bonifEnfantsTr.toFixed(2) + ' trimestres</p>';
-  }
-  
-  if (I.conditionsEnfantsApres2003 && I.nbEnfantsApres2003 > 0) {
-    resultHTML += '<p><strong>Majoration de durée d\'assurance (après 2003):</strong> ' + majorationsApres2003Tr.toFixed(2) + ' trimestres</p>';
-  }
-  
-  resultHTML += '<p><strong>Assurance au départ :</strong> ' + assuranceDepart + ' trimestres / ' + TR + '</p>';
-  resultHTML += '<p><strong>Liquidables au départ :</strong> ' + liquidablesDepart + ' / ' + TR + '</p>';
-  resultHTML += '</div>';
-
-  resultHTML += blocSurcotisation;
-
-  // REVENUS PENDANT LA PROGRESSIVE
-  resultHTML += '<div class="result-section">';
-  resultHTML += '<h3>Revenus pendant la retraite progressive</h3>';
-  
+  // NOUVEAU VISUEL RÉSULTATS
+  // Calcul des variables pour le visuel
   const traitementPleinDepart = I.indice * I.valeurPoint;
-  
-  // CALCUL MÉTHODE SRE : D'abord ratio liquidables, puis décote
   let tauxReferenceDepart = 0.75 * (liquidablesDepart / TR);
-  
-  // Application de la décote si assurance insuffisante au départ progressif
   if (assuranceDepart < TR) {
-    const trimestresManquantsDepart = TR - assuranceDepart;
-    const coefficientDecoteDepart = (trimestresManquantsDepart * 1.25) / 100;
-    tauxReferenceDepart = tauxReferenceDepart * (1 - coefficientDecoteDepart);
+    tauxReferenceDepart = tauxReferenceDepart * (1 - (TR - assuranceDepart) * 1.25 / 100);
   }
-  
   const montantReferenceDepart = traitementPleinDepart * tauxReferenceDepart;
   const traitementTPDepart = calcTraitementTP(traitementPleinDepart, I.quotite, I.appliquerDecret1982);
   const pensionProvisoireDepart = montantReferenceDepart * (1 - I.quotite);
-  
   let coutSurcotisationMensuel = 0;
   if (I.surcotisation) {
-    const tauxRetenueSurcotisation = I.tauxSurcotisation * 100;
-    const tauxRetenueNormal = 11.10;
-    coutSurcotisationMensuel = (tauxRetenueSurcotisation / 100 * traitementPleinDepart) - (tauxRetenueNormal / 100 * I.quotite * traitementPleinDepart);
+    coutSurcotisationMensuel = (I.tauxSurcotisation * 100 / 100 * traitementPleinDepart) - (11.10 / 100 * I.quotite * traitementPleinDepart);
   }
-  
   const totalBrutMensuel = traitementTPDepart + pensionProvisoireDepart;
-  const totalNetMensuelAvecSurcotisation = totalBrutMensuel - coutSurcotisationMensuel;
-  
-  resultHTML += '<p><strong>Traitement plein temps :</strong> ' + formatEuro(traitementPleinDepart) + '</p>';
-  resultHTML += '<p><strong>Traitement à la quotité:</strong> ' + formatEuro(traitementTPDepart) + '</p>';
-  
-  if (I.appliquerDecret1982 && (Math.abs(I.quotite - 0.80) < 1e-9 || Math.abs(I.quotite - 0.90) < 1e-9)) {
-    const quotitePourcent = (I.quotite * 100).toFixed(0);
-    const fractionAppliquee = Math.abs(I.quotite - 0.80) < 1e-9 ? '6/7ème' : '32/35ème';
-    const pourcentageReel = (traitementTPDepart / traitementPleinDepart * 100).toFixed(2);
-    resultHTML += '<p style="font-size:0.9rem;color:#ea580c;"><em>Décret n°82-624 appliqué : ' + quotitePourcent + '% -> ' + fractionAppliquee + ' (~' + pourcentageReel + '%)</em></p>';
+
+  const dateDebutFmt = I.dateDebut instanceof Date && !isNaN(I.dateDebut)
+    ? I.dateDebut.toLocaleDateString('fr-FR',{month:'short',year:'numeric'}) : '';
+  const dateFinFmt = I.dateFin instanceof Date && !isNaN(I.dateFin)
+    ? I.dateFin.toLocaleDateString('fr-FR',{month:'short',year:'numeric'}) : '';
+  const tauxRempl = traitementFin > 0 ? (pensionDefinitive/traitementFin*100).toFixed(1)+' %' : '—';
+  const progAss = Math.min(100, assuranceFinale/TR*100).toFixed(1);
+  const progLiq = Math.min(100, liquidablesFinale/TR*100).toFixed(1);
+  const tauxPlein = assuranceFinale >= TR;
+  const couleurAss = tauxPlein ? '#15803d' : '#1e40af';
+
+  let libelleQ = (I.quotite*100).toFixed(0)+' %';
+  if (I.appliquerDecret1982) {
+    if (Math.abs(I.quotite-0.80)<1e-9) libelleQ += ' (6/7e)';
+    if (Math.abs(I.quotite-0.90)<1e-9) libelleQ += ' (32/35e)';
   }
-  
-  resultHTML += '<p><strong>Pension provisoire:</strong> ' + formatEuro(pensionProvisoireDepart) + '</p>';
-  resultHTML += '<p style="font-size:0.85rem;color:#6b7280;"><em>Si vous changez de quotité, la pension provisoire s\'ajustera automatiquement</em></p>';
-  resultHTML += '<p><strong>Total brut mensuel:</strong> ' + formatEuro(totalBrutMensuel) + '</p>';
-  
+
+  let htmlSurcotCard = '';
   if (I.surcotisation) {
-    resultHTML += '<p style="color:#d97706;"><strong>- Coût surcotisation mensuel:</strong> -' + formatEuro(coutSurcotisationMensuel) + '</p>';
-    resultHTML += '<p style="color:#10b981;font-weight:bold;"><strong>= Revenu net après surcotisation:</strong> ' + formatEuro(totalNetMensuelAvecSurcotisation) + '</p>';
+    htmlSurcotCard = '<div style="background:#fff7ed;border:0.5px solid #fed7aa;border-radius:8px;padding:12px 14px;"><p style="font-size:12px;color:#92400e;margin:0 0 4px;">Cout surcotisation</p><p style="font-size:20px;font-weight:500;color:#d97706;margin:0;">- '+formatEuro(coutSurcotisationMensuel)+'</p></div>';
   }
-  resultHTML += '</div>';
 
-  resultHTML += '<div class="result-section">';
-  resultHTML += '<h3>Situation en fin de période</h3>';
-  resultHTML += '<p><strong>Assurance finale :</strong> ' + assuranceFinale + ' trimestres / ' + TR + '</p>';
-  resultHTML += '<p><strong>Liquidables finaux :</strong> ' + liquidablesFinale + ' / ' + TR + '</p>';
-  resultHTML += '<p><strong>Taux de liquidation estimé :</strong> ' + (tauxFinal*100).toFixed(2) + ' %</p>';
-  resultHTML += '<p><strong>Traitement plein temps estimé :</strong> ' + formatEuro(traitementFin) + '</p>';
-  resultHTML += '</div>';
+  let htmlDecoteV = '';
+  if (assuranceFinale < TR) {
+    const tm = TR - assuranceFinale;
+    htmlDecoteV = '<div style="background:#fff7ed;border-left:3px solid #f59e0b;padding:10px 12px;margin-bottom:16px;font-size:13px;"><strong>Decote :</strong> '+tm+' trimestre(s) — coefficient '+(tm*1.25).toFixed(2)+' %</div>';
+  }
 
-  resultHTML += '<div class="highlight-result">';
-  resultHTML += '<h3>Pension définitive estimée</h3>';
-  resultHTML += '<p style="font-size:1.3em;font-weight:bold;color:var(--pri);">' + formatEuro(pensionDefinitive) + '</p>';
+  let htmlSurcotesV = '';
+  if (surcoteAppliquee && tauxSurcoteFinale > 0) {
+    htmlSurcotesV = '<div style="background:#f0fdf4;border-left:3px solid #15803d;padding:10px 12px;margin-bottom:16px;font-size:13px;"><strong style="color:#14532d;">Majorations SRE appliquees</strong><br>'
+      + (tauxSurcoteParentale>0 ? '+ Surcote parentale : <strong>+'+tauxSurcoteParentale.toFixed(2)+' %</strong><br>' : '')
+      + (tauxSurcoteClassique>0 ? '+ Surcote classique : <strong>+'+tauxSurcoteClassique.toFixed(2)+' % ('+trimestresSurcotes+' trim. x 1,25 %)</strong><br>' : '')
+      + (tauxMajorationExcedentaire>0 ? '+ Majoration excedentaire : <strong>+'+tauxMajorationExcedentaire.toFixed(2)+' %</strong><br>' : '')
+      + '<strong>Total : +'+tauxSurcoteFinale.toFixed(2)+' %</strong></div>';
+  }
+
+  let htmlMajFamV = '';
   if (majorationFamiliale > 0) {
-    resultHTML += '<p><strong>Avec majoration familiale (+' + majorationFamiliale + '%) :</strong><br><span style="font-size:1.2em;font-weight:bold;">' + formatEuro(pensionAvecMajorationFamiliale) + '</span></p>';
+    htmlMajFamV = '<div style="background:#f5f3ff;border-left:3px solid #9333ea;padding:10px 12px;margin-bottom:12px;font-size:13px;"><strong style="color:#7c3aed;">Majoration familiale +'+majorationFamiliale+' %</strong><br>Pension avec majoration : <strong>'+formatEuro(pensionAvecMajorationFamiliale)+'</strong></div>';
   }
-  resultHTML += '</div>';
 
-  resultHTML += blocDecote + blocSurcote + blocMajorationFamiliale;
-
-  resultHTML += '<div class="warn" style="margin-top:20px;">';
-  resultHTML += '<h4 style="margin-top:0;">Avertissement important</h4>';
-  resultHTML += '<p>Résultats validés par comparaison avec le simulateur M@rel (info-retraite.fr).</p>';
-  resultHTML += '<p><strong>Pour votre estimation officielle :</strong> <a href="https://www.info-retraite.fr" target="_blank" style="color:#8a5a00;font-weight:bold;">info-retraite.fr</a></p>';
-  resultHTML += '</div>';
-
-  resultHTML += '<p class="muted" style="margin-top:20px;">Calculs basés sur la méthode officielle SRE (base 360j/an). Version V.04.2.8.</p>';
+  const resultHTML =
+    '<p style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:#6b7280;margin:0 0 10px;">Periode de retraite progressive · '+libelleQ+' · '+dateDebutFmt+' -> '+dateFinFmt+'</p>'
+    +'<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:10px;">'
+    +'<div style="font-size:11px;color:#6b7280;background:#f8fafc;border-radius:7px;padding:8px 12px;"><span style="display:block;margin-bottom:1px;">Releve -> Depart progressif</span><strong style="color:#0f172a;">'+P1.annees+' an(s), '+P1.mois+' mois, '+P1.jours+' j</strong></div>'
+    +'<div style="font-size:11px;color:#6b7280;background:#f8fafc;border-radius:7px;padding:8px 12px;"><span style="display:block;margin-bottom:1px;">Periode progressive</span><strong style="color:#0f172a;">'+P2.annees+' an(s), '+P2.mois+' mois, '+P2.jours+' j</strong></div>'
+    +'</div>'
+    +'<p style="font-size:13px;font-weight:500;color:#0f172a;margin:16px 0 8px;">Revenus pendant la retraite progressive</p>'
+    +'<div style="display:grid;grid-template-columns:repeat('+(I.surcotisation?'3':'2')+',minmax(0,1fr));gap:8px;margin-bottom:12px;">'
+    +'<div style="background:#f8fafc;border-radius:8px;padding:12px 14px;"><p style="font-size:12px;color:#6b7280;margin:0 0 4px;">Traitement a la quotite</p><p style="font-size:20px;font-weight:500;color:#0f172a;margin:0;">'+formatEuro(traitementTPDepart)+'</p><p style="font-size:11px;color:#94a3b8;margin:3px 0 0;">Part travaillee · salaire brut</p></div>'
+    +'<div style="background:#eff6ff;border:0.5px solid #bfdbfe;border-radius:8px;padding:12px 14px;"><p style="font-size:12px;color:#1e40af;margin:0 0 4px;">Pension provisoire SRE</p><p style="font-size:20px;font-weight:500;color:#1e40af;margin:0;">'+formatEuro(pensionProvisoireDepart)+'</p><p style="font-size:11px;color:#3b82f6;margin:3px 0 0;">Part non travaillee ('+(100-I.quotite*100).toFixed(0)+' %)</p></div>'
+    +htmlSurcotCard
+    +'</div>'
+    +'<div style="background:#f0fdf4;border:2px solid #86efac;border-radius:10px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">'
+    +'<div><p style="font-size:12px;color:#15803d;margin:0 0 2px;font-weight:500;">Total brut mensuel pendant la RP</p><p style="font-size:11px;color:#166534;margin:0;">Traitement + pension provisoire'+(I.surcotisation?' - surcotisation':'')+' · avant impot</p></div>'
+    +'<span style="font-size:28px;font-weight:500;color:#15803d;">'+formatEuro(I.surcotisation?totalBrutMensuel-coutSurcotisationMensuel:totalBrutMensuel)+'</span>'
+    +'</div>'
+    +blocSurcotisation
+    +'<p style="font-size:13px;font-weight:500;color:#0f172a;margin:0 0 8px;">Trimestres acquis en fin de periode</p>'
+    +'<div style="background:#f8fafc;border-radius:8px;padding:12px 14px;margin-bottom:8px;">'
+    +'<div style="display:flex;justify-content:space-between;align-items:baseline;font-size:13px;margin-bottom:4px;"><span style="color:#6b7280;">Assurance</span><span style="font-weight:500;">'+assuranceFinale+' / '+TR+' '+(tauxPlein?'<span style="color:#15803d;font-size:11px;">OK taux plein</span>':'<span style="color:#f59e0b;font-size:11px;">-'+(TR-assuranceFinale)+' trim.</span>')+'</span></div>'
+    +'<div style="background:#e2e8f0;border-radius:4px;height:5px;margin-bottom:10px;overflow:hidden;"><div style="background:'+couleurAss+';height:5px;width:'+progAss+'%;border-radius:4px;"></div></div>'
+    +'<div style="display:flex;justify-content:space-between;align-items:baseline;font-size:13px;margin-bottom:4px;"><span style="color:#6b7280;">Liquidables</span><span style="font-weight:500;">'+liquidablesFinale+' / '+TR+'</span></div>'
+    +'<div style="background:#e2e8f0;border-radius:4px;height:5px;overflow:hidden;"><div style="background:#1e40af;height:5px;width:'+progLiq+'%;border-radius:4px;"></div></div>'
+    +'</div>'
+    +'<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:20px;">'
+    +'<div style="background:#f8fafc;border-radius:8px;padding:10px 12px;font-size:12px;"><span style="color:#6b7280;display:block;margin-bottom:2px;">Taux de liquidation</span><strong style="font-size:16px;color:#0f172a;">'+(tauxFinal*100).toFixed(2)+' %</strong></div>'
+    +'<div style="background:#f8fafc;border-radius:8px;padding:10px 12px;font-size:12px;"><span style="color:#6b7280;display:block;margin-bottom:2px;">Traitement plein temps ref.</span><strong style="font-size:16px;color:#0f172a;">'+formatEuro(traitementFin)+'</strong></div>'
+    +'</div>'
+    +htmlDecoteV+htmlSurcotesV
+    +'<hr style="border:none;border-top:0.5px solid #e2e8f0;margin:4px 0 20px;">'
+    +'<p style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:#6b7280;margin:0 0 10px;">A partir de votre retraite definitive · '+dateFinFmt+'</p>'
+    +'<div style="background:#1e40af;border-radius:10px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">'
+    +'<div><p style="font-size:12px;color:#bfdbfe;margin:0 0 2px;font-weight:500;">Pension de retraite mensuelle</p><p style="font-size:11px;color:#93c5fd;margin:0;">Votre revenu a la retraite complete · brut avant impot</p></div>'
+    +'<span style="font-size:28px;font-weight:500;color:#ffffff;">'+formatEuro(pensionDefinitive)+'</span>'
+    +'</div>'
+    +'<div style="border-left:3px solid #1e40af;padding:9px 12px;margin-bottom:16px;font-size:12px;color:#6b7280;">La pension remplace votre salaire a partir du depart definitif. Elle est versee a vie par le SRE et revalorisee chaque annee. Ce montant est brut — deduire la CSG/CRDS.</div>'
+    +htmlMajFamV
+    +'<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:20px;">'
+    +'<div style="background:#f8fafc;border-radius:8px;padding:12px 14px;"><p style="font-size:12px;color:#6b7280;margin:0 0 4px;">Traitement de reference</p><p style="font-size:18px;font-weight:500;color:#0f172a;margin:0;">'+formatEuro(traitementFin)+'</p></div>'
+    +'<div style="background:#f8fafc;border-radius:8px;padding:12px 14px;"><p style="font-size:12px;color:#6b7280;margin:0 0 4px;">Taux de remplacement</p><p style="font-size:18px;font-weight:500;color:#0f172a;margin:0;">'+tauxRempl+'</p></div>'
+    +'</div>'
+    +'<div style="background:#fff7ed;border-left:3px solid #f59e0b;padding:10px 12px;margin-bottom:12px;font-size:12px;color:#92400e;">Simulateur educatif NON OFFICIEL. Pour votre estimation officielle : <a href="https://www.info-retraite.fr" target="_blank" style="color:#92400e;font-weight:500;">info-retraite.fr</a></div>'
+    +'<p style="font-size:11px;color:#94a3b8;margin:0;">V.04.2.8 – Reforme 2023</p>';
 
   document.getElementById('resultat').innerHTML = resultHTML;
-  
-  // Bouton export PDF
-  const btnExportPDF = '<div style="text-align:center;margin-top:20px;"><button onclick="exporterResultatsPDF()" class="primary">Télécharger les résultats en PDF</button></div>';
-  document.getElementById('resultat').innerHTML += btnExportPDF;
+  document.getElementById('resultat').innerHTML += '<div style="text-align:center;margin-top:20px;"><button onclick="exporterResultatsPDF()" class="primary">Telecharger les resultats en PDF</button></div>';
   
   switchTab('resultats');
   updateChart(I, liquidablesDepart, TR, assuranceDepart);
@@ -2029,168 +2054,102 @@ if (erreurs.length > 0) {
     }
 
     function exporterResultatsPDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      
-      const inputs = lireInputs();
-      let yPos = 20;
-      const leftMargin = 20;
-      const rightMargin = 190;
-      
-      // En-tête avec encadré
-      doc.setFillColor(34, 197, 94);
-      doc.rect(0, 0, 210, 35, 'F');
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(18);
-      doc.setFont(undefined, 'bold');
-      doc.text('SIMULATEUR DE RETRAITE PROGRESSIVE', 105, 15, { align: 'center' });
-      doc.setFontSize(11);
-      doc.setFont(undefined, 'normal');
-      doc.text('Fonctionnaire d\'État - Version V.04.2.8', 105, 23, { align: 'center' });
-      doc.setFontSize(9);
-      doc.text('Document généré le ' + new Date().toLocaleDateString('fr-FR'), 105, 30, { align: 'center' });
-      
-      yPos = 45;
-      doc.setTextColor(0, 0, 0);
-      
-      // AVERTISSEMENT RENFORCÉ EN PREMIÈRE PAGE
-      doc.setFillColor(255, 244, 230);
-      doc.rect(leftMargin - 5, yPos - 3, 170, 45, 'F');
-      doc.setFontSize(11);
-      doc.setFont(undefined, 'bold');
-      doc.setTextColor(194, 65, 12);
-      doc.text('AVERTISSEMENT - DOCUMENT NON OFFICIEL', 105, yPos, { align: 'center' });
-      yPos += 7;
-      doc.setFontSize(8);
-      doc.setFont(undefined, 'normal');
-      doc.setTextColor(0, 0, 0);
-      const avertissements = [
-        'Ce document est généré par un simulateur éducatif GRATUIT et NON OFFICIEL.',
-        'Résultats validés par comparaison avec le simulateur M@rel (info-retraite.fr).',
-        'avec le calcul officiel du SRE (règles internes non documentées).',
-        '',
-        'CE SIMULATEUR NE REMPLACE EN AUCUN CAS LES OUTILS OFFICIELS DE L\'ÉTAT.',
-        'Pour votre estimation officielle, consultez le simulateur M@rel sur info-retraite.fr.',
-        '',
-        'Pour une estimation officielle : info-retraite.fr (simulateur M@rel)',
-        '',
-        'L\'éditeur décline toute responsabilité en cas de décision prise',
-        'sur la base de ces estimations.'
-      ];
-      avertissements.forEach(line => {
-        doc.text(line, 105, yPos, { align: 'center' });
-        yPos += 4;
-      });
-      yPos += 10;
-      
-      // Section Paramètres
-      doc.setFillColor(249, 250, 251);
-      doc.rect(leftMargin - 5, yPos - 5, 170, 8, 'F');
-      doc.setFontSize(12);
-      doc.setFont(undefined, 'bold');
-      doc.text('PARAMETRES DE SIMULATION', leftMargin, yPos);
-      yPos += 10;
-      
-      doc.setFontSize(9);
-      doc.setFont(undefined, 'normal');
-      doc.text('Date de naissance : ' + new Date(inputs.dateNaissance).toLocaleDateString('fr-FR'), leftMargin, yPos);
-      yPos += 5;
-      doc.text('Indice majoré : ' + inputs.indice, leftMargin, yPos);
-      yPos += 5;
-      doc.text('Traitement actuel : ' + (inputs.indice * inputs.valeurPoint).toFixed(2) + ' EUR', leftMargin, yPos);
-      yPos += 5;
-      doc.text('Date départ progressif : ' + new Date(inputs.dateDebut).toLocaleDateString('fr-FR'), leftMargin, yPos);
-      yPos += 5;
-      doc.text('Date départ définitif : ' + new Date(inputs.dateFin).toLocaleDateString('fr-FR'), leftMargin, yPos);
-      yPos += 5;
-      doc.text('Quotité travail : ' + (inputs.quotite * 100).toFixed(0) + ' %', leftMargin, yPos);
-      yPos += 12;
-      
-      // Section Résultats - extraction des données clés
-      const resultatDiv = document.getElementById('resultat');
-      const resultSections = resultatDiv.querySelectorAll('.result-section, .highlight-result, .info, .warn, .ok');
-      
-      doc.setFillColor(249, 250, 251);
-      doc.rect(leftMargin - 5, yPos - 5, 170, 8, 'F');
-      doc.setFontSize(12);
-      doc.setFont(undefined, 'bold');
-      doc.text('RESULTATS DE LA SIMULATION', leftMargin, yPos);
-      yPos += 10;
-      
-      doc.setFontSize(9);
-      doc.setFont(undefined, 'normal');
-      
-      // Extraction intelligente du contenu
-      resultSections.forEach(section => {
-        const title = section.querySelector('h3');
-        const paragraphs = Array.from(section.querySelectorAll('p, small')).filter(el => !el.closest('table'));
-        
-        if (yPos > 260) {
-          doc.addPage();
-          yPos = 20;
-        }
-        
-        if (title) {
-          doc.setFont(undefined, 'bold');
-          doc.setFontSize(10);
-          doc.text(title.textContent.trim(), leftMargin, yPos);
-          yPos += 6;
-          doc.setFont(undefined, 'normal');
-          doc.setFontSize(9);
-        }
-        
-        paragraphs.forEach(p => {
-          if (yPos > 270) {
-            doc.addPage();
-            yPos = 20;
-          }
-          
-          let text = p.textContent.trim();
-          text = text.replace(/\s+/g, ' ');
-          
-          if (text.length > 0 && !text.includes('Télécharger') && !text.includes('PDF')) {
-            const lines = doc.splitTextToSize(text, rightMargin - leftMargin);
-            lines.forEach(line => {
-              if (yPos > 270) {
-                doc.addPage();
-                yPos = 20;
-              }
-              doc.text(line, leftMargin, yPos);
-              yPos += 4.5;
-            });
-            yPos += 1;
-          }
-        });
+    const{jsPDF}=window.jspdf;
+    const doc=new jsPDF();
+    const I=lireInputs();
+    let y=0;
+    const lm=15,rm=195,pw=rm-lm;
+    const BLEU=[30,64,175],VERT=[21,128,61],GRIS=[249,250,251],GRISD=[100,116,139],NOIR=[15,23,42];
+    function sautPage(){doc.addPage();y=15;}
+    function checkY(h){if(y+h>278)sautPage();}
+    function nettoyer(t){return(t||'').replace(/→/g,'->').replace(/−/g,'-').replace(/—/g,'-').replace(/–/g,'-').replace(/·/g,'.').replace(/•/g,'-').replace(/✓/g,'v').replace(/⚠/g,'!').replace(/️/g,'').replace(/[-]/g,'');}
+    function ligne(c){doc.setDrawColor(...(c||[226,232,240]));doc.setLineWidth(0.3);doc.line(lm,y,rm,y);y+=3;}
+    function titreSec(txt,r,g,b){checkY(12);doc.setFillColor(r,g,b);doc.rect(lm-2,y-4,pw+4,10,'F');doc.setTextColor(255,255,255);doc.setFontSize(9);doc.setFont(undefined,'bold');doc.text(txt,lm,y);doc.setTextColor(...NOIR);y+=9;}
+    function cartesDuo(g1,v1,g2,v2){checkY(18);const w=(pw-4)/2;doc.setFillColor(...GRIS);doc.rect(lm,y,w,16,'F');doc.setFontSize(7.5);doc.setFont(undefined,'normal');doc.setTextColor(...GRISD);doc.text(nettoyer(g1),lm+3,y+5);doc.setFontSize(10);doc.setFont(undefined,'bold');doc.setTextColor(...NOIR);doc.text(nettoyer(v1),lm+3,y+12);const x2=lm+w+4;doc.setFillColor(...GRIS);doc.rect(x2,y,w,16,'F');doc.setFontSize(7.5);doc.setFont(undefined,'normal');doc.setTextColor(...GRISD);doc.text(nettoyer(g2),x2+3,y+5);doc.setFontSize(10);doc.setFont(undefined,'bold');doc.setTextColor(...NOIR);doc.text(nettoyer(v2),x2+3,y+12);y+=20;}
+    function cartesTrio(g1,v1,s1,g2,v2,s2,g3,v3,s3){checkY(22);const w=(pw-6)/3;[[g1,v1,s1,lm],[g2,v2,s2,lm+w+3],[g3,v3,s3,lm+2*(w+3)]].forEach(([g,v,s,x])=>{doc.setFillColor(...GRIS);doc.rect(x,y,w,20,'F');doc.setFontSize(7);doc.setFont(undefined,'normal');doc.setTextColor(...GRISD);doc.text(nettoyer(g),x+2,y+5);doc.setFontSize(9.5);doc.setFont(undefined,'bold');doc.setTextColor(...NOIR);doc.text(nettoyer(v),x+2,y+12);doc.setFontSize(6.5);doc.setFont(undefined,'normal');doc.setTextColor(...GRISD);if(s)doc.text(nettoyer(s),x+2,y+17);});y+=24;}
+    function banniere(label,valeur,sousTitre,r,g,b){checkY(22);doc.setFillColor(r,g,b);doc.rect(lm-2,y-2,pw+4,20,'F');doc.setFontSize(8);doc.setFont(undefined,'normal');doc.setTextColor(200,220,255);doc.text(nettoyer(label),lm,y+4);doc.setFontSize(7);doc.setTextColor(150,190,255);if(sousTitre)doc.text(nettoyer(sousTitre),lm,y+9);doc.setFontSize(14);doc.setFont(undefined,'bold');doc.setTextColor(255,255,255);doc.text(nettoyer(valeur),rm-2,y+13,{align:'right'});doc.setTextColor(...NOIR);y+=23;}
+    function barreProgress(label,valeur,total,ok){checkY(12);const pct=Math.min(100,valeur/total*100);doc.setFontSize(8);doc.setFont(undefined,'normal');doc.setTextColor(...GRISD);doc.text(nettoyer(label),lm,y);doc.setFont(undefined,'bold');doc.setTextColor(...NOIR);doc.text(valeur+' / '+total+(ok?' (taux plein)':''),rm-2,y,{align:'right'});y+=3;doc.setFillColor(226,232,240);doc.rect(lm,y,pw,3,'F');doc.setFillColor(...(ok?VERT:BLEU));doc.rect(lm,y,pw*pct/100,3,'F');y+=6;}
+    function note(txt){checkY(8);doc.setFontSize(7.5);doc.setFont(undefined,'italic');doc.setTextColor(...GRISD);doc.splitTextToSize(nettoyer(txt),pw).forEach(l=>{checkY(5);doc.text(l,lm,y);y+=4;});doc.setFont(undefined,'normal');doc.setTextColor(...NOIR);y+=2;}
 
-        // Extraction des tableaux (ex: comparaison 3 placements) en colonnes alignées
-        section.querySelectorAll('table').forEach(table => {
-          if (yPos > 250) {
-            doc.addPage();
-            yPos = 20;
-          }
-          const lignesTab = extraireLignesTableau(table);
-          yPos = dessinerTableauPDF(doc, lignesTab, leftMargin, rightMargin, yPos);
-          yPos += 2;
-        });
+    doc.setFillColor(...BLEU);doc.rect(0,0,210,30,'F');
+    doc.setTextColor(255,255,255);doc.setFontSize(14);doc.setFont(undefined,'bold');
+    doc.text('SIMULATEUR RETRAITE PROGRESSIVE',105,12,{align:'center'});
+    doc.setFontSize(9);doc.setFont(undefined,'normal');
+    doc.text("Fonctionnaire d'Etat - Reforme 2023 (Decret n 2023-799)",105,20,{align:'center'});
+    doc.setFontSize(7.5);doc.text('Document genere le '+new Date().toLocaleDateString('fr-FR')+'  |  Outil educatif NON OFFICIEL',105,27,{align:'center'});
+    y=38;
 
-        yPos += 3;
-      });
-      
-      // Pied de page
-      const totalPages = doc.internal.getNumberOfPages();
-      for (let i = 1; i <= totalPages; i++) {
-        doc.setPage(i);
-        doc.setFontSize(8);
-        doc.setFont(undefined, 'italic');
-        doc.setTextColor(128, 128, 128);
-        doc.text('Page ' + i + ' / ' + totalPages, 105, 290, { align: 'center' });
-        doc.text('Simulation non contractuelle - Consulter info-retraite.fr', 105, 285, { align: 'center' });
-      }
-      
-      doc.save('simulation_retraite_progressive_' + new Date().toISOString().slice(0,10) + '.pdf');
-    }
+    titreSec('PARAMETRES DE SIMULATION',...BLEU);
+    const dn=I.dateNaissance instanceof Date&&!isNaN(I.dateNaissance)?I.dateNaissance.toLocaleDateString('fr-FR'):'—';
+    const dd=I.dateDebut instanceof Date&&!isNaN(I.dateDebut)?I.dateDebut.toLocaleDateString('fr-FR'):'—';
+    const df=I.dateFin instanceof Date&&!isNaN(I.dateFin)?I.dateFin.toLocaleDateString('fr-FR'):'—';
+    checkY(30);
+    const col1=[['Naissance',dn],['Depart progressif',dd],['Quotite',(I.quotite*100).toFixed(0)+' %']];
+    const col2=[['Indice',''+I.indice],['Depart definitif',df],['Traitement',(I.indice*I.valeurPoint).toFixed(2)+' EUR']];
+    const cw=(pw-6)/2;
+    col1.forEach(([k,v],i)=>{const ry=y+i*9;doc.setFontSize(7.5);doc.setFont(undefined,'normal');doc.setTextColor(...GRISD);doc.text(k,lm,ry);doc.setFont(undefined,'bold');doc.setTextColor(...NOIR);doc.text(v,lm+cw,ry,{align:'right'});doc.setFontSize(7.5);doc.setFont(undefined,'normal');doc.setTextColor(...GRISD);doc.text(col2[i][0],lm+cw+6,ry);doc.setFont(undefined,'bold');doc.setTextColor(...NOIR);doc.text(col2[i][1],rm,ry,{align:'right'});});
+    y+=32;ligne();
 
-    function exporterRetraiteDefinitivePDF() {
+    const divRes=document.getElementById('resultat');
+    const cartesFond=divRes?Array.from(divRes.querySelectorAll('div[style*="background:#f8fafc"][style*="border-radius:7px"]')):[];
+    let dureeP1='—',dureeP2='—';
+    if(cartesFond.length>=2){dureeP1=nettoyer((cartesFond[0].querySelector('strong')||{textContent:''}).textContent);dureeP2=nettoyer((cartesFond[1].querySelector('strong')||{textContent:''}).textContent);}
+    const ddFmt=I.dateDebut instanceof Date&&!isNaN(I.dateDebut)?I.dateDebut.toLocaleDateString('fr-FR',{month:'short',year:'numeric'}):'';
+    const dfFmt=I.dateFin instanceof Date&&!isNaN(I.dateFin)?I.dateFin.toLocaleDateString('fr-FR',{month:'short',year:'numeric'}):'';
+    const libelleQ=(I.quotite*100).toFixed(0)+'%'+(I.appliquerDecret1982&&Math.abs(I.quotite-0.80)<1e-9?' (6/7e)':I.appliquerDecret1982&&Math.abs(I.quotite-0.90)<1e-9?' (32/35e)':'');
+
+    titreSec('PERIODE RP - '+libelleQ+' - '+ddFmt.toUpperCase()+' -> '+dfFmt.toUpperCase(),...VERT);
+    checkY(10);doc.setFontSize(8);doc.setFont(undefined,'normal');doc.setTextColor(...GRISD);
+    doc.text('Releve -> Depart progressif : '+dureeP1,lm,y);y+=5;doc.text('Periode progressive : '+dureeP2,lm,y);y+=8;
+
+    const tpPDF=I.indice*I.valeurPoint;
+    let ttpPDF=tpPDF*I.quotite;
+    if(I.appliquerDecret1982){if(Math.abs(I.quotite-0.80)<1e-9)ttpPDF=tpPDF*(6/7);if(Math.abs(I.quotite-0.90)<1e-9)ttpPDF=tpPDF*(32/35);}
+    let pension='—',surcotCout='—';
+    const cartesR=divRes?Array.from(divRes.querySelectorAll('div[style*="border-radius:8px"]')):[];
+    cartesR.forEach(c=>{const ps=c.querySelectorAll('p');if(ps.length>=2){const lab=(ps[0].textContent||'').toLowerCase();const val=nettoyer((ps[1].textContent||'').trim());if(lab.includes('pension provisoire'))pension=val;else if(lab.includes('cout'))surcotCout=val;}});
+    const banEl=divRes?divRes.querySelector('div[style*="border:2px solid #86efac"]'):null;
+    let totBrut='—';if(banEl){const sp=banEl.querySelector('span');if(sp)totBrut=nettoyer(sp.textContent);}
+
+    checkY(10);doc.setFontSize(9);doc.setFont(undefined,'bold');doc.setTextColor(...NOIR);doc.text('Revenus pendant la retraite progressive',lm,y);y+=7;
+    if(I.surcotisation){cartesTrio('Traitement a la quotite',ttpPDF.toFixed(2)+' EUR','Part travaillee','Pension provisoire SRE',pension,'Part non travaillee','Cout surcotisation',surcotCout,'');}
+    else{cartesDuo('Traitement a la quotite',ttpPDF.toFixed(2)+' EUR','Pension provisoire SRE',pension);}
+    banniere('Total brut mensuel pendant la RP',totBrut,'Traitement + pension provisoire - avant impot',...VERT);y+=2;
+
+    const TR=I.trimestresRequis||171;
+    const flexD=divRes?Array.from(divRes.querySelectorAll('div[style*="display:flex;justify-content:space-between"]')):[];
+    let assVal=0,liqVal=0,tauxLiq='—',trRef='—';
+    flexD.forEach(d=>{const spans=d.querySelectorAll('span');if(spans.length>=2){const lab=(spans[0].textContent||'').toLowerCase();const val=nettoyer((spans[1].textContent||'').trim());if(lab.includes('assurance')){const m=val.match(/^(\d+)/);if(m)assVal=parseInt(m[1]);}if(lab.includes('liquidable')){const m=val.match(/^(\d+)/);if(m)liqVal=parseInt(m[1]);}}});
+    const stCards=divRes?Array.from(divRes.querySelectorAll('div[style*="padding:10px 12px;font-size:12px"]')):[];
+    stCards.forEach(c=>{const lab=(c.querySelector('span')||{textContent:''}).textContent.toLowerCase();const val=nettoyer((c.querySelector('strong')||{textContent:''}).textContent);if(lab.includes('taux'))tauxLiq=val;if(lab.includes('traitement'))trRef=val;});
+
+    ligne([226,232,240]);checkY(10);doc.setFontSize(9);doc.setFont(undefined,'bold');doc.setTextColor(...NOIR);doc.text('Trimestres acquis en fin de periode',lm,y);y+=7;
+    barreProgress('Assurance',assVal,TR,assVal>=TR);barreProgress('Liquidables',liqVal,TR,false);y+=2;
+    cartesDuo('Taux de liquidation',tauxLiq,'Traitement plein temps ref.',trRef);
+
+    const okD=divRes?divRes.querySelector('div[style*="border-left:3px solid #15803d"]'):null;
+    if(okD){checkY(10);doc.setFontSize(8);doc.setFont(undefined,'bold');doc.setTextColor(21,128,61);doc.text('Majorations SRE :',lm,y);y+=5;doc.setFont(undefined,'normal');doc.setTextColor(...NOIR);const pt=nettoyer(okD.textContent.replace(/Majorations SRE appliquees/g,'').replace(/\s+/g,' ').trim());doc.splitTextToSize(pt,pw).forEach(l=>{checkY(5);doc.text(l,lm,y);y+=4.5;});y+=3;}
+
+    const tRefPDF=I.indice*I.valeurPoint;
+    const strEls=divRes?Array.from(divRes.querySelectorAll('strong')):[];
+    let tLiqNum=0;
+    strEls.forEach(s=>{const t=(s.textContent||'').trim();const m=t.match(/^([\d,\.]+)\s*%$/);if(m&&!t.includes('+')){const v=parseFloat(t.replace(',','.'));if(v>50&&v<100)tLiqNum=v;}});
+    const pDefNum=tLiqNum>0?tRefPDF*tLiqNum/100:0;
+    const pDef=pDefNum>0?pDefNum.toFixed(2)+' EUR':'—';
+    const tRempl=pDefNum>0?(pDefNum/tRefPDF*100).toFixed(1)+' %':'—';
+
+    ligne();checkY(10);doc.setFontSize(8);doc.setFont(undefined,'bold');doc.setTextColor(...GRISD);
+    doc.text('A PARTIR DE VOTRE RETRAITE DEFINITIVE - '+dfFmt.toUpperCase(),lm,y);y+=5;
+    banniere('Pension de retraite mensuelle',pDef,'Votre revenu a la retraite complete - brut avant impot',...BLEU);
+    note('La pension remplace votre salaire a partir du depart definitif. Elle est versee a vie par le SRE. Montant brut avant CSG/CRDS.');
+    y+=2;cartesDuo('Traitement de reference',tRefPDF.toFixed(2)+' EUR','Taux de remplacement',tRempl);
+
+    const tot=doc.internal.getNumberOfPages();
+    for(let i=1;i<=tot;i++){doc.setPage(i);doc.setFontSize(7);doc.setFont(undefined,'italic');doc.setTextColor(150,150,150);doc.text('Page '+i+' / '+tot+' - Simulation non contractuelle - info-retraite.fr',105,292,{align:'center'});doc.setDrawColor(200,200,200);doc.setLineWidth(0.2);doc.line(lm,288,rm,288);}
+    doc.save('simulation_retraite_V04_'+new Date().toISOString().slice(0,10)+'.pdf');
+  }
+
+        function exporterRetraiteDefinitivePDF() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
       
