@@ -2273,6 +2273,21 @@ if (erreurs.length > 0) {
       const majF=I.totalEnfantsEleves>=3?10+Math.max(0,I.totalEnfantsEleves-3)*5:0;
       const pensionMaj=pensionDefinitive*(1+majF/100);
 
+      // ── REVENUS PENDANT LA PÉRIODE SI SURCOTISATION ──
+      if(surcotisationDef){
+        const tpRef=I.indice*I.valeurPoint;
+        let tpQuotite=tpRef*quotiteDef;
+        if(I.appliquerDecret1982){if(Math.abs(quotiteDef-0.80)<1e-9)tpQuotite=tpRef*(6/7);if(Math.abs(quotiteDef-0.90)<1e-9)tpQuotite=tpRef*(32/35);}
+        const coutSurcotMensuel=Math.max(0,(I.tauxSurcotisation*tpRef)-(0.1110*quotiteDef*tpRef));
+        titreSec('SURCOTISATION ACTIVEE',...VERT);
+        cartesTrio(
+          'Traitement a la quotite',tpQuotite.toFixed(2)+' EUR','Part travaillee',
+          'Taux de surcotisation',(I.tauxSurcotisation*100).toFixed(2)+' %','Taux brut applique',
+          'Cout mensuel surcotisation',coutSurcotMensuel.toFixed(2)+' EUR','Surcoût vs retenue normale'
+        );
+        note('La surcotisation permet de compter les trimestres liquidables a 100% malgre la quotite reduite (Art. L11 bis CPCMR, max 4 trim.).');
+      }
+
       // ── TRIMESTRES ──
       titreSec('TRIMESTRES AU DEPART DEFINITIF',...VERT);
       barreProgress('Assurance',assuranceFinale,TR,assuranceFinale>=TR);
@@ -2417,14 +2432,41 @@ if (erreurs.length > 0) {
       col1.forEach(([k,v],i)=>{const ry=y+i*9;doc.setFontSize(7.5);doc.setFont(undefined,'normal');doc.setTextColor(...GRISD);doc.text(k,lm,ry);doc.setFont(undefined,'bold');doc.setTextColor(...NOIR);doc.text(v,lm+cw,ry,{align:'right'});doc.setFontSize(7.5);doc.setFont(undefined,'normal');doc.setTextColor(...GRISD);doc.text(col2[i][0],lm+cw+6,ry);doc.setFont(undefined,'bold');doc.setTextColor(...NOIR);doc.text(col2[i][1],rm,ry,{align:'right'});});
       y+=32;ligne();
 
-      // ── RÉSULTATS FINANCIERS ──
+      // ── RÉSULTATS FINANCIERS — lus depuis le DOM résultat ──
       titreSec('RESULTATS FINANCIERS',...OR);
-      cartesDuo('Cout nominal',coutNominalStr,'Cout reel apres deduction fiscale',coutReelStr);
-      if(gainMensuelStr!=='—'){
-        banniere('Supplement de pension mensuel','+'+gainMensuelStr,'Versement a vie par le SRE - brut avant impot',...VERT);
+
+      // Extraire les valeurs depuis les cartes du DOM résultat rachat
+      const cartesRachat=divRachat?Array.from(divRachat.querySelectorAll('div[style*="border-radius"]')):[];
+      let coutNominalCalc='—',coutReelCalc='—',gainMensuelCalc='—',dureeRecupCalc='—',economieImpotCalc='—';
+      cartesRachat.forEach(carte=>{
+        const ps=carte.querySelectorAll('p');
+        if(ps.length>=2){
+          const lab=(ps[0].textContent||'').toLowerCase();
+          const val=nettoyer((ps[1].textContent||'').replace(/\s+/g,' ').trim());
+          if(lab.includes('cout nominal'))coutNominalCalc=val;
+          else if(lab.includes('cout reel')||lab.includes('apres impot'))coutReelCalc=val;
+          else if(lab.includes('supplement mensuel')||lab.includes('gain mensuel'))gainMensuelCalc=val;
+          else if(lab.includes('duree')||lab.includes('recuperer'))dureeRecupCalc=val;
+          else if(lab.includes('economie')||lab.includes('deduction'))economieImpotCalc=val;
+        }
+      });
+      // Fallback sur regex si cartes non trouvées
+      if(coutNominalCalc==='—')coutNominalCalc=coutNominalStr;
+      if(coutReelCalc==='—')coutReelCalc=coutReelStr;
+      if(gainMensuelCalc==='—')gainMensuelCalc=gainMensuelStr;
+      if(dureeRecupCalc==='—')dureeRecupCalc=dureeRentabStr;
+
+      if(gainMensuelCalc!=='—'&&gainMensuelCalc!==''){
+        cartesTrio(
+          'Cout nominal',coutNominalCalc,'Avant deduction fiscale',
+          'Economie fiscale (TMI '+(TMI*100).toFixed(0)+'%)',economieImpotCalc!=='—'?economieImpotCalc:'—','Deduction sur l\'IR',
+          'Cout reel apres impot',coutReelCalc,'Net de fiscalite'
+        );
+        banniere('Supplement de pension mensuel','+'+gainMensuelCalc,'Versement a vie par le SRE - brut avant impot',...VERT);
         y+=2;
-        cartesDuo('Duree pour recuperer le cout',dureeRentabStr,'Esperance de gain',gainMensuelStr+'/mois a vie');
+        cartesDuo('Duree pour recuperer le cout',dureeRecupCalc,'Esperance de gain',gainMensuelCalc+'/mois a vie');
       }else{
+        cartesDuo('Cout nominal',coutNominalCalc,'Cout reel apres deduction fiscale',coutReelCalc);
         checkY(12);doc.setFontSize(8.5);doc.setFont(undefined,'italic');doc.setTextColor(...GRISD);
         doc.text('Option 1 (Taux seul) : evite la decote sans augmenter le montant de la pension.',lm,y);y+=10;
       }
