@@ -2105,16 +2105,31 @@ if (erreurs.length > 0) {
     const tpPDF=I.indice*I.valeurPoint;
     let ttpPDF=tpPDF*I.quotite;
     if(I.appliquerDecret1982){if(Math.abs(I.quotite-0.80)<1e-9)ttpPDF=tpPDF*(6/7);if(Math.abs(I.quotite-0.90)<1e-9)ttpPDF=tpPDF*(32/35);}
-    let pension='—',surcotCout='—';
-    const cartesR=divRes?Array.from(divRes.querySelectorAll('div[style*="border-radius:8px"]')):[];
-    cartesR.forEach(c=>{const ps=c.querySelectorAll('p');if(ps.length>=2){const lab=(ps[0].textContent||'').toLowerCase();const val=nettoyer((ps[1].textContent||'').trim());if(lab.includes('pension provisoire'))pension=val;else if(lab.includes('cout'))surcotCout=val;}});
+    // ── Pension provisoire et surcout — recalcul direct depuis les inputs ──
+    const traitPlein_rp=I.indice*I.valeurPoint;
+    const P1_rp=diffDetaillee(I.dateReleve,I.dateDebut);
+    const P2_rp=diffDetaillee(I.dateDebut,I.dateFin);
+    const jAR_rp=(I.trimAssuranceReleve*90)+I.joursAssuranceReleve;
+    const jLR_rp=(I.trimLiquidablesReleve*90)+I.joursLiquidablesReleve;
+    const bEJ_rp=I.conditionsEnfantsAvant2004?I.nbEnfantsAvant2004*4*90:0;
+    const jLP1_rp=Math.floor(P1_rp.totalJours*(I.quotiteAvant||1));
+    const liqDepart_rp=arrondirTrimestresLiquidables(jLR_rp+jLP1_rp+bEJ_rp);
+    const assDepart_rp=calculerDureeAssurance(jAR_rp+P1_rp.totalJours+bEJ_rp).trimestres;
+    const TR_rp=I.trimestresRequis||171;
+    let tauxRef_rp=0.75*(liqDepart_rp/TR_rp);
+    if(assDepart_rp<TR_rp)tauxRef_rp=tauxRef_rp*(1-(TR_rp-assDepart_rp)*1.25/100);
+    const pensionProv_rp=traitPlein_rp*tauxRef_rp*(1-I.quotite);
+    const pension=pensionProv_rp.toFixed(2)+' EUR';
+    const coutSurcot_rp=I.surcotisation?Math.max(0,(I.tauxSurcotisation*traitPlein_rp)-(0.1110*I.quotite*traitPlein_rp)):0;
+    const surcotCout=I.surcotisation?coutSurcot_rp.toFixed(2)+' EUR':'—';
     const banEl=divRes?divRes.querySelector('div[style*="border:2px solid #86efac"]'):null;
     let totBrut='—';if(banEl){const sp=banEl.querySelector('span');if(sp)totBrut=nettoyer(sp.textContent);}
 
     checkY(10);doc.setFontSize(9);doc.setFont(undefined,'bold');doc.setTextColor(...NOIR);doc.text('Revenus pendant la retraite progressive',lm,y);y+=7;
-    if(I.surcotisation){cartesTrio('Traitement a la quotite',ttpPDF.toFixed(2)+' EUR','Part travaillee','Pension provisoire SRE',pension,'Part non travaillee','Cout surcotisation',surcotCout,'');}
+    if(coutSurcot_rp>0){cartesTrio('Traitement a la quotite',ttpPDF.toFixed(2)+' EUR','Part travaillee','Pension provisoire SRE',pension,'Part non travaillee','Cout surcotisation',coutSurcot_rp.toFixed(2)+' EUR','');}
     else{cartesDuo('Traitement a la quotite',ttpPDF.toFixed(2)+' EUR','Pension provisoire SRE',pension);}
     banniere('Total brut mensuel pendant la RP',totBrut,'Traitement + pension provisoire - avant impot',...VERT);y+=2;
+
 
     const TR=I.trimestresRequis||171;
     const flexD=divRes?Array.from(divRes.querySelectorAll('div[style*="display:flex;justify-content:space-between"]')):[];
@@ -2170,6 +2185,59 @@ if (erreurs.length > 0) {
     const pDefNum=Math.min(pBrute_pdf,tRefPDF);
     const pDef=pDefNum.toFixed(2)+' EUR';
     const tRempl=(pDefNum/tRefPDF*100).toFixed(1)+' %';
+
+    // ── ANALYSE RENTABILITÉ SURCOTISATION — utilise pDefNum déjà calculé ──
+    if(coutSurcot_rp>0){
+      const moisP2_rp2=Math.round(P2_rp.totalJours/30);
+      const coutTotal_rp2=coutSurcot_rp*moisP2_rp2;
+      // pDefNum = pension avec surcotisation (déjà calculé ci-dessus)
+      // Calculer pension sans surcotisation
+      const jLiqP2sans2=Math.floor(P2_rp.totalJours*I.quotite);
+      const liqSans2=arrondirTrimestresLiquidables(jLR_rp+jLP1_rp+bEJ_rp+jLiqP2sans2);
+      const rSans2=clamp(liqSans2/TR,0,1);
+      let tauxSans2=0.75*rSans2;
+      if(assF_pdf<TR){tauxSans2=(0.75*rSans2)*(1-(TR-assF_pdf)*1.25/100);}
+      else if(surcoteOk_pdf&&tSF_pdf>0){tauxSans2=(0.75*rSans2)*(1+tSF_pdf/100);}
+      const pSans2=Math.min(tRefPDF*tauxSans2,tRefPDF);
+      const gainMensuel_rp2=Math.max(0,pDefNum-pSans2);
+      const gainAnnuel_rp2=gainMensuel_rp2*12;
+      const ptMort2=gainAnnuel_rp2>0?coutTotal_rp2/gainAnnuel_rp2:Infinity;
+      const dureeCapit2=Math.max(0,(I.dateFin-new Date())/(1000*60*60*24*365.25));
+
+      titreSec('ANALYSE RENTABILITE SURCOTISATION',...VERT);
+      const ptMortStr2=ptMort2===Infinity?'Jamais recupere':ptMort2.toFixed(1)+' ans';
+      cartesTrio(
+        'Cout total surcotisation',coutTotal_rp2.toFixed(2)+' EUR',moisP2_rp2+' mois x '+coutSurcot_rp.toFixed(2)+' EUR',
+        'Supplement mensuel a vie','+'+gainMensuel_rp2.toFixed(2)+' EUR/mois','Gain de pension definitif',
+        'Duree recuperation',ptMortStr2,'Annees de retraite necessaires'
+      );
+      // Formule correcte : placement du coutTotal pendant toute la durée de la RP
+      const dureeRP_ans2=moisP2_rp2/12;
+      const scenarios2=[
+        {label:'Livret A',detail:'1,7%',taux:0.017},
+        {label:'Assurance-vie',detail:'3,5%',taux:0.035},
+        {label:'PEA ETF MSCI World',detail:'5%',taux:0.050}
+      ].map(s=>{
+        const C=coutTotal_rp2*Math.pow(1+s.taux,dureeRP_ans2);
+        return{...s,capital:C,revenu:(C-coutTotal_rp2)/12};
+      });
+      y+=2;checkY(10);doc.setFontSize(8);doc.setFont(undefined,'bold');doc.setTextColor(...NOIR);
+      doc.text('Comparaison avec des placements alternatifs',lm,y);y+=6;
+      const colWs2=[pw*0.25,pw*0.25,pw*0.28,pw*0.22];
+      doc.setFillColor(...BLEU);doc.rect(lm,y,pw,7,'F');
+      doc.setTextColor(255,255,255);doc.setFontSize(7);doc.setFont(undefined,'bold');
+      let xh3=lm;['Placement','Capital retraite','Revenu mensuel','Capital'].forEach((h,i2)=>{doc.text(h,i2===0?xh3+2:xh3+colWs2[i2]-2,y+5,{align:i2===0?'left':'right'});xh3+=colWs2[i2];});
+      y+=7;doc.setTextColor(...NOIR);
+      scenarios2.forEach((s,ri)=>{
+        checkY(7);doc.setFillColor(ri%2===0?255:249,ri%2===0?255:250,ri%2===0?255:251);doc.rect(lm,y,pw,7,'F');
+        doc.setFontSize(7);doc.setFont(undefined,'normal');
+        let xc3=lm;[s.label+' ('+s.detail+')',s.capital.toFixed(2)+' EUR',s.revenu.toFixed(2)+' EUR/mois','Conserve'].forEach((v,ci)=>{doc.text(nettoyer(v),ci===0?xc3+2:xc3+colWs2[ci]-2,y+5,{align:ci===0?'left':'right'});xc3+=colWs2[ci];});y+=7;
+      });
+      checkY(7);doc.setFillColor(239,246,255);doc.rect(lm,y,pw,7,'F');
+      doc.setFontSize(7);doc.setFont(undefined,'bold');doc.setTextColor(21,128,61);
+      let xcs2=lm;['Surcotisation (Art. L11 bis CPCMR)','—','+'+gainMensuel_rp2.toFixed(2)+' EUR/mois a vie','Non conserve'].forEach((v,ci)=>{doc.text(nettoyer(v),ci===0?xcs2+2:xcs2+colWs2[ci]-2,y+5,{align:ci===0?'left':'right'});xcs2+=colWs2[ci];});
+      y+=9;doc.setTextColor(...NOIR);
+    }
 
     ligne();checkY(10);doc.setFontSize(8);doc.setFont(undefined,'bold');doc.setTextColor(...GRISD);
     doc.text('A PARTIR DE VOTRE RETRAITE DEFINITIVE - '+dfFmt.toUpperCase(),lm,y);y+=5;
@@ -2239,10 +2307,14 @@ if (erreurs.length > 0) {
       const bETr=bEJ/90;const mA3Tr=mA3J/90;
       const trimSurcotDispo=I.trimSurcotDisponibles||0;
 
+      // trimSurcotDispo pour l'onglet Définitif — lire depuis l'input dédié si disponible
+      const trimSurcotDispoDefEl=document.getElementById('def-trimSurcotDejaUtilises');
+      const trimDejaUtilDef=trimSurcotDispoDefEl?parseInt(trimSurcotDispoDefEl.value)||0:I.trimSurcotDejaUtilises||0;
+      const trimSurcotDispoDef=Math.max(0,4-trimDejaUtilDef);
       let jLiqProj;
-      if(surcotisationDef&&trimSurcotDispo>0){
+      if(surcotisationDef&&trimSurcotDispoDef>0){
         const gTPJ=(1-quotiteDef)/90;
-        const jU=gTPJ>0?Math.min(periodeProj.totalJours,Math.floor(trimSurcotDispo/gTPJ)):0;
+        const jU=gTPJ>0?Math.min(periodeProj.totalJours,Math.floor(trimSurcotDispoDef/gTPJ)):0;
         jLiqProj=Math.floor(jU)+Math.floor((periodeProj.totalJours-jU)*quotiteDef);
       }else{
         jLiqProj=Math.floor(periodeProj.totalJours*quotiteDef);
@@ -2274,11 +2346,18 @@ if (erreurs.length > 0) {
       const pensionMaj=pensionDefinitive*(1+majF/100);
 
       // ── REVENUS PENDANT LA PÉRIODE SI SURCOTISATION ──
+      // Taux surcotisation pour l'onglet Définitif (barème selon quotiteDef)
+      const baremeSurcDef={
+        '0.50':0.2385,'0.60':0.2130,'0.70':0.1875,'0.80':0.1620,'0.90':0.1365,'1.00':0
+      };
+      const tauxSurcotDef=baremeSurcDef[quotiteDef.toFixed(2)]||I.tauxSurcotisation||0;
+      const tRefDef=I.indice*I.valeurPoint;
+      const coutSurcotDef=surcotisationDef?Math.max(0,(tauxSurcotDef*tRefDef)-(0.1110*quotiteDef*tRefDef)):0;
       if(surcotisationDef){
-        const tpRef=I.indice*I.valeurPoint;
+        const tpRef=tRefDef;
         let tpQuotite=tpRef*quotiteDef;
         if(I.appliquerDecret1982){if(Math.abs(quotiteDef-0.80)<1e-9)tpQuotite=tpRef*(6/7);if(Math.abs(quotiteDef-0.90)<1e-9)tpQuotite=tpRef*(32/35);}
-        const coutSurcotMensuel=Math.max(0,(I.tauxSurcotisation*tpRef)-(0.1110*quotiteDef*tpRef));
+        const coutSurcotMensuel=coutSurcotDef;
         titreSec('SURCOTISATION ACTIVEE',...VERT);
         cartesTrio(
           'Traitement a la quotite',tpQuotite.toFixed(2)+' EUR','Part travaillee',
@@ -2315,7 +2394,62 @@ if (erreurs.length > 0) {
       y+=2;
       cartesDuo('Traitement de reference',traitementFin.toFixed(2)+' EUR','Taux de remplacement',(pensionDefinitive/traitementFin*100).toFixed(1)+' %');
 
-      // ── TABLEAU COMPARATIF PAR QUOTITÉ (graphique en mode tableau) ──
+      // ── ANALYSE RENTABILITÉ SURCOTISATION (onglet Définitif) ──
+      // Toutes les variables utilisées ici sont définies dans cette fonction
+      if(surcotisationDef&&coutSurcotDef>0){
+        const moisProjDef=Math.round(periodeProj.totalJours/30);
+        const coutTotalDef=coutSurcotDef*moisProjDef;
+        // Pension sans surcotisation : mêmes règles mais liquidables sans surcot
+        const jLiqSansDef=Math.floor(periodeProj.totalJours*quotiteDef);
+        const liqSansDef=arrondirTrimestresLiquidables(jLR+jLiqSansDef+bEJ);
+        const ratioSansDef=clamp(liqSansDef/TR,0,1);
+        let tauxSansDef=0.75*ratioSansDef;
+        if(assuranceFinale<TR){
+          tauxSansDef=(0.75*ratioSansDef)*(1-(TR-assuranceFinale)*1.25/100);
+        }else if(tauxSurcoteFinale>0){
+          tauxSansDef=(0.75*ratioSansDef)*(1+tauxSurcoteFinale/100);
+        }
+        const pSansDef=Math.min(traitementFin*tauxSansDef,traitementFin);
+        const gainMensuelDef=Math.max(0,pensionDefinitive-pSansDef);
+        const gainAnnuelDef=gainMensuelDef*12;
+        const ptMortDef=gainAnnuelDef>0?coutTotalDef/gainAnnuelDef:Infinity;
+        const dureeCapitDef=Math.max(0,(dateDepartDef-new Date())/(1000*60*60*24*365.25));
+        titreSec('ANALYSE RENTABILITE SURCOTISATION',...VERT);
+        const ptMortStrDef=ptMortDef===Infinity?'Jamais recupere':ptMortDef.toFixed(1)+' ans';
+        cartesTrio(
+          'Cout total surcotisation',coutTotalDef.toFixed(2)+' EUR',moisProjDef+' mois x '+coutSurcotDef.toFixed(2)+' EUR',
+          'Supplement mensuel a vie','+'+gainMensuelDef.toFixed(2)+' EUR/mois','Gain de pension definitif',
+          'Duree recuperation',ptMortStrDef,'Annees de retraite necessaires'
+        );
+        // Formule correcte : coutTotal placé pendant toute la durée de la période
+        const dureeProj_ans=moisProjDef/12;
+        const scenariosDef=[
+          {label:'Livret A',detail:'1,7%',taux:0.017},
+          {label:'Assurance-vie',detail:'3,5%',taux:0.035},
+          {label:'PEA ETF MSCI World',detail:'5%',taux:0.050}
+        ].map(s=>{
+          const C=coutTotalDef*Math.pow(1+s.taux,dureeProj_ans);
+          return{...s,capital:C,revenu:(C-coutTotalDef)/12};
+        });
+        y+=2;checkY(10);doc.setFontSize(8);doc.setFont(undefined,'bold');doc.setTextColor(...NOIR);
+        doc.text('Comparaison avec des placements alternatifs',lm,y);y+=6;
+        const colWd=[pw*0.28,pw*0.24,pw*0.26,pw*0.22];
+        doc.setFillColor(...BLEU);doc.rect(lm,y,pw,7,'F');
+        doc.setTextColor(255,255,255);doc.setFontSize(7);doc.setFont(undefined,'bold');
+        let xhd=lm;['Placement','Capital retraite','Revenu mensuel','Capital'].forEach((h,i2)=>{doc.text(h,i2===0?xhd+2:xhd+colWd[i2]-2,y+5,{align:i2===0?'left':'right'});xhd+=colWd[i2];});
+        y+=7;doc.setTextColor(...NOIR);
+        scenariosDef.forEach((s,ri)=>{
+          checkY(7);doc.setFillColor(ri%2===0?255:249,ri%2===0?255:250,ri%2===0?255:251);doc.rect(lm,y,pw,7,'F');
+          doc.setFontSize(7);doc.setFont(undefined,'normal');
+          let xcd=lm;[s.label+' ('+s.detail+')',s.capital.toFixed(2)+' EUR',s.revenu.toFixed(2)+' EUR/mois','Conserve'].forEach((v,ci)=>{doc.text(nettoyer(v),ci===0?xcd+2:xcd+colWd[ci]-2,y+5,{align:ci===0?'left':'right'});xcd+=colWd[ci];});y+=7;
+        });
+        checkY(7);doc.setFillColor(239,246,255);doc.rect(lm,y,pw,7,'F');
+        doc.setFontSize(7);doc.setFont(undefined,'bold');doc.setTextColor(21,128,61);
+        let xcsd=lm;['Surcotisation (Art. L11 bis CPCMR)','—','+'+gainMensuelDef.toFixed(2)+' EUR/mois a vie','Non conserve'].forEach((v,ci)=>{doc.text(nettoyer(v),ci===0?xcsd+2:xcsd+colWd[ci]-2,y+5,{align:ci===0?'left':'right'});xcsd+=colWd[ci];});
+        y+=9;doc.setTextColor(...NOIR);
+      }
+
+            // ── TABLEAU COMPARATIF PAR QUOTITÉ (graphique en mode tableau) ──
       titreSec('COMPARAISON PAR QUOTITE DE TRAVAIL',...BLEU);
       note('Simulation de la pension definitive selon la quotite de travail jusqu\'au depart, toutes choses egales par ailleurs.');
 
@@ -2337,7 +2471,13 @@ if (erreurs.length > 0) {
       doc.setTextColor(...NOIR);
 
       quotites.forEach((q,idx)=>{
-        let jLiqQ=Math.floor(periodeProj.totalJours*q);
+        // Pour la quotité sélectionnée avec surcotisation, utiliser jLiqProj déjà calculé
+        let jLiqQ;
+        if(surcotisationDef&&Math.abs(q-quotiteDef)<0.01){
+          jLiqQ=jLiqProj; // déjà calculé avec surcotisation
+        }else{
+          jLiqQ=Math.floor(periodeProj.totalJours*q);
+        }
         const assQ=calculerDureeAssurance(jAR+periodeProj.totalJours+bEJ+mA3J).trimestres;
         const liqQ=arrondirTrimestresLiquidables(jLR+jLiqQ+bEJ);
         const ratioQ=clamp(liqQ/TR,0,1);
