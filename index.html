@@ -104,6 +104,8 @@
       transition: transform .15s, box-shadow .15s, opacity .15s;
     }
     .btn:hover { transform: translateY(-2px); opacity: .93; }
+    .btn-blue        { background: #1d4ed8; color: #fff; box-shadow: 0 4px 18px rgba(29,78,216,.30); }
+    .btn-blue-light  { background: #eff6ff; color: #1d4ed8; border: 1.5px solid #bfdbfe; box-shadow: 0 2px 10px rgba(29,78,216,.12); }
     .btn-gold    { background: var(--gold); color: var(--navy); box-shadow: 0 4px 18px rgba(201,168,76,.35); }
     .btn-purple  { background: var(--purple); color: #fff; box-shadow: 0 4px 18px rgba(124,58,237,.35); }
     .btn-outline { background: transparent; color: #fff; border: 1.5px solid rgba(255,255,255,.4); }
@@ -219,7 +221,7 @@
     }
     .sim-card.v04::before   { background: #2563eb; }
     .sim-card.v06e::before  { background: var(--green); }
-    .sim-card.v06g          { grid-column: 1 / -1; flex-direction: row; align-items: center; gap: 32px; }
+    .sim-card.v04g::before  { background: #2563eb; }
     .sim-card.v06g::before  { background: var(--purple); }
 
     .sim-badge {
@@ -234,6 +236,7 @@
     }
     .sim-card.v04  .sim-badge { background: #dbeafe; color: #1d4ed8; }
     .sim-card.v06e .sim-badge { background: var(--green-light); color: var(--green); }
+    .sim-card.v04g .sim-badge { background: #dbeafe; color: #1d4ed8; }
     .sim-card.v06g .sim-badge { background: #ede9fe; color: var(--purple); }
 
     .sim-card h3 {
@@ -269,6 +272,7 @@
       margin-top: 1px;
     }
     .sim-card.v04 .sim-features li::before  { color: #2563eb; }
+    .sim-card.v04g .sim-features li::before { color: #2563eb; }
     .sim-card.v06g .sim-features li::before { color: var(--purple); }
 
     .sim-card .cadre {
@@ -469,24 +473,46 @@
   <h2>Les simulateurs disponibles</h2>
   <div class="sims-grid">
 
-    <!-- V04.2.8 -->
+    <!-- V04.2.8 Expert -->
     <div class="sim-card v04">
-      <span class="sim-badge">Réforme 2023</span>
+      <span class="sim-badge">Réforme 2023 — Mode Expert</span>
       <h3>Simulateur V.04.2.8</h3>
       <p class="sim-sub">Décret n°2023-799 du 21 août 2023 — Départ prévu à partir de 2028</p>
       <ul class="sim-features">
         <li>Âge légal progressif (62 → 64 ans)</li>
         <li>Durée de cotisation réforme 2023</li>
         <li>Surcote classique, parentale et excédentaire</li>
-        <li>31 règles de validation des données</li>
-        <li>Analyse rachat de trimestres + export PDF</li>
+        <li>Retraite Progressive + Définitive + Analyse Rachat</li>
+        <li>31 règles de validation + export PDF</li>
       </ul>
       <div class="cadre">
         <strong>Cadre réglementaire :</strong> Loi n°2023-270 du 14 avril 2023 et décrets d'application
       </div>
       <div class="sim-card-footer">
-        <a href="simulateur_retraite_progressiveV.04.2.8.html" class="btn btn-green" target="_blank" style="width:100%;justify-content:center;">
-          🚀 Ouvrir le simulateur V.04.2.8
+        <a href="simulateur_retraite_progressiveV.04.2.8.html" class="btn btn-blue" target="_blank" style="width:100%;justify-content:center;">
+          🔧 Mode Expert V.04.2.8
+        </a>
+      </div>
+    </div>
+
+    <!-- V04.2.8 Guide -->
+    <div class="sim-card v04g">
+      <span class="sim-badge">✨ Réforme 2023 — Assistant Guidé</span>
+      <h3>Assistant Guidé V.04.2.8</h3>
+      <p class="sim-sub">Même réglementation que le Mode Expert · Idéal pour une première simulation</p>
+      <ul class="sim-features">
+        <li>Saisie guidée en 6 étapes claires et validées</li>
+        <li>Explications contextuelles à chaque étape</li>
+        <li>Validation immédiate des données saisies</li>
+        <li>Résultat Retraite Progressive + tableau comparatif</li>
+        <li>Lien vers le Mode Expert intégré</li>
+      </ul>
+      <div class="cadre">
+        <strong>Cadre réglementaire :</strong> Loi n°2023-270 du 14 avril 2023 et décrets d'application
+      </div>
+      <div class="sim-card-footer">
+        <a href="simulateur_retraite_progressiveV.04.2.8_guide.html" class="btn btn-blue-light" target="_blank" style="width:100%;justify-content:center;">
+          ✨ Assistant Guidé V.04.2.8
         </a>
       </div>
     </div>
@@ -509,30 +535,29 @@
       </div>
       <div class="sim-card-footer">
         <a href="simulateur_retraite_progressive_V06_expert.html" class="btn btn-green" target="_blank" style="width:100%;justify-content:center;">
-          🔧 Ouvrir le Mode Expert
+          🔧 Ouvrir le Mode Expert V.06
         </a>
       </div>
     </div>
 
-    <!-- V06 Guide (pleine largeur) -->
+    <!-- V06 Guide -->
     <div class="sim-card v06g">
-      <div class="v06g-left">
-        <span class="sim-badge">✨ Nouveau — Assistant Guidé V.06</span>
-        <h3>Assistant Simulateur de Retraite Progressive</h3>
-        <p class="sim-sub">Même réglementation que le Mode Expert · Idéal pour une première simulation</p>
-        <ul class="sim-features">
-          <li>Saisie guidée en 6 étapes claires et validées</li>
-          <li>Explications contextuelles à chaque étape</li>
-          <li>Validation immédiate des données saisies</li>
-          <li>Résultat Retraite Progressive + tableau comparatif par quotité</li>
-          <li>Bouton "Mode Expert" intégré pour aller plus loin</li>
-        </ul>
+      <span class="sim-badge">✨ Gel 2026 — Assistant Guidé</span>
+      <h3>Assistant Guidé V.06</h3>
+      <p class="sim-sub">Même réglementation que le Mode Expert V.06 · Idéal pour une première simulation</p>
+      <ul class="sim-features">
+        <li>Saisie guidée en 6 étapes claires et validées</li>
+        <li>Explications contextuelles à chaque étape</li>
+        <li>Validation immédiate des données saisies</li>
+        <li>Résultat Retraite Progressive + tableau comparatif</li>
+        <li>Lien vers le Mode Expert intégré</li>
+      </ul>
+      <div class="cadre">
+        <strong>Cadre réglementaire :</strong> LFSS 2026, article 105 — suspension applicable au 1<sup>er</sup> septembre 2026
       </div>
-      <div class="v06g-right">
-        <span class="big-icon">✨</span>
-        <p>Recommandé pour<br><strong>débuter</strong> ou<br><strong>découvrir</strong><br>le simulateur</p>
-        <a href="simulateur_retraite_progressive_V06_guide.html" class="btn btn-purple" target="_blank" style="width:100%;justify-content:center;margin-top:8px;">
-          Ouvrir l'Assistant Guidé
+      <div class="sim-card-footer">
+        <a href="simulateur_retraite_progressive_V06_guide.html" class="btn btn-purple" target="_blank" style="width:100%;justify-content:center;">
+          ✨ Ouvrir l'Assistant Guidé V.06
         </a>
       </div>
     </div>
@@ -542,7 +567,7 @@
 
 <!-- FONCTIONNALITÉS COMMUNES -->
 <section class="features">
-  <h2>Fonctionnalités communes aux deux simulateurs V06</h2>
+  <h2>Fonctionnalités communes aux simulateurs</h2>
   <div class="features-grid">
     <div class="feature-card">
       <span class="feature-icon">📊</span>
