@@ -21,11 +21,12 @@
 
 | Version | Cadre réglementaire | Public cible |
 |---|---|---|
-| **V04.2.8** | Réforme 2023 — Décret n°2023-799 du 21 août 2023 | Départ prévu à partir de 2028 |
-| **V06 — Mode Expert** ⭐ | Suspension réforme 2023 — LFSS 2026, art. 105 | Utilisateurs à l'aise avec les formulaires |
+| **V04.2.8 — Mode Expert** 🔧 | Réforme 2023 — Décret n°2023-799 du 21 août 2023 | Départ prévu à partir de 2028 · Simulation avancée |
+| **V04.2.8 — Assistant Guidé** ✨ | Réforme 2023 — Décret n°2023-799 du 21 août 2023 | Départ prévu à partir de 2028 · Première utilisation |
+| **V06 — Mode Expert** ⭐🔧 | Suspension réforme 2023 — LFSS 2026, art. 105 | Utilisateurs à l'aise avec les formulaires |
 | **V06 — Assistant Guidé** ✨ | Suspension réforme 2023 — LFSS 2026, art. 105 | Découverte · Première utilisation |
 
-### 🧭 Expert ou Guidé ?
+### 🧭 Expert ou Guidé ? (valable pour V04.2.8 et V06)
 
 | | Assistant Guidé | Mode Expert |
 |---|---|---|
@@ -80,12 +81,12 @@ Calculé automatiquement selon votre année de naissance.
 
 | Génération | Réforme 2023 (V04.2.8) | Gel 2026 (V06) |
 |---|---|---|
-| 1958-1960 | 168 | 168 |
-| 1961-1962 | 168-169 | 168-169 |
+| 1958-1961 | 168 | 168 |
+| 1962 | 169 | 169 |
 | 1963 | 170 | 170 |
 | **1964** | **171** | **170** |
-| **1965** | **172** | **170-171** |
-| 1966-1967 | 171-172 | 171 |
+| **1965** | **172** | **170** |
+| 1966-1967 | 172 | 171 |
 | 1968+ | 172 | 172 |
 
 **Indice majoré (IM)**
@@ -202,7 +203,7 @@ Quand la surcotisation est cochée, le simulateur compare automatiquement le **s
 
 ## 3️⃣ Mode Expert — fonctionnalités avancées
 
-Le **Mode Expert (V06)** donne accès à des onglets supplémentaires non disponibles dans l'Assistant Guidé :
+Le **Mode Expert** (V04.2.8 et V06) donne accès à des onglets supplémentaires non disponibles dans l'Assistant Guidé :
 
 ### Onglet Retraite Définitive
 

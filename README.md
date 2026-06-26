@@ -1,6 +1,7 @@
 # 🧮 Simulateur de Retraite Progressive – Fonctionnaire d'État
 
-[![V04.2.8 Réforme 2023](https://img.shields.io/badge/V04.2.8-R%C3%A9forme%202023-blue.svg)](https://github.com/J34NMY/simulateur-retraite-progressive/blob/main/simulateur_retraite_progressiveV.04.2.8.html)
+[![V04.2.8 Expert](https://img.shields.io/badge/V04.2.8-Mode%20Expert-blue.svg)](https://github.com/J34NMY/simulateur-retraite-progressive/blob/main/simulateur_retraite_progressiveV.04.2.8.html)
+[![V04.2.8 Guidé](https://img.shields.io/badge/V04.2.8-Assistant%20Guid%C3%A9-1d4ed8.svg)](https://github.com/J34NMY/simulateur-retraite-progressive/blob/main/simulateur_retraite_progressiveV.04.2.8_guide.html)
 [![V06 Expert](https://img.shields.io/badge/V06-Mode%20Expert-green.svg)](https://github.com/J34NMY/simulateur-retraite-progressive/blob/main/simulateur_retraite_progressive_V06_expert.html)
 [![V06 Guidé](https://img.shields.io/badge/V06-Assistant%20Guid%C3%A9-purple.svg)](https://github.com/J34NMY/simulateur-retraite-progressive/blob/main/simulateur_retraite_progressive_V06_guide.html)
 [![Licence CC BY-NC-SA 4.0](https://img.shields.io/badge/licence-CC%20BY--NC--SA%204.0-lightgrey.svg)](LICENSE.md)
@@ -23,16 +24,18 @@ La réforme des retraites de 2023 est **suspendue du 1er septembre 2026 au 1er j
 
 | Version | Cadre réglementaire | Pour qui ? |
 |---|---|---|
-| **V04.2.8** | Réforme 2023 — Décret n°2023-799 du 21 août 2023 | Départ prévu à partir de 2028 |
-| **V06 — Mode Expert** ⭐ | Gel 2026 — LFSS 2026, art. 105 | Utilisateurs à l'aise avec les formulaires |
+| **V04.2.8 — Mode Expert** 🔧 | Réforme 2023 — Décret n°2023-799 du 21 août 2023 | Départ prévu à partir de 2028 · Simulation avancée |
+| **V04.2.8 — Assistant Guidé** ✨ | Réforme 2023 — Décret n°2023-799 du 21 août 2023 | Départ prévu à partir de 2028 · Première utilisation |
+| **V06 — Mode Expert** ⭐🔧 | Gel 2026 — LFSS 2026, art. 105 | Utilisateurs à l'aise avec les formulaires |
 | **V06 — Assistant Guidé** ✨ | Gel 2026 — LFSS 2026, art. 105 | Première utilisation · Découverte |
 
-### 🧭 Expert ou Guidé ?
+### 🧭 Expert ou Guidé ? (valable pour V04.2.8 et V06)
 
 | | Assistant Guidé | Mode Expert |
 |---|---|---|
 | **Saisie** | Pas à pas, 6 étapes | Formulaire complet |
 | **Résultats** | Retraite Progressive + tableau comparatif | RP + Définitive + Rachat + Graphiques + PDF |
+| **Validation** | Immédiate à chaque étape | À la soumission |
 | **Pour qui ?** | Première utilisation | Simulation avancée |
 
 > 💡 L'Assistant Guidé dispose d'un bouton **"Mode Expert"** pour basculer vers la version complète à tout moment.
@@ -52,7 +55,7 @@ La réforme des retraites de 2023 est **suspendue du 1er septembre 2026 au 1er j
 
 ## ✨ Fonctionnalités
 
-### Communes aux deux simulateurs V06
+### Communes à tous les simulateurs
 - Retraite progressive et définitive (méthode SRE, base 360 j/an)
 - Décote, surcote classique et parentale, majoration familiale
 - Bonifications enfants (avant/après 2004)
