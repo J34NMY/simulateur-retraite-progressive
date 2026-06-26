@@ -2130,13 +2130,46 @@ if (erreurs.length > 0) {
     const okD=divRes?divRes.querySelector('div[style*="border-left:3px solid #15803d"]'):null;
     if(okD){checkY(10);doc.setFontSize(8);doc.setFont(undefined,'bold');doc.setTextColor(21,128,61);doc.text('Majorations SRE :',lm,y);y+=5;doc.setFont(undefined,'normal');doc.setTextColor(...NOIR);const pt=nettoyer(okD.textContent.replace(/Majorations SRE appliquees/g,'').replace(/\s+/g,' ').trim());doc.splitTextToSize(pt,pw).forEach(l=>{checkY(5);doc.text(l,lm,y);y+=4.5;});y+=3;}
 
+    // ═══ PENSION DÉFINITIVE — recalcul complet depuis les inputs (pas de DOM) ═══
     const tRefPDF=I.indice*I.valeurPoint;
-    const strEls=divRes?Array.from(divRes.querySelectorAll('strong')):[];
-    let tLiqNum=0;
-    strEls.forEach(s=>{const t=(s.textContent||'').trim();const m=t.match(/^([\d,\.]+)\s*%$/);if(m&&!t.includes('+')){const v=parseFloat(t.replace(',','.'));if(v>50&&v<100)tLiqNum=v;}});
-    const pDefNum=tLiqNum>0?tRefPDF*tLiqNum/100:0;
-    const pDef=pDefNum>0?pDefNum.toFixed(2)+' EUR':'—';
-    const tRempl=pDefNum>0?(pDefNum/tRefPDF*100).toFixed(1)+' %':'—';
+    const TR_pdf=I.trimestresRequis||171;
+    const jAR_pdf=(I.trimAssuranceReleve*90)+I.joursAssuranceReleve;
+    const jLR_pdf=(I.trimLiquidablesReleve*90)+I.joursLiquidablesReleve;
+    const P1_pdf=diffDetaillee(I.dateReleve,I.dateDebut);
+    const P2_pdf=diffDetaillee(I.dateDebut,I.dateFin);
+    const bEJ_pdf=I.conditionsEnfantsAvant2004?I.nbEnfantsAvant2004*4*90:0;
+    const mA3J_pdf=I.conditionsEnfantsApres2003?I.nbEnfantsApres2003*2*90:0;
+    const bETr_pdf=bEJ_pdf/90;
+    const mA3Tr_pdf=mA3J_pdf/90;
+    let jLP2_pdf;
+    if(I.surcotisation&&I.trimSurcotDisponibles>0){
+      const gTPJ_pdf=(1-I.quotite)/90;
+      const jU_pdf=gTPJ_pdf>0?Math.min(P2_pdf.totalJours,Math.floor(I.trimSurcotDisponibles/gTPJ_pdf)):0;
+      jLP2_pdf=Math.floor(jU_pdf)+Math.floor((P2_pdf.totalJours-jU_pdf)*I.quotite);
+    }else{
+      jLP2_pdf=Math.floor(P2_pdf.totalJours*(I.surcotisation?1:I.quotite));
+    }
+    const jLP1_pdf=Math.floor(P1_pdf.totalJours*(I.quotiteAvant||1));
+    const assF_pdf=calculerDureeAssurance(jAR_pdf+P1_pdf.totalJours+P2_pdf.totalJours+bEJ_pdf+mA3J_pdf).trimestres;
+    const liqF_pdf=arrondirTrimestresLiquidables(jLR_pdf+jLP1_pdf+bEJ_pdf+jLP2_pdf);
+    const rF_pdf=clamp(liqF_pdf/TR_pdf,0,1);
+    let taux_pdf=0.75*rF_pdf;
+    if(assF_pdf<TR_pdf)taux_pdf=(0.75*rF_pdf)*(1-(TR_pdf-assF_pdf)*1.25/100);
+    const ageD_pdf=(I.dateFin-I.dateNaissance)/(1000*60*60*24*365.25);
+    const ageSR_pdf=calculerAgeSurcote(I.dateNaissance);
+    let tSC_pdf=0,tSP_pdf=0,surcoteOk_pdf=false;
+    const sp_pdf=calculerSurcoteParentaleSRE(I.dateNaissance,TR_pdf,assF_pdf,bETr_pdf,mA3Tr_pdf,I.quotite);
+    if(sp_pdf.applicable){tSP_pdf=sp_pdf.tauxSurcote;surcoteOk_pdf=true;}
+    if(assF_pdf>=TR_pdf&&ageD_pdf>=ageSR_pdf){
+      const trimSC_pdf=Math.floor((Math.min(ageD_pdf,70)-ageSR_pdf)*4);
+      if(trimSC_pdf>0){tSC_pdf=trimSC_pdf*1.25;surcoteOk_pdf=true;}
+    }
+    const tSF_pdf=tSC_pdf+tSP_pdf;
+    if(surcoteOk_pdf&&tSF_pdf>0)taux_pdf=(0.75*rF_pdf)*(1+tSF_pdf/100);
+    const pBrute_pdf=tRefPDF*taux_pdf;
+    const pDefNum=Math.min(pBrute_pdf,tRefPDF);
+    const pDef=pDefNum.toFixed(2)+' EUR';
+    const tRempl=(pDefNum/tRefPDF*100).toFixed(1)+' %';
 
     ligne();checkY(10);doc.setFontSize(8);doc.setFont(undefined,'bold');doc.setTextColor(...GRISD);
     doc.text('A PARTIR DE VOTRE RETRAITE DEFINITIVE - '+dfFmt.toUpperCase(),lm,y);y+=5;
