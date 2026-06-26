@@ -2221,21 +2221,21 @@ if (erreurs.length > 0) {
         const C=coutTotal_rp2*Math.pow(1+s.taux,dureeRP_ans2);
         return{...s,capital:C,revenu:(C-coutTotal_rp2)/12};
       });
-      y+=2;checkY(10);doc.setFontSize(8);doc.setFont(undefined,'bold');doc.setTextColor(...NOIR);
-      doc.text('Comparaison avec des placements alternatifs',lm,y);y+=6;
+      y+=4;checkY(55);doc.setFontSize(8);doc.setFont(undefined,'bold');doc.setTextColor(...NOIR);
+      doc.text('Comparaison avec des placements alternatifs',lm,y);y+=5;
       const colWs2=[pw*0.25,pw*0.25,pw*0.28,pw*0.22];
-      doc.setFillColor(...BLEU);doc.rect(lm,y,pw,7,'F');
+      doc.setFillColor(...BLEU);doc.rect(lm,y,pw,9,'F');
       doc.setTextColor(255,255,255);doc.setFontSize(7);doc.setFont(undefined,'bold');
       let xh3=lm;['Placement','Capital retraite','Revenu mensuel','Capital'].forEach((h,i2)=>{doc.text(h,i2===0?xh3+2:xh3+colWs2[i2]-2,y+5,{align:i2===0?'left':'right'});xh3+=colWs2[i2];});
       y+=7;doc.setTextColor(...NOIR);
       scenarios2.forEach((s,ri)=>{
-        checkY(7);doc.setFillColor(ri%2===0?255:249,ri%2===0?255:250,ri%2===0?255:251);doc.rect(lm,y,pw,7,'F');
-        doc.setFontSize(7);doc.setFont(undefined,'normal');
-        let xc3=lm;[s.label+' ('+s.detail+')',s.capital.toFixed(2)+' EUR',s.revenu.toFixed(2)+' EUR/mois','Conserve'].forEach((v,ci)=>{doc.text(nettoyer(v),ci===0?xc3+2:xc3+colWs2[ci]-2,y+5,{align:ci===0?'left':'right'});xc3+=colWs2[ci];});y+=7;
+        checkY(9);doc.setFillColor(ri%2===0?255:249,ri%2===0?255:250,ri%2===0?255:251);doc.rect(lm,y,pw,9,'F');
+        doc.setFontSize(7.5);doc.setFont(undefined,'normal');
+        let xc3=lm;[s.label+' ('+s.detail+')',s.capital.toFixed(2)+' EUR',s.revenu.toFixed(2)+' EUR/mois','Conserve'].forEach((v,ci)=>{doc.text(nettoyer(v),ci===0?xc3+2:xc3+colWs2[ci]-2,y+6,{align:ci===0?'left':'right'});xc3+=colWs2[ci];});y+=7;
       });
-      checkY(7);doc.setFillColor(239,246,255);doc.rect(lm,y,pw,7,'F');
+      checkY(9);doc.setFillColor(239,246,255);doc.rect(lm,y,pw,9,'F');
       doc.setFontSize(7);doc.setFont(undefined,'bold');doc.setTextColor(21,128,61);
-      let xcs2=lm;['Surcotisation (Art. L11 bis CPCMR)','—','+'+gainMensuel_rp2.toFixed(2)+' EUR/mois a vie','Non conserve'].forEach((v,ci)=>{doc.text(nettoyer(v),ci===0?xcs2+2:xcs2+colWs2[ci]-2,y+5,{align:ci===0?'left':'right'});xcs2+=colWs2[ci];});
+      let xcs2=lm;['Surcotisation (Art. L11 bis CPCMR)','—','+'+gainMensuel_rp2.toFixed(2)+' EUR/mois a vie','Non conserve'].forEach((v,ci)=>{doc.text(nettoyer(v),ci===0?xcs2+2:xcs2+colWs2[ci]-2,y+6,{align:ci===0?'left':'right'});xcs2+=colWs2[ci];});
       y+=9;doc.setTextColor(...NOIR);
     }
 
@@ -2431,25 +2431,26 @@ if (erreurs.length > 0) {
           const C=coutTotalDef*Math.pow(1+s.taux,dureeProj_ans);
           return{...s,capital:C,revenu:(C-coutTotalDef)/12};
         });
-        y+=2;checkY(10);doc.setFontSize(8);doc.setFont(undefined,'bold');doc.setTextColor(...NOIR);
-        doc.text('Comparaison avec des placements alternatifs',lm,y);y+=6;
+        y+=4;checkY(55);doc.setFontSize(8);doc.setFont(undefined,'bold');doc.setTextColor(...NOIR);
+        doc.text('Comparaison avec des placements alternatifs',lm,y);y+=5;
         const colWd=[pw*0.28,pw*0.24,pw*0.26,pw*0.22];
-        doc.setFillColor(...BLEU);doc.rect(lm,y,pw,7,'F');
+        doc.setFillColor(...BLEU);doc.rect(lm,y,pw,9,'F');
         doc.setTextColor(255,255,255);doc.setFontSize(7);doc.setFont(undefined,'bold');
         let xhd=lm;['Placement','Capital retraite','Revenu mensuel','Capital'].forEach((h,i2)=>{doc.text(h,i2===0?xhd+2:xhd+colWd[i2]-2,y+5,{align:i2===0?'left':'right'});xhd+=colWd[i2];});
         y+=7;doc.setTextColor(...NOIR);
         scenariosDef.forEach((s,ri)=>{
-          checkY(7);doc.setFillColor(ri%2===0?255:249,ri%2===0?255:250,ri%2===0?255:251);doc.rect(lm,y,pw,7,'F');
-          doc.setFontSize(7);doc.setFont(undefined,'normal');
-          let xcd=lm;[s.label+' ('+s.detail+')',s.capital.toFixed(2)+' EUR',s.revenu.toFixed(2)+' EUR/mois','Conserve'].forEach((v,ci)=>{doc.text(nettoyer(v),ci===0?xcd+2:xcd+colWd[ci]-2,y+5,{align:ci===0?'left':'right'});xcd+=colWd[ci];});y+=7;
+          checkY(9);doc.setFillColor(ri%2===0?255:249,ri%2===0?255:250,ri%2===0?255:251);doc.rect(lm,y,pw,9,'F');
+          doc.setFontSize(7.5);doc.setFont(undefined,'normal');
+          let xcd=lm;[s.label+' ('+s.detail+')',s.capital.toFixed(2)+' EUR',s.revenu.toFixed(2)+' EUR/mois','Conserve'].forEach((v,ci)=>{doc.text(nettoyer(v),ci===0?xcd+2:xcd+colWd[ci]-2,y+6,{align:ci===0?'left':'right'});xcd+=colWd[ci];});y+=7;
         });
-        checkY(7);doc.setFillColor(239,246,255);doc.rect(lm,y,pw,7,'F');
+        checkY(9);doc.setFillColor(239,246,255);doc.rect(lm,y,pw,9,'F');
         doc.setFontSize(7);doc.setFont(undefined,'bold');doc.setTextColor(21,128,61);
-        let xcsd=lm;['Surcotisation (Art. L11 bis CPCMR)','—','+'+gainMensuelDef.toFixed(2)+' EUR/mois a vie','Non conserve'].forEach((v,ci)=>{doc.text(nettoyer(v),ci===0?xcsd+2:xcsd+colWd[ci]-2,y+5,{align:ci===0?'left':'right'});xcsd+=colWd[ci];});
+        let xcsd=lm;['Surcotisation (Art. L11 bis CPCMR)','—','+'+gainMensuelDef.toFixed(2)+' EUR/mois a vie','Non conserve'].forEach((v,ci)=>{doc.text(nettoyer(v),ci===0?xcsd+2:xcsd+colWd[ci]-2,y+6,{align:ci===0?'left':'right'});xcsd+=colWd[ci];});
         y+=9;doc.setTextColor(...NOIR);
       }
 
             // ── TABLEAU COMPARATIF PAR QUOTITÉ (graphique en mode tableau) ──
+      y+=4;checkY(40);
       titreSec('COMPARAISON PAR QUOTITE DE TRAVAIL',...BLEU);
       note('Simulation de la pension definitive selon la quotite de travail jusqu\'au depart, toutes choses egales par ailleurs.');
 
