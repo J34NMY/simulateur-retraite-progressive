@@ -2183,282 +2183,313 @@ if (erreurs.length > 0) {
   }
 
         function exporterRetraiteDefinitivePDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      
-      let yPos = 20;
-      const leftMargin = 20;
-      const rightMargin = 190;
-      
-      // En-tête
-      doc.setFillColor(34, 197, 94);
-      doc.rect(0, 0, 210, 35, 'F');
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(18);
-      doc.setFont(undefined, 'bold');
-      doc.text('SIMULATION RETRAITE DEFINITIVE', 105, 15, { align: 'center' });
-      doc.setFontSize(11);
-      doc.setFont(undefined, 'normal');
-      doc.text('Fonctionnaire d\'État - Version V.04.2.8', 105, 23, { align: 'center' });
-      doc.setFontSize(9);
-      doc.text('Document généré le ' + new Date().toLocaleDateString('fr-FR'), 105, 30, { align: 'center' });
-      
-      yPos = 45;
-      doc.setTextColor(0, 0, 0);
-      
-      // AVERTISSEMENT
-      doc.setFillColor(255, 244, 230);
-      doc.rect(leftMargin - 5, yPos - 3, 170, 45, 'F');
-      doc.setFontSize(11);
-      doc.setFont(undefined, 'bold');
-      doc.setTextColor(194, 65, 12);
-      doc.text('AVERTISSEMENT - DOCUMENT NON OFFICIEL', 105, yPos, { align: 'center' });
-      yPos += 7;
-      doc.setFontSize(8);
-      doc.setFont(undefined, 'normal');
-      doc.setTextColor(0, 0, 0);
-      const avertissements = [
-        'Ce document est généré par un simulateur éducatif GRATUIT et NON OFFICIEL.',
-        'Résultats validés par comparaison avec le simulateur M@rel (info-retraite.fr).',
-        'avec le calcul officiel du SRE (règles internes non documentées).',
-        '',
-        'CE SIMULATEUR NE REMPLACE EN AUCUN CAS LES OUTILS OFFICIELS DE L\'ÉTAT.',
-        'Pour votre estimation officielle, consultez le simulateur M@rel sur info-retraite.fr.',
-        '',
-        'Pour une estimation officielle : info-retraite.fr (simulateur M@rel)',
-        '',
-        'L\'éditeur décline toute responsabilité en cas de décision prise',
-        'sur la base de ces estimations.'
-      ];
-      avertissements.forEach(line => {
-        doc.text(line, 105, yPos, { align: 'center' });
-        yPos += 4;
-      });
-      yPos += 10;
-      
-      // Contenu du résultat
-      const resultatDiv = document.getElementById('resultat-definitive');
-      const sections = resultatDiv.querySelectorAll('.result-section, .highlight-result, .info, .warn, .ok');
-      
-      sections.forEach(section => {
-        if (yPos > 260) {
-          doc.addPage();
-          yPos = 20;
-        }
-        
-        const title = section.querySelector('h3, h4');
-        const paragraphs = Array.from(section.querySelectorAll('p, small')).filter(el => !el.closest('table'));
-        
-        if (title) {
-          doc.setFont(undefined, 'bold');
-          doc.setFontSize(10);
-          doc.text(title.textContent.trim(), leftMargin, yPos);
-          yPos += 6;
-          doc.setFont(undefined, 'normal');
-          doc.setFontSize(9);
-        }
-        
-        paragraphs.forEach(p => {
-          if (yPos > 270) {
-            doc.addPage();
-            yPos = 20;
-          }
-          
-          let text = p.textContent.trim();
-          text = text.replace(/\s+/g, ' ');
-          
-          if (text.length > 0 && !text.includes('Télécharger') && !text.includes('PDF')) {
-            const lines = doc.splitTextToSize(text, rightMargin - leftMargin);
-            lines.forEach(line => {
-              if (yPos > 270) {
-                doc.addPage();
-                yPos = 20;
-              }
-              doc.text(line, leftMargin, yPos);
-              yPos += 4.5;
-            });
-            yPos += 1;
-          }
-        });
+      const {jsPDF}=window.jspdf;
+      const doc=new jsPDF();
+      const I=lireInputs();
+      let y=0;
+      const lm=15,rm=195,pw=rm-lm;
+      const BLEU=[30,64,175],VERT=[21,128,61],GRIS=[249,250,251],GRISD=[100,116,139],NOIR=[15,23,42];
+      function sautPage(){doc.addPage();y=15;}
+      function checkY(h){if(y+h>278)sautPage();}
+      function nettoyer(t){return(t||'').replace(/→/g,'->').replace(/−/g,'-').replace(/—/g,'-').replace(/–/g,'-').replace(/·/g,'.').replace(/•/g,'-').replace(/✓/g,'v').replace(/⚠/g,'!').replace(/️/g,'').replace(/[]/g,'');}
+      function ligne(c){doc.setDrawColor(...(c||[226,232,240]));doc.setLineWidth(0.3);doc.line(lm,y,rm,y);y+=3;}
+      function titreSec(txt,r,g,b){checkY(12);doc.setFillColor(r,g,b);doc.rect(lm-2,y-4,pw+4,10,'F');doc.setTextColor(255,255,255);doc.setFontSize(9);doc.setFont(undefined,'bold');doc.text(txt,lm,y);doc.setTextColor(...NOIR);y+=9;}
+      function cartesDuo(g1,v1,g2,v2){checkY(18);const w=(pw-4)/2;doc.setFillColor(...GRIS);doc.rect(lm,y,w,16,'F');doc.setFontSize(7.5);doc.setFont(undefined,'normal');doc.setTextColor(...GRISD);doc.text(nettoyer(g1),lm+3,y+5);doc.setFontSize(10);doc.setFont(undefined,'bold');doc.setTextColor(...NOIR);doc.text(nettoyer(v1),lm+3,y+12);const x2=lm+w+4;doc.setFillColor(...GRIS);doc.rect(x2,y,w,16,'F');doc.setFontSize(7.5);doc.setFont(undefined,'normal');doc.setTextColor(...GRISD);doc.text(nettoyer(g2),x2+3,y+5);doc.setFontSize(10);doc.setFont(undefined,'bold');doc.setTextColor(...NOIR);doc.text(nettoyer(v2),x2+3,y+12);y+=20;}
+      function cartesTrio(g1,v1,s1,g2,v2,s2,g3,v3,s3){checkY(22);const w=(pw-6)/3;[[g1,v1,s1,lm],[g2,v2,s2,lm+w+3],[g3,v3,s3,lm+2*(w+3)]].forEach(([g,v,s,x])=>{doc.setFillColor(...GRIS);doc.rect(x,y,w,20,'F');doc.setFontSize(7);doc.setFont(undefined,'normal');doc.setTextColor(...GRISD);doc.text(nettoyer(g),x+2,y+5);doc.setFontSize(9.5);doc.setFont(undefined,'bold');doc.setTextColor(...NOIR);doc.text(nettoyer(v),x+2,y+12);doc.setFontSize(6.5);doc.setFont(undefined,'normal');doc.setTextColor(...GRISD);if(s)doc.text(nettoyer(s),x+2,y+17);});y+=24;}
+      function banniere(label,valeur,sousTitre,r,g,b){checkY(22);doc.setFillColor(r,g,b);doc.rect(lm-2,y-2,pw+4,20,'F');doc.setFontSize(8);doc.setFont(undefined,'normal');doc.setTextColor(200,220,255);doc.text(nettoyer(label),lm,y+4);doc.setFontSize(7);doc.setTextColor(150,190,255);if(sousTitre)doc.text(nettoyer(sousTitre),lm,y+9);doc.setFontSize(14);doc.setFont(undefined,'bold');doc.setTextColor(255,255,255);doc.text(nettoyer(valeur),rm-2,y+13,{align:'right'});doc.setTextColor(...NOIR);y+=23;}
+      function barreProgress(label,valeur,total,ok){checkY(12);const pct=Math.min(100,valeur/total*100);doc.setFontSize(8);doc.setFont(undefined,'normal');doc.setTextColor(...GRISD);doc.text(nettoyer(label),lm,y);doc.setFont(undefined,'bold');doc.setTextColor(...NOIR);doc.text(valeur+' / '+total+(ok?' (taux plein)':''),rm-2,y,{align:'right'});y+=3;doc.setFillColor(226,232,240);doc.rect(lm,y,pw,3,'F');doc.setFillColor(...(ok?VERT:BLEU));doc.rect(lm,y,pw*pct/100,3,'F');y+=6;}
+      function note(txt){checkY(8);doc.setFontSize(7.5);doc.setFont(undefined,'italic');doc.setTextColor(...GRISD);doc.splitTextToSize(nettoyer(txt),pw).forEach(l=>{checkY(5);doc.text(l,lm,y);y+=4;});doc.setFont(undefined,'normal');doc.setTextColor(...NOIR);y+=2;}
 
-        // Extraction des tableaux (ex: comparaison 3 placements) en colonnes alignées
-        section.querySelectorAll('table').forEach(table => {
-          if (yPos > 250) {
-            doc.addPage();
-            yPos = 20;
-          }
-          const lignesTab = extraireLignesTableau(table);
-          yPos = dessinerTableauPDF(doc, lignesTab, leftMargin, rightMargin, yPos);
-          yPos += 2;
-        });
+      // ── EN-TÊTE ──
+      doc.setFillColor(...BLEU);doc.rect(0,0,210,30,'F');
+      doc.setTextColor(255,255,255);doc.setFontSize(14);doc.setFont(undefined,'bold');
+      doc.text('SIMULATION RETRAITE DEFINITIVE',105,12,{align:'center'});
+      doc.setFontSize(9);doc.setFont(undefined,'normal');
+      doc.text("Fonctionnaire d'Etat - Reforme 2023 (Decret n 2023-799)",105,20,{align:'center'});
+      doc.setFontSize(7.5);doc.text('Document genere le '+new Date().toLocaleDateString('fr-FR')+'  |  Outil educatif NON OFFICIEL',105,27,{align:'center'});
+      y=38;
 
-        yPos += 3;
-      });
-      
-      // Pied de page
-      const totalPages = doc.internal.getNumberOfPages();
-      for (let i = 1; i <= totalPages; i++) {
-        doc.setPage(i);
-        doc.setFontSize(8);
-        doc.setFont(undefined, 'italic');
-        doc.setTextColor(128, 128, 128);
-        doc.text('Page ' + i + ' / ' + totalPages, 105, 290, { align: 'center' });
-        doc.text('Simulation non contractuelle - Consulter info-retraite.fr', 105, 285, { align: 'center' });
+      // ── RÉCUPÉRER LES DONNÉES SAISIES dans l'onglet définitive ──
+      const defDateDepart=document.getElementById('def-dateDepart');
+      const defQuotite=document.getElementById('def-quotiteFuture');
+      const defSurcot=document.getElementById('def-surcotisation');
+      const dateDepartDef=defDateDepart&&defDateDepart.value?new Date(defDateDepart.value):I.dateFin;
+      const quotiteDef=defQuotite?parseFloat(defQuotite.value):1.00;
+      const surcotisationDef=defSurcot?defSurcot.checked:false;
+
+      // ── PARAMÈTRES ──
+      titreSec('PARAMETRES DE SIMULATION',...BLEU);
+      const dn=I.dateNaissance instanceof Date&&!isNaN(I.dateNaissance)?I.dateNaissance.toLocaleDateString('fr-FR'):'—';
+      const dd=dateDepartDef instanceof Date&&!isNaN(dateDepartDef)?dateDepartDef.toLocaleDateString('fr-FR'):'—';
+      const col1=[['Naissance',dn],['Depart definitif',dd],['Quotite jusqu\'au depart',(quotiteDef*100).toFixed(0)+' %']];
+      const col2=[['Indice',''+I.indice],['Trimestres requis',''+I.trimestresRequis],['Traitement de ref.',(I.indice*I.valeurPoint).toFixed(2)+' EUR']];
+      const cw=(pw-6)/2;
+      checkY(30);
+      col1.forEach(([k,v],i)=>{const ry=y+i*9;doc.setFontSize(7.5);doc.setFont(undefined,'normal');doc.setTextColor(...GRISD);doc.text(k,lm,ry);doc.setFont(undefined,'bold');doc.setTextColor(...NOIR);doc.text(v,lm+cw,ry,{align:'right'});doc.setFontSize(7.5);doc.setFont(undefined,'normal');doc.setTextColor(...GRISD);doc.text(col2[i][0],lm+cw+6,ry);doc.setFont(undefined,'bold');doc.setTextColor(...NOIR);doc.text(col2[i][1],rm,ry,{align:'right'});});
+      y+=32;ligne();
+
+      // ── RECALCUL COMPLET (même logique que calculerRetraiteDefinitive) ──
+      const TR=I.trimestresRequis||171;
+      const traitementFin=I.indice*I.valeurPoint;
+      const periodeProj=diffDetaillee(I.dateReleve,dateDepartDef);
+      const jAR=(I.trimAssuranceReleve*90)+I.joursAssuranceReleve;
+      const jLR=(I.trimLiquidablesReleve*90)+I.joursLiquidablesReleve;
+      const bEJ=I.conditionsEnfantsAvant2004?I.nbEnfantsAvant2004*4*90:0;
+      const mA3J=I.conditionsEnfantsApres2003?I.nbEnfantsApres2003*2*90:0;
+      const bETr=bEJ/90;const mA3Tr=mA3J/90;
+      const trimSurcotDispo=I.trimSurcotDisponibles||0;
+
+      let jLiqProj;
+      if(surcotisationDef&&trimSurcotDispo>0){
+        const gTPJ=(1-quotiteDef)/90;
+        const jU=gTPJ>0?Math.min(periodeProj.totalJours,Math.floor(trimSurcotDispo/gTPJ)):0;
+        jLiqProj=Math.floor(jU)+Math.floor((periodeProj.totalJours-jU)*quotiteDef);
+      }else{
+        jLiqProj=Math.floor(periodeProj.totalJours*quotiteDef);
       }
-      
-      doc.save('simulation_retraite_definitive_' + new Date().toISOString().slice(0,10) + '.pdf');
+      const assuranceFinale=calculerDureeAssurance(jAR+periodeProj.totalJours+bEJ+mA3J).trimestres;
+      const liquidablesFinale=arrondirTrimestresLiquidables(jLR+jLiqProj+bEJ);
+      const ratioFin=clamp(liquidablesFinale/TR,0,1);
+      const ageDepartDef=(dateDepartDef-I.dateNaissance)/(1000*60*60*24*365.25);
+      const ageSurcoteReq=calculerAgeSurcote(I.dateNaissance);
+
+      let tauxFinal=0.75*ratioFin;
+      let tauxSurcoteFinale=0,surcoteAppliquee=false;
+      const sp=calculerSurcoteParentaleSRE(I.dateNaissance,TR,assuranceFinale,bETr,mA3Tr,quotiteDef);
+      if(sp.applicable){tauxSurcoteFinale+=sp.tauxSurcote;surcoteAppliquee=true;}
+      if(assuranceFinale>=TR&&ageDepartDef>=ageSurcoteReq){
+        const trimSC=Math.floor((Math.min(ageDepartDef,70)-ageSurcoteReq)*4);
+        if(trimSC>0){tauxSurcoteFinale+=trimSC*1.25;surcoteAppliquee=true;}
+      }
+      if(assuranceFinale<TR){
+        const coefDec=(TR-assuranceFinale)*1.25/100;
+        tauxFinal=(0.75*ratioFin)*(1-coefDec);
+        surcoteAppliquee=false;tauxSurcoteFinale=0;
+      }else if(surcoteAppliquee&&tauxSurcoteFinale>0){
+        tauxFinal=(0.75*ratioFin)*(1+tauxSurcoteFinale/100);
+      }
+      const pensionBrute=traitementFin*tauxFinal;
+      const pensionDefinitive=Math.min(pensionBrute,traitementFin);
+      const majF=I.totalEnfantsEleves>=3?10+Math.max(0,I.totalEnfantsEleves-3)*5:0;
+      const pensionMaj=pensionDefinitive*(1+majF/100);
+
+      // ── TRIMESTRES ──
+      titreSec('TRIMESTRES AU DEPART DEFINITIF',...VERT);
+      barreProgress('Assurance',assuranceFinale,TR,assuranceFinale>=TR);
+      barreProgress('Liquidables',liquidablesFinale,TR,false);
+      y+=2;
+      cartesDuo('Age au depart',ageDepartDef.toFixed(1)+' ans','Taux de liquidation',(tauxFinal*100).toFixed(2)+' %');
+
+      if(assuranceFinale<TR){
+        checkY(10);doc.setFontSize(8);doc.setFont(undefined,'bold');doc.setTextColor(185,28,28);
+        doc.text('Decote appliquee : '+(TR-assuranceFinale)+' trim. manquants x 1,25 % = -'+((TR-assuranceFinale)*1.25).toFixed(2)+' %',lm,y);
+        doc.setTextColor(...NOIR);y+=7;
+      }else if(surcoteAppliquee&&tauxSurcoteFinale>0){
+        checkY(10);doc.setFontSize(8);doc.setFont(undefined,'bold');doc.setTextColor(21,128,61);
+        doc.text('Surcote appliquee : +'+tauxSurcoteFinale.toFixed(2)+' %',lm,y);
+        doc.setTextColor(...NOIR);y+=7;
+      }
+
+      // ── PENSION DÉFINITIVE ──
+      titreSec('PENSION DEFINITIVE ESTIMEE',...BLEU);
+      banniere('Pension mensuelle brute',pensionDefinitive.toFixed(2)+' EUR','Votre revenu a la retraite complete - brut avant impot',...BLEU);
+      if(majF>0){
+        y+=2;
+        banniere('Avec majoration familiale (+'+majF+'%)',pensionMaj.toFixed(2)+' EUR','Art. L18 CPCMR - '+I.totalEnfantsEleves+' enfants eleves',...VERT);
+      }
+      y+=2;
+      cartesDuo('Traitement de reference',traitementFin.toFixed(2)+' EUR','Taux de remplacement',(pensionDefinitive/traitementFin*100).toFixed(1)+' %');
+
+      // ── TABLEAU COMPARATIF PAR QUOTITÉ (graphique en mode tableau) ──
+      titreSec('COMPARAISON PAR QUOTITE DE TRAVAIL',...BLEU);
+      note('Simulation de la pension definitive selon la quotite de travail jusqu\'au depart, toutes choses egales par ailleurs.');
+
+      const quotites=[0.50,0.60,0.70,0.80,0.90,1.00];
+      const colW=[pw/6,pw/6,pw/6,pw/6,pw/6,pw/6];
+      const headers=['Quotite','Liquidables','Assurance','Taux liq.','Pension brute','Tx remplact'];
+      checkY(10);
+      // En-tête tableau
+      doc.setFillColor(...BLEU);
+      doc.rect(lm,y,pw,8,'F');
+      doc.setTextColor(255,255,255);doc.setFontSize(7);doc.setFont(undefined,'bold');
+      let xh=lm;
+      headers.forEach((h,i)=>{
+        const align=i>0?'right':'left';
+        doc.text(h,i===0?xh+2:xh+colW[i]-2,y+5.5,{align});
+        xh+=colW[i];
+      });
+      y+=8;
+      doc.setTextColor(...NOIR);
+
+      quotites.forEach((q,idx)=>{
+        let jLiqQ=Math.floor(periodeProj.totalJours*q);
+        const assQ=calculerDureeAssurance(jAR+periodeProj.totalJours+bEJ+mA3J).trimestres;
+        const liqQ=arrondirTrimestresLiquidables(jLR+jLiqQ+bEJ);
+        const ratioQ=clamp(liqQ/TR,0,1);
+        const ageSRQ=calculerAgeSurcote(I.dateNaissance);
+        let tQ=0.75*ratioQ,tSQ=0,scOk=false;
+        const spQ=calculerSurcoteParentaleSRE(I.dateNaissance,TR,assQ,bETr,mA3Tr,q);
+        if(spQ.applicable){tSQ+=spQ.tauxSurcote;scOk=true;}
+        if(assQ>=TR&&ageDepartDef>=ageSRQ){const trimSCQ=Math.floor((Math.min(ageDepartDef,70)-ageSRQ)*4);if(trimSCQ>0){tSQ+=trimSCQ*1.25;scOk=true;}}
+        if(assQ<TR){tQ=(0.75*ratioQ)*(1-(TR-assQ)*1.25/100);}
+        else if(scOk&&tSQ>0){tQ=(0.75*ratioQ)*(1+tSQ/100);}
+        const pQ=Math.min(traitementFin*tQ,traitementFin);
+        const isSelected=Math.abs(q-quotiteDef)<0.01;
+        checkY(8);
+        if(isSelected){doc.setFillColor(219,234,254);}else{doc.setFillColor(idx%2===0?255:249,idx%2===0?255:250,idx%2===0?255:251);}
+        doc.rect(lm,y,pw,7,'F');
+        doc.setFontSize(7.5);doc.setFont(undefined,isSelected?'bold':'normal');
+        doc.setTextColor(...NOIR);
+        const cells=[(q*100).toFixed(0)+'%'+(isSelected?' *':''),liqQ+' tr.',assQ+' tr.',(tQ*100).toFixed(2)+'%',pQ.toFixed(2)+' EUR',(pQ/traitementFin*100).toFixed(1)+'%'];
+        let xc=lm;
+        cells.forEach((val,i)=>{
+          const align=i>0?'right':'left';
+          doc.text(val,i===0?xc+2:xc+colW[i]-2,y+5,{align});
+          xc+=colW[i];
+        });
+        y+=7;
+      });
+      checkY(6);doc.setFontSize(7);doc.setFont(undefined,'italic');doc.setTextColor(...GRISD);
+      doc.text('* Quotite selectionnee dans la simulation',lm,y);y+=6;
+
+      // ── AVERTISSEMENT ──
+      y+=4;
+      note('Outil educatif NON OFFICIEL. Pour votre estimation officielle : info-retraite.fr (simulateur M@rel). Le SRE reste la seule source faisant foi.');
+
+      // ── PIED DE PAGE ──
+      const tot=doc.internal.getNumberOfPages();
+      for(let i=1;i<=tot;i++){doc.setPage(i);doc.setFontSize(7);doc.setFont(undefined,'italic');doc.setTextColor(150,150,150);doc.text('Page '+i+' / '+tot+' - Simulation non contractuelle - info-retraite.fr',105,292,{align:'center'});doc.setDrawColor(200,200,200);doc.setLineWidth(0.2);doc.line(lm,288,rm,288);}
+      doc.save('simulation_retraite_definitive_V04_'+new Date().toISOString().slice(0,10)+'.pdf');
     }
 
     function exporterAnalyseRachatPDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      
-      let yPos = 20;
-      const leftMargin = 20;
-      const rightMargin = 190;
-      
-      // En-tête
-      doc.setFillColor(34, 197, 94);
-      doc.rect(0, 0, 210, 35, 'F');
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(18);
-      doc.setFont(undefined, 'bold');
-      doc.text('ANALYSE RACHAT DE TRIMESTRES', 105, 15, { align: 'center' });
-      doc.setFontSize(11);
-      doc.setFont(undefined, 'normal');
-      doc.text('Fonction Publique d\'État - Version V.04.2.8', 105, 23, { align: 'center' });
-      doc.setFontSize(9);
-      doc.text('Document généré le ' + new Date().toLocaleDateString('fr-FR'), 105, 30, { align: 'center' });
-      
-      yPos = 45;
-      doc.setTextColor(0, 0, 0);
-      
-      // AVERTISSEMENT SPÉCIFIQUE RACHAT
-      doc.setFillColor(255, 244, 230);
-      doc.rect(leftMargin - 5, yPos - 3, 170, 50, 'F');
-      doc.setFontSize(11);
-      doc.setFont(undefined, 'bold');
-      doc.setTextColor(194, 65, 12);
-      doc.text('AVERTISSEMENT - COUTS INDICATIFS', 105, yPos, { align: 'center' });
-      yPos += 7;
-      doc.setFontSize(8);
-      doc.setFont(undefined, 'normal');
-      doc.setTextColor(0, 0, 0);
-      const avertissements = [
-        'Les montants affichés sont des ESTIMATIONS basées sur les coefficients 2024',
-        'de la Fonction Publique d\'État (catégorie sédentaire).',
-        '',
-        'Le coût exact dépend de nombreux paramètres :',
-        '- Votre traitement indiciaire au moment du rachat',
-        '- Votre catégorie (sédentaire, actif, insalubre)',
-        '- Les barèmes en vigueur à la date du rachat',
-        '',
-        'Ce simulateur ne remplace pas les outils officiels de l\'État.',
-        '',
-        'Pour un DEVIS PERSONNALISE et OFFICIEL : ensap.gouv.fr'
-      ];
-      avertissements.forEach(line => {
-        doc.text(line, 105, yPos, { align: 'center' });
-        yPos += 4;
-      });
-      yPos += 10;
-      
-      // Contenu de l'analyse
-      const resultatDiv = document.getElementById('resultat-rachat');
-      const sections = resultatDiv.querySelectorAll('.result-section, .highlight-result, .info, .warn, .ok');
-      
-      sections.forEach(section => {
-        if (yPos > 260) {
-          doc.addPage();
-          yPos = 20;
-        }
-        
-        const title = section.querySelector('h3, h4');
-        const paragraphs = Array.from(section.querySelectorAll('p, ul li, small')).filter(el => !el.closest('table'));
-        
-        if (title) {
-          doc.setFont(undefined, 'bold');
-          doc.setFontSize(10);
-          doc.text(title.textContent.trim(), leftMargin, yPos);
-          yPos += 6;
-          doc.setFont(undefined, 'normal');
-          doc.setFontSize(9);
-        }
-        
-        paragraphs.forEach(p => {
-          if (yPos > 270) {
-            doc.addPage();
-            yPos = 20;
-          }
-          
-          let text = p.textContent.trim();
-          text = text.replace(/\s+/g, ' ');
-          
-          if (text.length > 0 && !text.includes('Télécharger') && !text.includes('PDF')) {
-            const lines = doc.splitTextToSize(text, rightMargin - leftMargin);
-            lines.forEach(line => {
-              if (yPos > 270) {
-                doc.addPage();
-                yPos = 20;
-              }
-              doc.text(line, leftMargin, yPos);
-              yPos += 4.5;
-            });
-            yPos += 1;
-          }
-        });
+      const {jsPDF}=window.jspdf;
+      const doc=new jsPDF();
+      const I=lireInputs();
+      let y=0;
+      const lm=15,rm=195,pw=rm-lm;
+      const BLEU=[30,64,175],VERT=[21,128,61],OR=[180,120,20],GRIS=[249,250,251],GRISD=[100,116,139],NOIR=[15,23,42];
+      function sautPage(){doc.addPage();y=15;}
+      function checkY(h){if(y+h>278)sautPage();}
+      function nettoyer(t){return(t||'').replace(/→/g,'->').replace(/−/g,'-').replace(/—/g,'-').replace(/–/g,'-').replace(/·/g,'.').replace(/•/g,'-').replace(/✓/g,'v').replace(/⚠/g,'!').replace(/️/g,'').replace(/[]/g,'');}
+      function ligne(c){doc.setDrawColor(...(c||[226,232,240]));doc.setLineWidth(0.3);doc.line(lm,y,rm,y);y+=3;}
+      function titreSec(txt,r,g,b){checkY(12);doc.setFillColor(r,g,b);doc.rect(lm-2,y-4,pw+4,10,'F');doc.setTextColor(255,255,255);doc.setFontSize(9);doc.setFont(undefined,'bold');doc.text(txt,lm,y);doc.setTextColor(...NOIR);y+=9;}
+      function cartesDuo(g1,v1,g2,v2){checkY(18);const w=(pw-4)/2;doc.setFillColor(...GRIS);doc.rect(lm,y,w,16,'F');doc.setFontSize(7.5);doc.setFont(undefined,'normal');doc.setTextColor(...GRISD);doc.text(nettoyer(g1),lm+3,y+5);doc.setFontSize(10);doc.setFont(undefined,'bold');doc.setTextColor(...NOIR);doc.text(nettoyer(v1),lm+3,y+12);const x2=lm+w+4;doc.setFillColor(...GRIS);doc.rect(x2,y,w,16,'F');doc.setFontSize(7.5);doc.setFont(undefined,'normal');doc.setTextColor(...GRISD);doc.text(nettoyer(g2),x2+3,y+5);doc.setFontSize(10);doc.setFont(undefined,'bold');doc.setTextColor(...NOIR);doc.text(nettoyer(v2),x2+3,y+12);y+=20;}
+      function cartesTrio(g1,v1,s1,g2,v2,s2,g3,v3,s3){checkY(22);const w=(pw-6)/3;[[g1,v1,s1,lm],[g2,v2,s2,lm+w+3],[g3,v3,s3,lm+2*(w+3)]].forEach(([g,v,s,x])=>{doc.setFillColor(...GRIS);doc.rect(x,y,w,20,'F');doc.setFontSize(7);doc.setFont(undefined,'normal');doc.setTextColor(...GRISD);doc.text(nettoyer(g),x+2,y+5);doc.setFontSize(9.5);doc.setFont(undefined,'bold');doc.setTextColor(...NOIR);doc.text(nettoyer(v),x+2,y+12);doc.setFontSize(6.5);doc.setFont(undefined,'normal');doc.setTextColor(...GRISD);if(s)doc.text(nettoyer(s),x+2,y+17);});y+=24;}
+      function banniere(label,valeur,sousTitre,r,g,b){checkY(22);doc.setFillColor(r,g,b);doc.rect(lm-2,y-2,pw+4,20,'F');doc.setFontSize(8);doc.setFont(undefined,'normal');doc.setTextColor(200,220,255);doc.text(nettoyer(label),lm,y+4);doc.setFontSize(7);doc.setTextColor(150,190,255);if(sousTitre)doc.text(nettoyer(sousTitre),lm,y+9);doc.setFontSize(14);doc.setFont(undefined,'bold');doc.setTextColor(255,255,255);doc.text(nettoyer(valeur),rm-2,y+13,{align:'right'});doc.setTextColor(...NOIR);y+=23;}
+      function note(txt){checkY(8);doc.setFontSize(7.5);doc.setFont(undefined,'italic');doc.setTextColor(...GRISD);doc.splitTextToSize(nettoyer(txt),pw).forEach(l=>{checkY(5);doc.text(l,lm,y);y+=4;});doc.setFont(undefined,'normal');doc.setTextColor(...NOIR);y+=2;}
 
-        // Extraction des tableaux (ex: comparaison 3 placements) en colonnes alignées
-        section.querySelectorAll('table').forEach(table => {
-          if (yPos > 250) {
-            doc.addPage();
-            yPos = 20;
-          }
-          const lignesTab = extraireLignesTableau(table);
-          yPos = dessinerTableauPDF(doc, lignesTab, leftMargin, rightMargin, yPos);
-          yPos += 2;
-        });
+      // ── EN-TÊTE ──
+      doc.setFillColor(...OR);doc.rect(0,0,210,30,'F');
+      doc.setTextColor(255,255,255);doc.setFontSize(14);doc.setFont(undefined,'bold');
+      doc.text('ANALYSE RACHAT DE TRIMESTRES',105,12,{align:'center'});
+      doc.setFontSize(9);doc.setFont(undefined,'normal');
+      doc.text("Fonctionnaire d'Etat - Reforme 2023 - V.04.2.8",105,20,{align:'center'});
+      doc.setFontSize(7.5);doc.text('Document genere le '+new Date().toLocaleDateString('fr-FR')+'  |  Couts INDICATIFS - Devis officiel : ensap.gouv.fr',105,27,{align:'center'});
+      y=38;
 
-        yPos += 3;
-      });
-      
-      // Avertissement final
-      if (yPos > 240) {
-        doc.addPage();
-        yPos = 20;
+      // ── LIRE LES INPUTS DE L'ONGLET RACHAT ──
+      const typeRachat=document.getElementById('type-rachat')?.value||'';
+      const optionRachat=document.getElementById('option-rachat')?.value||'';
+      const nbTrimestres=parseFloat(document.getElementById('nb-trimestres')?.value||0);
+      const ageRachat=parseFloat(document.getElementById('age-rachat')?.value||0);
+      const TMI=parseFloat(document.getElementById('tmi-rachat')?.value||0)/100;
+
+      // ── RÉCUPÉRER LES RÉSULTATS CALCULÉS DEPUIS LE DOM ──
+      const divRachat=document.getElementById('resultat-rachat');
+      const texteBrut=divRachat?divRachat.innerText||'':'';
+
+      // Extraire les valeurs clés via regex sur le texte
+      function extraireVal(pattern){const m=texteBrut.match(pattern);return m?m[1]:null;}
+      const coutNominalStr=extraireVal(/Cout nominal[^:]*:\s*([0-9 ,.]+\s*€)/i)||'—';
+      const coutReelStr=extraireVal(/Cout reel[^:]*:\s*([0-9 ,.]+\s*€)/i)||'—';
+      const gainMensuelStr=extraireVal(/Supplement mensuel[^:]*:\s*\+([0-9 ,.]+\s*€)/i)||'—';
+      const dureeRentabStr=extraireVal(/Duree pour recuperer[^:]*:\s*([0-9,.]+\s*ans|Jamais[^)]*)/i)||'—';
+
+      // ── PARAMÈTRES ──
+      titreSec('PARAMETRES DU RACHAT / DE LA SURCOTISATION',...OR);
+      const typeLabel=typeRachat==='surcotisation_retroactive'?'Surcotisation retroactive (Art. L11 bis)':typeRachat==='annees_etudes'?'Annees d\'etudes superieures':typeRachat==='annees_incompletes'?'Annees civiles incompletes':'—';
+      const optionLabel=typeRachat==='surcotisation_retroactive'?'—':optionRachat==='taux_seul'?'Option 1 - Taux seul':'Option 2 - Taux + Duree';
+      checkY(30);
+      const col1=[['Type de rachat',typeLabel.substring(0,35)],['Trimestres concernes',nbTrimestres+' trim.'],['TMI applicable',(TMI*100).toFixed(0)+' %']];
+      const col2=[['Option',optionLabel],['Age au rachat',ageRachat+' ans'],['Traitement de ref.',(I.indice*I.valeurPoint).toFixed(2)+' EUR']];
+      const cw=(pw-6)/2;
+      col1.forEach(([k,v],i)=>{const ry=y+i*9;doc.setFontSize(7.5);doc.setFont(undefined,'normal');doc.setTextColor(...GRISD);doc.text(k,lm,ry);doc.setFont(undefined,'bold');doc.setTextColor(...NOIR);doc.text(v,lm+cw,ry,{align:'right'});doc.setFontSize(7.5);doc.setFont(undefined,'normal');doc.setTextColor(...GRISD);doc.text(col2[i][0],lm+cw+6,ry);doc.setFont(undefined,'bold');doc.setTextColor(...NOIR);doc.text(col2[i][1],rm,ry,{align:'right'});});
+      y+=32;ligne();
+
+      // ── RÉSULTATS FINANCIERS ──
+      titreSec('RESULTATS FINANCIERS',...OR);
+      cartesDuo('Cout nominal',coutNominalStr,'Cout reel apres deduction fiscale',coutReelStr);
+      if(gainMensuelStr!=='—'){
+        banniere('Supplement de pension mensuel','+'+gainMensuelStr,'Versement a vie par le SRE - brut avant impot',...VERT);
+        y+=2;
+        cartesDuo('Duree pour recuperer le cout',dureeRentabStr,'Esperance de gain',gainMensuelStr+'/mois a vie');
+      }else{
+        checkY(12);doc.setFontSize(8.5);doc.setFont(undefined,'italic');doc.setTextColor(...GRISD);
+        doc.text('Option 1 (Taux seul) : evite la decote sans augmenter le montant de la pension.',lm,y);y+=10;
       }
-      
-      doc.setFillColor(255, 247, 230);
-      doc.rect(leftMargin - 5, yPos - 3, 170, 25, 'F');
-      doc.setFontSize(10);
-      doc.setFont(undefined, 'bold');
-      doc.text('IMPORTANT', leftMargin, yPos);
-      yPos += 6;
-      doc.setFontSize(8);
-      doc.setFont(undefined, 'normal');
-      const avertissementFinal = [
-        'Cette analyse est un outil d\'aide à la décision, non un devis.',
-        'Les coefficients et barèmes peuvent évoluer dans le temps.'
+
+      // ── TABLEAU PLACEMENTS ALTERNATIFS ──
+      titreSec('COMPARAISON - PLACEMENTS ALTERNATIFS',...BLEU);
+      note('Si le meme capital etait place en epargne au lieu d\'etre utilise pour le rachat :');
+
+      const colWP=[pw*0.22,pw*0.20,pw*0.20,pw*0.23,pw*0.15];
+      const headersP=['Placement','Capital retraite','Gain total','Revenu mensuel','Capital'];
+      checkY(10);
+      doc.setFillColor(...BLEU);doc.rect(lm,y,pw,8,'F');
+      doc.setTextColor(255,255,255);doc.setFontSize(7);doc.setFont(undefined,'bold');
+      let xhP=lm;
+      headersP.forEach((h,i)=>{doc.text(h,i===0?xhP+2:xhP+colWP[i]-2,y+5.5,{align:i===0?'left':'right'});xhP+=colWP[i];});
+      y+=8;
+      doc.setTextColor(...NOIR);
+
+      // Extraire les lignes placements depuis le DOM
+      const tablesRachat=divRachat?Array.from(divRachat.querySelectorAll('table')):[];
+      if(tablesRachat.length>0){
+        const lignesTab=extraireLignesTableau(tablesRachat[tablesRachat.length-1]);
+        lignesTab.forEach((row,ri)=>{
+          if(ri===0)return;// skip header
+          checkY(8);
+          doc.setFillColor(ri%2===0?255:249,ri%2===0?255:250,ri%2===0?255:251);
+          doc.rect(lm,y,pw,7,'F');
+          doc.setFontSize(7);doc.setFont(undefined,'normal');
+          let xc=lm;
+          row.slice(0,5).forEach((cell,ci)=>{
+            const txt=nettoyer(cell).substring(0,28);
+            doc.text(txt,ci===0?xc+2:xc+colWP[ci]-2,y+5,{align:ci===0?'left':'right'});
+            xc+=colWP[ci];
+          });
+          y+=7;
+        });
+      }else{
+        note('Lancez l\'analyse pour voir la comparaison avec les placements.');
+      }
+
+      // ── CONCLUSION ──
+      y+=4;
+      titreSec('A VOUS DE DECIDER',...BLEU);
+      checkY(22);
+      doc.setFillColor(239,246,255);doc.rect(lm,y,pw,20,'F');
+      doc.setFontSize(8);doc.setFont(undefined,'normal');doc.setTextColor(...NOIR);
+      const lignesConclusion=[
+        'Rachat / surcotisation : supplement de pension a VIE - capital definitivement perdu.',
+        'Placement : revenu mensuel sur interets - capital conserve, fructifie et transmissible.',
+        'Criteres cles : duree de recuperation, situation patrimoniale et familiale, TMI.',
       ];
-      avertissementFinal.forEach(line => {
-        doc.text(line, leftMargin, yPos);
-        yPos += 4;
-      });
-      
-      // Pied de page
-      const totalPages = doc.internal.getNumberOfPages();
-      for (let i = 1; i <= totalPages; i++) {
-        doc.setPage(i);
-        doc.setFontSize(8);
-        doc.setFont(undefined, 'italic');
-        doc.setTextColor(128, 128, 128);
-        doc.text('Page ' + i + ' / ' + totalPages, 105, 290, { align: 'center' });
-        doc.text('Analyse indicative - Demander un devis officiel au SRE', 105, 285, { align: 'center' });
-      }
-      
-      doc.save('analyse_rachat_trimestres_' + new Date().toISOString().slice(0,10) + '.pdf');
+      lignesConclusion.forEach((l,i)=>{doc.text('- '+l,lm+3,y+5+i*5.5);});
+      y+=23;
+
+      // ── AVERTISSEMENT ──
+      note('Coefficients indicatifs (base 2024, categorie sedentaire). Pour un devis officiel : ensap.gouv.fr');
+      note('Outil educatif NON OFFICIEL. Ce document ne remplace pas les outils officiels de l\'Etat.');
+
+      // ── PIED DE PAGE ──
+      const tot=doc.internal.getNumberOfPages();
+      for(let i=1;i<=tot;i++){doc.setPage(i);doc.setFontSize(7);doc.setFont(undefined,'italic');doc.setTextColor(150,150,150);doc.text('Page '+i+' / '+tot+' - Simulation non contractuelle - ensap.gouv.fr',105,292,{align:'center'});doc.setDrawColor(200,200,200);doc.setLineWidth(0.2);doc.line(lm,288,rm,288);}
+      doc.save('analyse_rachat_V04_'+new Date().toISOString().slice(0,10)+'.pdf');
     }
 
+    
     function updateChart(inputs, liquidablesDepart, trimestresRequis, assuranceDepart) {
       const quotites = [0.50, 0.60, 0.70, 0.80, 0.90];
       const canvas = document.getElementById('graphique');
