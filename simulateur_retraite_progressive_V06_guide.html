@@ -7,6 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Assistant Simulateur de Retraite Progressive</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <style>
     :root {
       --bleu:#1e40af; --bleu-clair:#eff6ff; --bleu-bord:#bfdbfe;
@@ -366,6 +367,13 @@
   <!-- RESULTATS -->
   <div class="results-section" id="results-section">
     <div id="resultat"></div>
+    <div class="result-section" id="graphique-wizard-container" style="margin-top:14px;">
+      <h3>Comparaison des revenus par quotite</h3>
+      <p style="font-size:.78rem;color:var(--gris-txt);margin-bottom:10px;">Traitement + pension provisoire pendant la retraite progressive, selon la quotite de travail choisie.</p>
+      <div style="position:relative;height:260px;">
+        <canvas id="graphique-wizard"></canvas>
+      </div>
+    </div>
     <div id="tableau-comparaison" style="margin-top:14px;"></div>
     <div style="text-align:center;margin-top:14px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
       <button class="btn btn-secondary" onclick="modifierSimulation()">Modifier mes donnees</button>
@@ -1370,10 +1378,30 @@
       return{q,ttp,pen,tot,ok:Math.abs(q-I.quotite)<0.01};
     });
     const maxT=Math.max(...lignes.map(l=>l.tot));
-    const tab='<div class="result-section"><h3>Comparaison des revenus par quotite</h3><p style="font-size:.78rem;color:var(--gris-txt);margin-bottom:10px;">Traitement + pension provisoire pendant la RP.</p><table style="width:100%;border-collapse:collapse;font-size:.84rem;"><thead><tr style="background:var(--bleu);color:#fff;"><th style="padding:8px;text-align:center;">Quotite</th><th style="padding:8px;text-align:right;">Traitement</th><th style="padding:8px;text-align:right;">Pension provisoire</th><th style="padding:8px;text-align:right;">Total brut</th><th style="padding:8px;text-align:left;">Repartition</th></tr></thead><tbody>'+
+    const tab='<div class="result-section"><h3>Detail chiffre par quotite</h3><p style="font-size:.78rem;color:var(--gris-txt);margin-bottom:10px;">Traitement + pension provisoire pendant la RP.</p><table style="width:100%;border-collapse:collapse;font-size:.84rem;"><thead><tr style="background:var(--bleu);color:#fff;"><th style="padding:8px;text-align:center;">Quotite</th><th style="padding:8px;text-align:right;">Traitement</th><th style="padding:8px;text-align:right;">Pension provisoire</th><th style="padding:8px;text-align:right;">Total brut</th><th style="padding:8px;text-align:left;">Repartition</th></tr></thead><tbody>'+
       lignes.map(l=>'<tr style="background:'+(l.ok?'#eff6ff':'#fff')+';border-bottom:1px solid var(--gris-bord);"><td style="padding:8px;text-align:center;font-weight:'+(l.ok?'700':'400')+';color:'+(l.ok?'var(--bleu)':'inherit')+';">'+(l.q*100).toFixed(0)+' %'+(l.ok?' <':'')+'</td><td style="padding:8px;text-align:right;">'+formatEuro(l.ttp)+'</td><td style="padding:8px;text-align:right;">'+formatEuro(l.pen)+'</td><td style="padding:8px;text-align:right;font-weight:700;color:'+(l.ok?'var(--bleu)':'var(--vert)')+';">'+formatEuro(l.tot)+'</td><td style="padding:8px;"><div style="background:var(--gris-bord);border-radius:3px;height:10px;"><div style="background:'+(l.ok?'var(--bleu)':'var(--vert)')+';border-radius:3px;height:10px;width:'+(l.tot/maxT*100).toFixed(1)+'%;"></div></div></td></tr>').join('')+
       '</tbody></table><p style="font-size:.74rem;color:var(--gris-txt);margin-top:6px;">Pour la retraite definitive : <a href="simulateur_retraite_progressive_V06_expert.html" target="_blank">Mode Expert V06</a>.</p></div>';
     document.getElementById('tableau-comparaison').innerHTML=tab;
+    dessinerGraphiqueWizard(lignes);
+  }
+
+  let graphiqueWizardChart=null;
+  function dessinerGraphiqueWizard(lignes){
+    const canvas=document.getElementById('graphique-wizard');
+    if(!canvas||typeof Chart==='undefined')return;
+    if(graphiqueWizardChart){graphiqueWizardChart.destroy();}
+    const labels=lignes.map(l=>(l.q*100).toFixed(0)+' %');
+    const data=lignes.map(l=>l.tot);
+    const couleurs=lignes.map(l=>l.ok?'#1e40af':'#16a34a');
+    graphiqueWizardChart=new Chart(canvas.getContext('2d'),{
+      type:'bar',
+      data:{labels:labels,datasets:[{label:'Total brut mensuel pendant la RP (EUR)',data:data,backgroundColor:couleurs,borderRadius:4}]},
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>formatEuro(ctx.parsed.y)}}},
+        scales:{y:{beginAtZero:false,ticks:{callback:v=>v.toFixed(0)+' EUR'}}}
+      }
+    });
   }
 
   function modifierSimulation(){

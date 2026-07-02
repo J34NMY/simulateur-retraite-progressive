@@ -406,10 +406,12 @@
       <li><a href="#options" class="sub">→ Options</a></li>
       <li><a href="#resultats">Résultats</a></li>
       <li><a href="#pension-prov" class="sub">→ Pension provisoire</a></li>
+      <li><a href="#comparaison" class="sub">→ Comparaison par quotité</a></li>
       <li><a href="#pension-def" class="sub">→ Pension définitive</a></li>
       <li><a href="#surcotisation" class="sub">→ Surcotisation</a></li>
       <li><a href="#expert">Mode Expert</a></li>
       <li><a href="#pdf">Export PDF</a></li>
+      <li><a href="#sources">Sources &amp; références</a></li>
       <li><a href="#confidentialite">Confidentialité</a></li>
     </ul>
     <div class="sidebar-back">
@@ -662,6 +664,9 @@
         </table>
       </div>
 
+      <h3 id="comparaison">Comparaison des revenus par quotité</h3>
+      <p>Après le calcul, un graphique et un tableau comparent le total brut mensuel pendant la RP pour toutes les quotités possibles (50 % à 90 %), en mettant en évidence celle que vous avez choisie. Disponible dans le <strong>mode Guidé</strong> comme dans le <strong>mode Expert</strong> (onglet Graphique).</p>
+
       <h3 id="pension-def">Pension de retraite mensuelle (retraite définitive)</h3>
       <div class="info-card blue">
         <h4>Votre revenu à la retraite complète</h4>
@@ -700,19 +705,19 @@
       <p>Simule une retraite définitive sans période progressive. Cliquez sur <strong>↻ Récupérer les données</strong> pour importer vos paramètres, puis choisissez la date de départ et la quotité envisagée.</p>
 
       <h3>Onglet Graphique</h3>
-      <p>Affiche la courbe des revenus totaux bruts selon la quotité de travail pendant la retraite progressive. Le point rouge indique votre quotité choisie.</p>
+      <p>Affiche un graphique en barres des revenus totaux bruts selon la quotité de travail pendant la retraite progressive, avec votre quotité choisie mise en évidence. Le même graphique est disponible dans le mode Guidé, à la fin de la simulation.</p>
 
       <h3>Onglet Analyse Rachat</h3>
       <div class="table-wrap">
         <table>
           <thead><tr><th>Type de rachat</th><th>Base légale</th></tr></thead>
           <tbody>
-            <tr><td>Années d'études supérieures</td><td>Art. L9 bis CPCMR</td></tr>
-            <tr><td>Années civiles incomplètes</td><td>Art. L9 bis CPCMR</td></tr>
-            <tr><td><strong>Surcotisation rétroactive</strong></td><td>Art. L11 bis + Décret 2004-678 — récupère des trimestres perdus pendant des périodes à temps partiel depuis le 01/01/2004</td></tr>
+            <tr><td>Années d'études supérieures</td><td>Décret n°2007-262 (coefficients par âge)</td></tr>
+            <tr><td>Années civiles incomplètes</td><td>Décret n°2007-262 (coefficients par âge)</td></tr>
           </tbody>
         </table>
       </div>
+      <p style="font-size:.86rem;color:var(--gris-txt);">Pour récupérer des trimestres liés à une période à temps partiel déjà effectuée (surcotisation rétroactive, Art. L11 bis CPCMR), utilisez l'option <strong>Surcotisation</strong> dans l'onglet Paramètres — le plafond de 4 trimestres y est géré de façon cohérente avec le reste de la simulation.</p>
       <div class="alert alert-orange">
         ⚠️ Les coefficients de rachat sont indicatifs (base 2024, catégorie sédentaire). Demandez toujours un devis officiel au SRE via <a href="https://ensap.gouv.fr" target="_blank" style="color:#92400e;font-weight:600;">ensap.gouv.fr</a>.
       </div>
@@ -737,6 +742,41 @@
         </table>
       </div>
       <p>Le PDF inclut : paramètres de simulation, revenus pendant la RP, trimestres acquis, pension définitive, tableau comparatif par quotité et avertissement non-officiel.</p>
+    </section>
+
+    <!-- SOURCES -->
+    <section id="sources">
+      <p class="section-eyebrow">Références</p>
+      <h2>Sources &amp; références réglementaires</h2>
+      <p>Ce simulateur s'appuie sur les textes officiels suivants. En cas de doute, ces sources font foi — pas ce simulateur, qui reste un outil pédagogique non officiel.</p>
+
+      <h3>Textes de référence</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Texte</th><th>Objet</th></tr></thead>
+          <tbody>
+            <tr><td>Code des pensions civiles et militaires de retraite — Art. L11, L12, L12 bis, L13, L14, L89 bis à L89 ter</td><td>Calcul de la pension, trimestres liquidables, retraite progressive des fonctionnaires</td></tr>
+            <tr><td>LFSS 2026, art. 105</td><td>Suspension de la réforme des retraites 2023 du 01/09/2026 au 01/01/2028 (gel)</td></tr>
+            <tr><td>Décret n°82-624 du 20/07/1982</td><td>Modalités du temps partiel (quotités 6/7ème et 32/35ème)</td></tr>
+            <tr><td>Décret n°2023-799 du 21/08/2023</td><td>Extension de la retraite progressive aux fonctionnaires ; surcote parentale</td></tr>
+            <tr><td>Décret n°2007-262 du 27/02/2007</td><td>Rachat de trimestres — années d'études supérieures et années incomplètes</td></tr>
+            <tr><td>Décret n°2004-678 du 08/07/2004 — Art. L11 bis CPCMR</td><td>Surcotisation rétroactive pour périodes à temps partiel depuis le 01/01/2004 (max. 4 trimestres)</td></tr>
+            <tr><td>FAQ DGAFP 2025 — Retraite progressive dans la fonction publique</td><td>Précisions administratives sur l'éligibilité, la fin du dispositif et les cas particuliers</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Sites officiels</h3>
+      <ul style="line-height:1.9;">
+        <li><a href="https://retraitesdeletat.gouv.fr" target="_blank" style="color:var(--navy);font-weight:500;">retraitesdeletat.gouv.fr</a> — Service des Retraites de l'État (SRE), formule de calcul détaillée</li>
+        <li><a href="https://ensap.gouv.fr" target="_blank" style="color:var(--navy);font-weight:500;">ensap.gouv.fr</a> — Espace numérique sécurisé de l'agent public : relevé de carrière, demande de retraite progressive, devis officiel de rachat</li>
+        <li><a href="https://www.info-retraite.fr" target="_blank" style="color:var(--navy);font-weight:500;">info-retraite.fr</a> — Simulateur inter-régimes officiel (M@rel), estimation tous régimes confondus</li>
+        <li><a href="https://www.service-public.gouv.fr" target="_blank" style="color:var(--navy);font-weight:500;">service-public.gouv.fr</a> — Fiches pratiques sur la retraite progressive de l'agent public</li>
+      </ul>
+
+      <div class="alert alert-orange" style="margin-top:14px;">
+        ⚠️ La réglementation évolue. Le gel de la réforme 2023 est suspendu du 01/09/2026 au 01/01/2028 (LFSS 2026, art. 105) ; les règles applicables après cette date dépendront des décisions prises d'ici là. Vérifiez toujours vos droits sur ENSAP avant toute décision.
+      </div>
     </section>
 
     <!-- CONFIDENTIALITÉ -->

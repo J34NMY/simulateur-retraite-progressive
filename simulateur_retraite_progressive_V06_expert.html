@@ -299,6 +299,7 @@
     <div id="tab-definitive" class="tab-content">
       <div style="text-align: center; margin-bottom: 20px;">
         <h3>Simulation Retraite Définitive (sans retraite progressive)</h3>
+        <p class="muted" style="max-width:700px;margin:8px auto 0;">Cet outil simule un scénario <strong>indépendant de la retraite progressive</strong> : combien toucheriez-vous à la retraite si, à partir de votre relevé de carrière, vous continuiez à temps partiel classique ou à temps plein jusqu'à votre départ définitif — sans passer par la retraite progressive ?</p>
       </div>
       <div class="row">
         <div class="col">
@@ -324,6 +325,7 @@
             <option value="0.80">80 %</option><option value="0.70">70 %</option>
             <option value="0.60">60 %</option><option value="0.50">50 %</option>
           </select>
+          <small style="display:block;margin-top:4px;color:#92400e;">⚠️ Si vous êtes déjà entré en retraite progressive : un retour à 100% y met fin définitivement (vous ne pourrez pas la réintégrer). Une quotité de 50 à 90% correspond à un temps partiel classique, distinct de la retraite progressive.</small>
           <div style="margin-top: 15px; background: #fff7ed; padding: 10px; border-radius: 6px; border-left: 3px solid #f97316;">
             <label class="bonif-label">
               <input type="checkbox" id="def-appliquerDecret1982" checked>
@@ -404,11 +406,11 @@
           <small>Maximum : 12 trimestres</small>
 
           <label for="rachat-typeRachat">Type de rachat</label>
-          <select id="rachat-typeRachat" onchange="mettreAJourTypeRachat()">
+          <select id="rachat-typeRachat">
             <option value="etudes">Années d'études supérieures</option>
             <option value="incompletes">Années civiles incomplètes</option>
-            <option value="surcotisation_retroactive">Surcotisation rétroactive — temps partiel depuis 2004 (Art. L11 bis CPCMR)</option>
           </select>
+          <small>Pour récupérer des trimestres liés à un temps partiel déjà effectué, voir l'option "Surcotisation" dans l'onglet Paramètres.</small>
 
           <div id="rachat-optionContainer">
             <label for="rachat-optionRachat">Option de rachat</label>
@@ -417,22 +419,6 @@
               <option value="taux_duree">Option 2 : Taux + Durée d'assurance</option>
             </select>
             <small>Option 1 : évite la décote | Option 2 : augmente aussi la pension</small>
-          </div>
-
-          <div id="rachat-surcotContainer" style="display:none;background:#eff6ff;border-left:3px solid #3b82f6;padding:10px;border-radius:6px;margin:8px 0;">
-            <strong>Surcotisation rétroactive (Art. L11 bis CPCMR)</strong><br>
-            <small style="color:#1d4ed8;">
-              Récupère jusqu'à <strong>4 trimestres liquidables</strong> pour des périodes à temps partiel effectuées depuis le 01/01/2004.<br>
-              Coût calculé selon le Décret n°2004-678 : <strong>(11,10% × QT + 80% × (11,10% + 37,65%) × QNT) × traitement plein</strong>
-            </small>
-            <label for="rachat-quotitePassee" style="margin-top:8px;display:block;">Quotité travaillée pendant la période à récupérer (%)</label>
-            <select id="rachat-quotitePassee">
-              <option value="0.50">50 %</option>
-              <option value="0.60">60 %</option>
-              <option value="0.70">70 %</option>
-              <option value="0.80" selected>80 %</option>
-              <option value="0.90">90 %</option>
-            </select>
           </div>
 
           <label for="rachat-ageRachat">Âge au moment du rachat (ans)</label>
@@ -559,44 +545,6 @@
     taux_seul: { 20: 0.25, 25: 0.26, 30: 0.28, 35: 0.31, 40: 0.35, 45: 0.42, 50: 0.48, 55: 0.65, 60: 0.85, 62: 0.90 },
     taux_duree: { 20: 0.45, 25: 0.47, 30: 0.50, 35: 0.55, 40: 0.62, 45: 0.74, 50: 0.85, 55: 1.15, 60: 1.50, 62: 1.60 }
   };
-
-  // ============================================
-  // SURCOTISATION RÉTROACTIVE — Art. L11 bis CPCMR + Décret n°2004-678
-  // Formule : (11,10% × QT + 80% × (11,10% + 37,65%) × QNT) × traitement plein
-  // QT = quotité travaillée, QNT = quotité non travaillée = (1 - QT)
-  // Taux employeur 2026 : 37,65%
-  // ============================================
-  function calculerCoutSurcotisationRetroactive(quotite, traitementPlein) {
-    const tauxRetenue = 11.10 / 100;
-    const tauxEmployeur = 37.65 / 100;
-    const QT = quotite;
-    const QNT = 1 - quotite;
-    // Taux surcotisé selon Décret 2004-678
-    const tauxSurcot = (tauxRetenue * QT) + (0.80 * (tauxRetenue + tauxEmployeur) * QNT);
-    // Coût mensuel = différence entre surcotisation et retenue normale
-    const coutMensuel = (tauxSurcot * traitementPlein) - (tauxRetenue * QT * traitementPlein);
-    // Durée pour 1 trimestre supplémentaire selon quotité (en mois)
-    // À 80% : 1 trim perdu tous les 5 ans → 5 ans = 60 mois pour 1 trimestre
-    const gainTrimParMois = (1 - quotite) / 3; // trimestres gagnés par mois de surcotisation
-    const moisPour1Trim = gainTrimParMois > 0 ? 1 / gainTrimParMois : Infinity;
-    return { tauxSurcot, coutMensuel, moisPour1Trim };
-  }
-
-  function mettreAJourTypeRachat() {
-    const type = document.getElementById('rachat-typeRachat').value;
-    const optionContainer = document.getElementById('rachat-optionContainer');
-    const surcotContainer = document.getElementById('rachat-surcotContainer');
-    if (type === 'surcotisation_retroactive') {
-      optionContainer.style.display = 'none';
-      surcotContainer.style.display = 'block';
-    } else {
-      optionContainer.style.display = 'block';
-      surcotContainer.style.display = 'none';
-    }
-    // Vider les résultats pour forcer un nouveau calcul
-    document.getElementById('resultat-rachat').innerHTML =
-      '<div class="info" style="text-align:center;padding:20px;"><p>Paramètres modifiés — cliquez sur <strong>"Analyser la rentabilité"</strong> pour recalculer.</p></div>';
-  }
 
   function getCoefficientRachat(age, option) {
     const coefficients = coefficientsRachatFonctionPublique[option];
@@ -1863,39 +1811,17 @@
     const traitementIndiciaire = inputs.indice * inputs.valeurPoint;
     const TR = inputs.trimestresRequis;
 
-    let coutNominal, coutReel, gainTrimestres, gainMensuel, gainAnnuel,
-        dureeRentabilisation, typeLabel, economieImpot,
-        coefficient = 0, coutParTrimestre = 0;
-
-    if (typeRachat === 'surcotisation_retroactive') {
-      // Art. L11 bis CPCMR — Surcotisation rétroactive
-      // Limité à 4 trimestres max sur toute la carrière
-      const nbTrimsLimite = Math.min(nbTrimestres, 4);
-      const quotitePassee = parseFloat(document.getElementById('rachat-quotitePassee').value);
-      const { coutMensuel, moisPour1Trim } = calculerCoutSurcotisationRetroactive(quotitePassee, traitementIndiciaire);
-      const moisTotaux = moisPour1Trim * nbTrimsLimite;
-      coutNominal = coutMensuel * moisTotaux;
-      economieImpot = coutNominal * TMI;
-      coutReel = coutNominal - economieImpot;
-      // La surcotisation L11 bis augmente TOUJOURS les liquidables (équivalent option taux+durée)
-      gainTrimestres = nbTrimsLimite;
-      gainMensuel = traitementIndiciaire * 0.75 * (gainTrimestres / TR);
-      gainAnnuel = gainMensuel * 12;
-      dureeRentabilisation = gainAnnuel > 0 ? coutReel / gainAnnuel : Infinity;
-      typeLabel = `Surcotisation rétroactive Art. L11 bis — ${(quotitePassee*100).toFixed(0)}% — ${nbTrimsLimite} trimestre(s)`;
-    } else {
-      // Rachat classique (études / années incomplètes)
-      coefficient = getCoefficientRachat(ageRachat, optionRachat);
-      coutParTrimestre = traitementIndiciaire * coefficient;
-      coutNominal = coutParTrimestre * nbTrimestres;
-      economieImpot = coutNominal * TMI;
-      coutReel = coutNominal - economieImpot;
-      gainTrimestres = optionRachat === 'taux_duree' ? nbTrimestres : 0;
-      gainMensuel = gainTrimestres > 0 ? (traitementIndiciaire * 0.75 * (gainTrimestres / TR)) : 0;
-      gainAnnuel = gainMensuel * 12;
-      dureeRentabilisation = gainAnnuel > 0 ? coutReel / gainAnnuel : Infinity;
-      typeLabel = typeRachat === 'etudes' ? "Rachat années d'études" : "Rachat années incomplètes";
-    }
+    // Rachat classique (études / années incomplètes) — Décret n°2007-262
+    const coefficient = getCoefficientRachat(ageRachat, optionRachat);
+    const coutParTrimestre = traitementIndiciaire * coefficient;
+    const coutNominal = coutParTrimestre * nbTrimestres;
+    const economieImpot = coutNominal * TMI;
+    const coutReel = coutNominal - economieImpot;
+    const gainTrimestres = optionRachat === 'taux_duree' ? nbTrimestres : 0;
+    const gainMensuel = gainTrimestres > 0 ? (traitementIndiciaire * 0.75 * (gainTrimestres / TR)) : 0;
+    const gainAnnuel = gainMensuel * 12;
+    const dureeRentabilisation = gainAnnuel > 0 ? coutReel / gainAnnuel : Infinity;
+    const typeLabel = typeRachat === 'etudes' ? "Rachat années d'études" : "Rachat années incomplètes";
 
     const esperanceVie = inputs.sexe === 'F' ? donneesActuarielles.esperanceVie.femmes : donneesActuarielles.esperanceVie.hommes;
 
@@ -1906,54 +1832,22 @@
       dureeJusquRetraite = Math.max(1, ageDebut - ageRachat);
     }
 
-    // Pour la surcotisation rétroactive : versements mensuels sur dureeCotisation
-    // Pour le rachat classique : versement unique du coutReel
-    let dureeCotisationAns = 0;
-    let versementMensuel = 0;
-    if (typeRachat === 'surcotisation_retroactive') {
-      const quotitePassee = parseFloat(document.getElementById('rachat-quotitePassee').value);
-      const nbTrimsLimite = Math.min(nbTrimestres, 4);
-      const { coutMensuel, moisPour1Trim } = calculerCoutSurcotisationRetroactive(quotitePassee, traitementIndiciaire);
-      dureeCotisationAns = (moisPour1Trim * nbTrimsLimite) / 12;
-      versementMensuel = coutMensuel;
-    } else {
-      // Rachat classique : versement unique considéré au moment du rachat
-      dureeCotisationAns = 0;
-      versementMensuel = 0;
-    }
-    const delaiInsuffisant = dureeCotisationAns > dureeJusquRetraite;
-    const dureeCapitalisationAns = Math.max(0, dureeJusquRetraite - dureeCotisationAns);
+    // Rachat classique : versement unique du coutReel au moment du rachat, puis capitalisation jusqu'à la retraite
+    const dureeCapitalisationAns = dureeJusquRetraite;
 
     let resultHTML = '<div class="result-section">';
     resultHTML += '<h3>' + typeLabel + '</h3>';
-
-    // Détail du coût selon le type
-    if (typeRachat === 'surcotisation_retroactive') {
-      const quotitePassee = parseFloat(document.getElementById('rachat-quotitePassee').value);
-      const nbTrimsLimite = Math.min(nbTrimestres, 4);
-      const { moisPour1Trim } = calculerCoutSurcotisationRetroactive(quotitePassee, traitementIndiciaire);
-      resultHTML += '<p><strong>Quotité passée :</strong> ' + (quotitePassee * 100).toFixed(0) + '%</p>';
-      resultHTML += '<p><strong>Trimestres récupérés :</strong> ' + nbTrimsLimite + ' (limité à 4 par Art. L11 bis CPCMR)</p>';
-      resultHTML += '<p><strong>Durée de surcotisation nécessaire :</strong> ' + (moisPour1Trim * nbTrimsLimite / 12).toFixed(1) + ' ans</p>';
-      if (delaiInsuffisant) {
-        resultHTML += '<div style="background:#fee2e2;border-left:4px solid #dc2626;padding:10px;border-radius:6px;margin:10px 0;">';
-        resultHTML += '<strong style="color:#991b1b;">⛔ Délai insuffisant avant le départ en retraite progressive</strong><br>';
-        resultHTML += '<span style="color:#991b1b;">La surcotisation nécessite <strong>' + (moisPour1Trim * nbTrimsLimite / 12).toFixed(1) + ' ans</strong>, mais il ne reste que <strong>' + dureeJusquRetraite.toFixed(1) + ' ans</strong> avant la date de départ en retraite progressive renseignée dans l\'onglet Paramètres. Réduisez le nombre de trimestres souhaités ou vérifiez votre date de départ.</span>';
-        resultHTML += '</div>';
-      }
-    } else {
-      resultHTML += '<p><strong>Coefficient appliqué :</strong> ' + (coefficient * 100).toFixed(2) + '% du traitement</p>';
-      resultHTML += '<p><strong>Coût par trimestre :</strong> ' + formatEuro(coutParTrimestre) + '</p>';
-    }
+    resultHTML += '<p><strong>Coefficient appliqué :</strong> ' + (coefficient * 100).toFixed(2) + '% du traitement</p>';
+    resultHTML += '<p><strong>Coût par trimestre :</strong> ' + formatEuro(coutParTrimestre) + '</p>';
     resultHTML += '<p><strong>Coût nominal :</strong> ' + formatEuro(coutNominal) + '</p>';
     resultHTML += '<p><strong>Économie d\'impôt (TMI ' + (TMI * 100).toFixed(0) + '%) :</strong> -' + formatEuro(economieImpot) + '</p>';
     resultHTML += '<p style="font-size:1.1em;font-weight:bold;color:#2563eb;"><strong>Coût réel après impôt :</strong> ' + formatEuro(coutReel) + '</p>';
     resultHTML += '</div>';
 
     // Impact sur la pension
-    if (typeRachat === 'surcotisation_retroactive' || optionRachat === 'taux_duree') {
+    if (optionRachat === 'taux_duree') {
       resultHTML += '<div class="result-section">';
-      resultHTML += '<h3>Supplément de pension (Art. L11 bis CPCMR)</h3>';
+      resultHTML += '<h3>Supplément de pension</h3>';
       resultHTML += '<p><strong>Supplément mensuel estimé :</strong> <strong style="color:#16a34a;">+' + formatEuro(gainMensuel) + '/mois à vie</strong></p>';
       resultHTML += '<p><strong>Supplément annuel estimé :</strong> <strong style="color:#16a34a;">+' + formatEuro(gainAnnuel) + '/an</strong></p>';
       const dureeAffichage = dureeRentabilisation === Infinity ? 'Jamais récupéré' : dureeRentabilisation.toFixed(1) + ' ans';
@@ -1966,43 +1860,22 @@
       resultHTML += '</div>';
     }
 
-    // Tableau comparatif 3 placements
-    // Calcul en 2 phases pour chaque scénario de placement
-    // Phase 1 : versements mensuels pendant dureeCotisationAns → C1
-    // Phase 2 : C1 capitalisé pendant dureeCapitalisationAns → C2 à la retraite
-    // Revenu mensuel à la retraite = intérêts annuels de C2 / 12
+    // Tableau comparatif 3 placements — versement unique (coutReel) capitalisé jusqu'à la retraite
     const scenarios3 = [
       { taux: 0.017, label: 'Livret A', detail: '1,7% — variable', couleur: '#3b82f6' },
       { taux: 0.035, label: 'Assurance-vie', detail: '3,5% — fonds euros', couleur: '#8b5cf6' },
       { taux: 0.050, label: 'PEA ETF MSCI World', detail: '5% — non garanti', couleur: '#f59e0b' }
     ].map(s => {
-      const tauxMensuel = s.taux / 12;
-      let C1;
-      if (typeRachat === 'surcotisation_retroactive' && dureeCotisationAns > 0) {
-        // Phase 1 : épargne mensuelle (versements réguliers)
-        const nMois = Math.round(dureeCotisationAns * 12);
-        C1 = versementMensuel * ((Math.pow(1 + tauxMensuel, nMois) - 1) / tauxMensuel);
-      } else {
-        // Rachat classique : versement unique
-        C1 = coutReel;
-      }
-      // Phase 2 : capitalisation jusqu'à la retraite
+      const C1 = coutReel;
       const C2 = C1 * Math.pow(1 + s.taux, dureeCapitalisationAns);
-      // Gain total = C2 - versements réels totaux (pas coutReel qui est après déduction fiscale)
-      const versementsTotaux = typeRachat === 'surcotisation_retroactive'
-        ? versementMensuel * Math.round(dureeCotisationAns * 12)
-        : coutNominal;
-      const gainTotal = C2 - versementsTotaux;
-      // Revenu mensuel = intérêts annuels de C2 / 12
+      const gainTotal = C2 - coutNominal;
       const revenuMensuel = (C2 * s.taux) / 12;
       return { ...s, C1, C2, int: gainTotal, revenuMensuel };
     });
 
     resultHTML += '<div class="result-section">';
     resultHTML += '<h3>Comparaison avec des placements alternatifs</h3>';
-    const descPlacement = typeRachat === 'surcotisation_retroactive'
-      ? 'Si vous placez ' + formatEuro(versementMensuel) + '/mois pendant ' + dureeCotisationAns.toFixed(1) + ' ans, puis laissez fructifier ' + dureeCapitalisationAns.toFixed(0) + ' ans jusqu\'à la retraite :'
-      : 'Si vous placez ' + formatEuro(coutReel) + ' pendant ' + dureeJusquRetraite.toFixed(0) + ' ans jusqu\'à la retraite :';
+    const descPlacement = 'Si vous placez ' + formatEuro(coutReel) + ' pendant ' + dureeJusquRetraite.toFixed(0) + ' ans jusqu\'à la retraite :';
     resultHTML += '<small style="color:#6b7280;">' + descPlacement + '</small>';
     resultHTML += '<table style="width:100%;border-collapse:collapse;font-size:0.88rem;margin:10px 0;">';
     resultHTML += '<thead><tr style="background:#e2e8f0;">';
@@ -2022,7 +1895,7 @@
       resultHTML += '</tr>';
     });
     resultHTML += '<tr style="background:#eff6ff;">';
-    resultHTML += '<td style="padding:8px;border:1px solid #e5e7eb;font-weight:bold;">Rachat/Surcotisation</td>';
+    resultHTML += '<td style="padding:8px;border:1px solid #e5e7eb;font-weight:bold;">Rachat</td>';
     resultHTML += '<td style="padding:8px;border:1px solid #e5e7eb;text-align:right;color:#6b7280;">—</td>';
     resultHTML += '<td style="padding:8px;border:1px solid #e5e7eb;text-align:right;color:#6b7280;">—</td>';
     resultHTML += '<td style="padding:8px;border:1px solid #e5e7eb;text-align:right;font-weight:bold;color:#16a34a;">+' + formatEuro(gainMensuel) + '/mois à vie</td>';
@@ -2038,7 +1911,7 @@
     // Note neutre — la décision appartient à l'utilisateur
     resultHTML += '<div style="padding:12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;margin:10px 0;font-size:0.88rem;">';
     resultHTML += '<strong>📊 À vous de décider :</strong><br>';
-    resultHTML += '• La surcotisation/rachat génère un <strong>supplément de pension à vie</strong> — le capital investi est définitivement perdu.<br>';
+    resultHTML += '• Le rachat génère un <strong>supplément de pension à vie</strong> — le capital investi est définitivement perdu.<br>';
     resultHTML += '• Le placement génère un <strong>revenu mensuel sur intérêts</strong> — le capital reste disponible, fructifie et est transmissible à vos héritiers.<br>';
     resultHTML += '<small style="color:#6b7280;">La durée pour récupérer le coût et votre situation patrimoniale et familiale sont les critères clés de cette décision.</small>';
     resultHTML += '</div>';
@@ -2617,11 +2490,11 @@
       y=38;
 
       // ── LIRE LES INPUTS DE L'ONGLET RACHAT ──
-      const typeRachat=document.getElementById('type-rachat')?.value||'';
-      const optionRachat=document.getElementById('option-rachat')?.value||'';
-      const nbTrimestres=parseFloat(document.getElementById('nb-trimestres')?.value||0);
-      const ageRachat=parseFloat(document.getElementById('age-rachat')?.value||0);
-      const TMI=parseFloat(document.getElementById('tmi-rachat')?.value||0)/100;
+      const typeRachat=document.getElementById('rachat-typeRachat')?.value||'';
+      const optionRachat=document.getElementById('rachat-optionRachat')?.value||'';
+      const nbTrimestres=parseFloat(document.getElementById('rachat-nbTrimestres')?.value||0);
+      const ageRachat=parseFloat(document.getElementById('rachat-ageRachat')?.value||0);
+      const TMI=parseFloat(document.getElementById('rachat-TMI')?.value||0)/100;
 
       // ── RÉCUPÉRER LES RÉSULTATS CALCULÉS DEPUIS LE DOM ──
       const divRachat=document.getElementById('resultat-rachat');
@@ -2635,9 +2508,9 @@
       const dureeRentabStr=extraireVal(/Duree pour recuperer[^:]*:\s*([0-9,.]+\s*ans|Jamais[^)]*)/i)||'—';
 
       // ── PARAMÈTRES ──
-      titreSec('PARAMETRES DU RACHAT / DE LA SURCOTISATION',...OR);
-      const typeLabel=typeRachat==='surcotisation_retroactive'?'Surcotisation retroactive (Art. L11 bis)':typeRachat==='annees_etudes'?'Annees d\'etudes superieures':typeRachat==='annees_incompletes'?'Annees civiles incompletes':'—';
-      const optionLabel=typeRachat==='surcotisation_retroactive'?'—':optionRachat==='taux_seul'?'Option 1 - Taux seul':'Option 2 - Taux + Duree';
+      titreSec('PARAMETRES DU RACHAT',...OR);
+      const typeLabel=typeRachat==='etudes'?'Annees d\'etudes superieures':typeRachat==='incompletes'?'Annees civiles incompletes':'—';
+      const optionLabel=optionRachat==='taux_seul'?'Option 1 - Taux seul':'Option 2 - Taux + Duree';
       checkY(30);
       const col1=[['Type de rachat',typeLabel.substring(0,35)],['Trimestres concernes',nbTrimestres+' trim.'],['TMI applicable',(TMI*100).toFixed(0)+' %']];
       const col2=[['Option',optionLabel],['Age au rachat',ageRachat+' ans'],['Traitement de ref.',(I.indice*I.valeurPoint).toFixed(2)+' EUR']];
