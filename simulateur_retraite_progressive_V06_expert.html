@@ -1059,7 +1059,7 @@
   }
 
   function accepterConditions() {
-    localStorage.setItem('simulateur_consent', 'accepted');
+    try { localStorage.setItem('simulateur_consent', 'accepted'); } catch(e) {}
     document.getElementById('consent-banner').style.display = 'none';
   }
 
@@ -2768,16 +2768,23 @@
     reader.readAsText(file);
   }
 
-  function lireDonneesTransfert() {
-    try { const s = sessionStorage.getItem('simulateur_transfert_guide'); if (s) return s; } catch(e) {}
-    try { return localStorage.getItem('simulateur_transfert_guide'); } catch(e) { return null; }
+  function lireParametresTransfert() {
+    // 1) Parametre URL "data" — prioritaire, insensible aux blocages de stockage navigateur (Tracking Prevention, navigation privee...)
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const data = params.get('data');
+      if (data) return JSON.parse(data);
+    } catch(e) {}
+    // 2) sessionStorage / localStorage — compatibilite avec d'anciens liens sans "data"
+    try { const s = sessionStorage.getItem('simulateur_transfert_guide'); if (s) return JSON.parse(s).parametres; } catch(e) {}
+    try { const l = localStorage.getItem('simulateur_transfert_guide'); if (l) return JSON.parse(l).parametres; } catch(e) {}
+    return null;
   }
 
   function chargerDonneesTransfert() {
     try {
-      const raw = lireDonneesTransfert();
-      if (!raw) { alert('Aucune donnée du mode Guidé trouvée. Revenez au wizard, cliquez sur "Calculer ma simulation", puis réessayez.'); return; }
-      const p = JSON.parse(raw).parametres;
+      const p = lireParametresTransfert();
+      if (!p) { alert('Aucune donnée du mode Guidé trouvée. Revenez au wizard, cliquez sur "Calculer ma simulation", puis réessayez.'); return; }
       appliquerParametres(p);
       document.getElementById('transfert-banner').style.display = 'none';
       const params = new URLSearchParams(window.location.search);
@@ -2799,11 +2806,12 @@
   }
 
   document.addEventListener('DOMContentLoaded', function() {
-    const consent = localStorage.getItem('simulateur_consent');
+    let consent = null;
+    try { consent = localStorage.getItem('simulateur_consent'); } catch(e) {}
     if (!consent) document.getElementById('consent-banner').style.display = 'block';
 
     const params = new URLSearchParams(window.location.search);
-    if (params.get('depuis') === 'guide' && lireDonneesTransfert()) {
+    if (params.get('depuis') === 'guide' && lireParametresTransfert()) {
       document.getElementById('transfert-banner').style.display = 'block';
     }
 

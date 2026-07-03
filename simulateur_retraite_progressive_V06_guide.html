@@ -785,24 +785,28 @@
     let htmlPost2028='';
     if(I.dateFin>=new Date('2028-01-01')){htmlPost2028=`<div style="background:#fef2f2;border-left:3px solid #dc2626;padding:10px 12px;margin-bottom:16px;font-size:12px;"><strong style="color:#991b1b;">Date hors perimetre du gel 2026</strong><br>Votre depart definitif (${I.dateFin.toLocaleDateString('fr-FR')}) est apres le 01/01/2028. Resultats indicatifs uniquement.</div>`;}
 
-    // Sauvegarde des donnees pour transfert vers le Mode Expert (evite la ressaisie)
-    // sessionStorage prioritaire (plus fiable en navigation privee, notamment Safari), localStorage en secours
+    // Donnees pour transfert vers le Mode Expert (evite la ressaisie)
+    // Methode principale : encodees directement dans l'URL du lien (fonctionne meme si le stockage
+    // navigateur est bloque, ex: "Tracking Prevention" d'Edge, navigation privee Safari, etc.)
+    // sessionStorage/localStorage restent en secours pour les liens deja partages sans le parametre "data".
+    const parametresTransfert={
+      indice:I.indice,valeurPoint:I.valeurPoint,
+      dateReleve:document.getElementById('dateReleve').value,
+      trimAssuranceReleve:I.trimAssuranceReleve,joursAssuranceReleve:I.joursAssuranceReleve,
+      trimLiquidablesReleve:I.trimLiquidablesReleve,joursLiquidablesReleve:I.joursLiquidablesReleve,
+      dateNaissance:document.getElementById('dateNaissance').value,sexe:I.sexe,
+      dateDebut:document.getElementById('dateDebut').value,dateFin:document.getElementById('dateFin').value,
+      quotiteAvant:document.getElementById('quotiteAvant').value,quotite:document.getElementById('quotite').value,surcotisation:I.surcotisation,
+      enfantsAvant2004:I.nbEnfantsAvant2004,enfantsApres2003:I.nbEnfantsApres2003,
+      totalEnfantsEleves:I.totalEnfantsEleves,bonifEnfants:I.conditionsEnfantsAvant2004,
+      majorationEnfants:I.conditionsEnfantsApres2003,appliquerDecret1982:I.appliquerDecret1982
+    };
+    const payload=JSON.stringify({version:'V.06',date:new Date().toISOString(),parametres:parametresTransfert});
     try{
-      const payload=JSON.stringify({version:'V.06',date:new Date().toISOString(),parametres:{
-        indice:I.indice,valeurPoint:I.valeurPoint,
-        dateReleve:document.getElementById('dateReleve').value,
-        trimAssuranceReleve:I.trimAssuranceReleve,joursAssuranceReleve:I.joursAssuranceReleve,
-        trimLiquidablesReleve:I.trimLiquidablesReleve,joursLiquidablesReleve:I.joursLiquidablesReleve,
-        dateNaissance:document.getElementById('dateNaissance').value,sexe:I.sexe,
-        dateDebut:document.getElementById('dateDebut').value,dateFin:document.getElementById('dateFin').value,
-        quotiteAvant:document.getElementById('quotiteAvant').value,quotite:document.getElementById('quotite').value,surcotisation:I.surcotisation,
-        enfantsAvant2004:I.nbEnfantsAvant2004,enfantsApres2003:I.nbEnfantsApres2003,
-        totalEnfantsEleves:I.totalEnfantsEleves,bonifEnfants:I.conditionsEnfantsAvant2004,
-        majorationEnfants:I.conditionsEnfantsApres2003,appliquerDecret1982:I.appliquerDecret1982
-      }});
-      try{ sessionStorage.setItem('simulateur_transfert_guide',payload); }
-      catch(e1){ try{ localStorage.setItem('simulateur_transfert_guide',payload); }catch(e2){ console.warn('Transfert vers Mode Expert impossible (stockage bloque par le navigateur) :',e2); } }
+      try{ sessionStorage.setItem('simulateur_transfert_guide',payload); try{ localStorage.removeItem('simulateur_transfert_guide'); }catch(e0){} }
+      catch(e1){ try{ localStorage.setItem('simulateur_transfert_guide',payload); }catch(e2){} }
     }catch(e){}
+    const donneesEncodees=encodeURIComponent(JSON.stringify(parametresTransfert));
 
     // Bloc contextuel rachat de trimestres, sans nouveau calcul (renvoie vers le Mode Expert deja pre-rempli)
     // Distinction essentielle : assF (assurance, evite la decote) != liqF (liquidables, determine le MONTANT de la pension)
@@ -810,7 +814,7 @@
     {
       const manqueAssurance=Math.max(0,TR-assF);
       const margeLiquidation=Math.max(0,TR-liqF);
-      const lienRachat='simulateur_retraite_progressive_V06_expert.html?depuis=guide&onglet=rachat';
+      const lienRachat='simulateur_retraite_progressive_V06_expert.html?depuis=guide&onglet=rachat&data='+donneesEncodees;
       if(manqueAssurance>0){
         htmlRachatSummary=`<div style="background:#eff6ff;border-left:3px solid #1e40af;padding:12px 14px;margin-bottom:16px;font-size:13px;">
           <strong style="color:#1e40af;">Racheter des trimestres ?</strong><br>
