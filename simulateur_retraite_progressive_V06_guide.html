@@ -786,8 +786,9 @@
     if(I.dateFin>=new Date('2028-01-01')){htmlPost2028=`<div style="background:#fef2f2;border-left:3px solid #dc2626;padding:10px 12px;margin-bottom:16px;font-size:12px;"><strong style="color:#991b1b;">Date hors perimetre du gel 2026</strong><br>Votre depart definitif (${I.dateFin.toLocaleDateString('fr-FR')}) est apres le 01/01/2028. Resultats indicatifs uniquement.</div>`;}
 
     // Sauvegarde des donnees pour transfert vers le Mode Expert (evite la ressaisie)
+    // sessionStorage prioritaire (plus fiable en navigation privee, notamment Safari), localStorage en secours
     try{
-      localStorage.setItem('simulateur_transfert_guide',JSON.stringify({version:'V.06',date:new Date().toISOString(),parametres:{
+      const payload=JSON.stringify({version:'V.06',date:new Date().toISOString(),parametres:{
         indice:I.indice,valeurPoint:I.valeurPoint,
         dateReleve:document.getElementById('dateReleve').value,
         trimAssuranceReleve:I.trimAssuranceReleve,joursAssuranceReleve:I.joursAssuranceReleve,
@@ -798,7 +799,9 @@
         enfantsAvant2004:I.nbEnfantsAvant2004,enfantsApres2003:I.nbEnfantsApres2003,
         totalEnfantsEleves:I.totalEnfantsEleves,bonifEnfants:I.conditionsEnfantsAvant2004,
         majorationEnfants:I.conditionsEnfantsApres2003,appliquerDecret1982:I.appliquerDecret1982
-      }}));
+      }});
+      try{ sessionStorage.setItem('simulateur_transfert_guide',payload); }
+      catch(e1){ try{ localStorage.setItem('simulateur_transfert_guide',payload); }catch(e2){ console.warn('Transfert vers Mode Expert impossible (stockage bloque par le navigateur) :',e2); } }
     }catch(e){}
 
     // Bloc contextuel rachat de trimestres, sans nouveau calcul (renvoie vers le Mode Expert deja pre-rempli)

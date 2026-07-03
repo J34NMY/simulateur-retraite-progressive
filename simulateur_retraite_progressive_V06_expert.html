@@ -539,6 +539,16 @@
     document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
     document.getElementById('tab-' + tabName).classList.add('active');
     document.querySelector('[onclick="switchTab(\'' + tabName + '\')"]').classList.add('active');
+    if (tabName === 'rachat') mettreAJourAgeMinRachat();
+  }
+
+  function mettreAJourAgeMinRachat() {
+    const dn = new Date(document.getElementById('dateNaissance').value);
+    if (isNaN(dn)) return;
+    const ageActuel = Math.floor((new Date() - dn) / (1000 * 60 * 60 * 24 * 365.25));
+    const champAge = document.getElementById('rachat-ageRachat');
+    champAge.min = Math.max(20, ageActuel);
+    if (parseInt(champAge.value) < ageActuel) champAge.value = Math.min(66, ageActuel);
   }
 
   const baremeSurcotisation = {
@@ -1825,14 +1835,7 @@
     document.getElementById('rachat-assurance').textContent = (inputs.trimAssuranceReleve + inputs.joursAssuranceReleve/90).toFixed(2) + ' trimestres';
     document.getElementById('rachat-liquidables').textContent = (inputs.trimLiquidablesReleve + inputs.joursLiquidablesReleve/90).toFixed(2) + ' trimestres';
     document.getElementById('rachat-requis').textContent = inputs.trimestresRequis + ' trimestres';
-
-    // Age actuel — on ne peut pas legalement demander un rachat a un age deja depasse
-    if (inputs.dateNaissance && !isNaN(inputs.dateNaissance)) {
-      const ageActuel = Math.floor((new Date() - inputs.dateNaissance) / (1000 * 60 * 60 * 24 * 365.25));
-      const champAge = document.getElementById('rachat-ageRachat');
-      champAge.min = Math.max(20, ageActuel);
-      if (parseInt(champAge.value) < ageActuel) champAge.value = Math.min(66, ageActuel);
-    }
+    mettreAJourAgeMinRachat();
   }
 
   function analyserRachat() {
@@ -2763,10 +2766,15 @@
     reader.readAsText(file);
   }
 
+  function lireDonneesTransfert() {
+    try { const s = sessionStorage.getItem('simulateur_transfert_guide'); if (s) return s; } catch(e) {}
+    try { return localStorage.getItem('simulateur_transfert_guide'); } catch(e) { return null; }
+  }
+
   function chargerDonneesTransfert() {
     try {
-      const raw = localStorage.getItem('simulateur_transfert_guide');
-      if (!raw) return;
+      const raw = lireDonneesTransfert();
+      if (!raw) { alert('Aucune donnée du mode Guidé trouvée. Revenez au wizard, cliquez sur "Calculer ma simulation", puis réessayez.'); return; }
       const p = JSON.parse(raw).parametres;
       appliquerParametres(p);
       document.getElementById('transfert-banner').style.display = 'none';
@@ -2793,7 +2801,7 @@
     if (!consent) document.getElementById('consent-banner').style.display = 'block';
 
     const params = new URLSearchParams(window.location.search);
-    if (params.get('depuis') === 'guide' && localStorage.getItem('simulateur_transfert_guide')) {
+    if (params.get('depuis') === 'guide' && lireDonneesTransfert()) {
       document.getElementById('transfert-banner').style.display = 'block';
     }
 
