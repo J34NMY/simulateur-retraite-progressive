@@ -7,6 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Assistant Simulateur de Retraite Progressive - Reforme 2023</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <style>
     :root {
       --bleu:#1e40af; --bleu-clair:#eff6ff; --bleu-bord:#bfdbfe;
@@ -366,6 +367,13 @@
   <!-- RESULTATS -->
   <div class="results-section" id="results-section">
     <div id="resultat"></div>
+    <div class="result-section" id="graphique-wizard-container" style="margin-top:14px;">
+      <h3>Comparaison des revenus par quotite</h3>
+      <p style="font-size:.78rem;color:var(--gris-txt);margin-bottom:10px;">Traitement + pension provisoire pendant la retraite progressive, selon la quotite de travail choisie.</p>
+      <div style="position:relative;height:260px;">
+        <canvas id="graphique-wizard"></canvas>
+      </div>
+    </div>
     <div id="tableau-comparaison" style="margin-top:14px;"></div>
     <div style="text-align:center;margin-top:14px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
       <button class="btn btn-secondary" onclick="modifierSimulation()">Modifier mes donnees</button>
@@ -606,12 +614,12 @@
       return{...s,capital:cap,interets:int,renteMensuelle:int/12};
     });
     const pm=gA>0?cout/gA:Infinity;
-    const strat=gM>=scenarios[0].renteMensuelle?'surcotisation':'placement';
-    let eval2,couleur,reco;
-    if(strat==='placement'){eval2='defavorable';couleur='#dc2626';reco='Le placement semble plus avantageux que la surcotisation.';}
-    else if(pm<eva*0.5){eval2='favorable';couleur='#16a34a';reco='La surcotisation est rentable et se rentabilise rapidement.';}
-    else{eval2='neutre';couleur='#ca8a04';reco='La surcotisation genere plus qu\'un Livret A mais la rentabilisation est longue.';}
-    return{gainMensuel:gM,gainAnnuel:gA,pointMort:pm,esperanceVie:eva,evaluation:eval2,couleur,recommandation:reco,coutTotal:cout,dureePeriodeAnnees:dA,scenarios};
+    // Couleur indicative liee a la duree de retour sur investissement (accent visuel neutre, pas un verdict ecrit)
+    let couleur;
+    if(gM<scenarios[0].renteMensuelle)couleur='#dc2626';
+    else if(pm<eva*0.5)couleur='#16a34a';
+    else couleur='#ca8a04';
+    return{gainMensuel:gM,gainAnnuel:gA,pointMort:pm,esperanceVie:eva,couleur,coutTotal:cout,dureePeriodeAnnees:dA,scenarios};
   }
 
   function afficherAnalyseRentabilite(a){
@@ -773,6 +781,51 @@
 
     const htmlPost2028='';
 
+    // Donnees pour transfert vers le Mode Expert (evite la ressaisie)
+    // Methode principale : encodees directement dans l'URL du lien (fonctionne meme si le stockage
+    // navigateur est bloque, ex: "Tracking Prevention" d'Edge, navigation privee Safari, etc.)
+    const parametresTransfert={
+      indice:I.indice,valeurPoint:I.valeurPoint,
+      dateReleve:document.getElementById('dateReleve').value,
+      trimAssuranceReleve:I.trimAssuranceReleve,joursAssuranceReleve:I.joursAssuranceReleve,
+      trimLiquidablesReleve:I.trimLiquidablesReleve,joursLiquidablesReleve:I.joursLiquidablesReleve,
+      dateNaissance:document.getElementById('dateNaissance').value,sexe:I.sexe,
+      dateDebut:document.getElementById('dateDebut').value,dateFin:document.getElementById('dateFin').value,
+      quotiteAvant:document.getElementById('quotiteAvant').value,quotite:document.getElementById('quotite').value,surcotisation:I.surcotisation,
+      enfantsAvant2004:I.nbEnfantsAvant2004,enfantsApres2003:I.nbEnfantsApres2003,
+      totalEnfantsEleves:I.totalEnfantsEleves,bonifEnfants:I.conditionsEnfantsAvant2004,
+      majorationEnfants:I.conditionsEnfantsApres2003,appliquerDecret1982:I.appliquerDecret1982
+    };
+    const payloadTransfert=JSON.stringify({version:'V.04.2.8',date:new Date().toISOString(),parametres:parametresTransfert});
+    try{
+      try{ sessionStorage.setItem('simulateur_transfert_guide',payloadTransfert); try{ localStorage.removeItem('simulateur_transfert_guide'); }catch(e0){} }
+      catch(e1){ try{ localStorage.setItem('simulateur_transfert_guide',payloadTransfert); }catch(e2){} }
+    }catch(e){}
+    const donneesEncodees=encodeURIComponent(JSON.stringify(parametresTransfert));
+
+    // Bloc contextuel rachat de trimestres, sans nouveau calcul (renvoie vers le Mode Expert deja pre-rempli)
+    // Distinction essentielle : assF (assurance, evite la decote) != liqF (liquidables, determine le MONTANT de la pension)
+    let htmlRachatSummary='';
+    {
+      const manqueAssurance=Math.max(0,TR-assF);
+      const margeLiquidation=Math.max(0,TR-liqF);
+      const lienRachat='simulateur_retraite_progressiveV.04.2.8.html?depuis=guide&onglet=rachat&data='+donneesEncodees;
+      if(manqueAssurance>0){
+        htmlRachatSummary=`<div style="background:#eff6ff;border-left:3px solid #1e40af;padding:12px 14px;margin-bottom:16px;font-size:13px;">
+          <strong style="color:#1e40af;">Racheter des trimestres ?</strong><br>
+          Il vous manque <strong>${manqueAssurance} trimestre(s) d'assurance</strong> pour le taux plein (${assF}/${TR}), ce qui entraine une decote. Le rachat de trimestres d'etudes superieures ou d'annees incompletes (option Duree d'assurance) peut reduire cet ecart.<br>
+          <a href="${lienRachat}" target="_blank" style="display:inline-block;margin-top:8px;background:#1e40af;color:#fff;padding:7px 14px;border-radius:6px;text-decoration:none;font-weight:500;font-size:12.5px;">Tester le rachat de trimestres &rarr;</a>
+        </div>`;
+      }else if(margeLiquidation>0){
+        htmlRachatSummary=`<div style="background:#f0fdf4;border-left:3px solid #15803d;padding:12px 14px;margin-bottom:16px;font-size:13px;">
+          <strong style="color:#15803d;">Aller plus loin avec le rachat de trimestres</strong><br>
+          Vous etes deja au taux plein (pas de decote), mais vos trimestres liquidables (${liqF}/${TR}) restent en dessous du maximum — c'est frequent apres une periode a temps partiel ou en RP. Un rachat en option "Supplement de liquidation" peut encore augmenter le <strong>montant</strong> de votre pension.<br>
+          <a href="${lienRachat}" target="_blank" style="display:inline-block;margin-top:8px;background:#15803d;color:#fff;padding:7px 14px;border-radius:6px;text-decoration:none;font-weight:500;font-size:12.5px;">Tester le rachat de trimestres &rarr;</a>
+        </div>`;
+      }
+      // Si assF>=TR ET liqF>=TR : aucune marge, le rachat n'aurait aucun effet — on n'affiche rien pour eviter de pousser vers une depense inutile
+    }
+
     let blocSurcotisationGuide='';
     if(I.surcotisation){
       const cT=coutSurcotMensuel*(P2.totalJours/30);
@@ -850,6 +903,7 @@
       </div>
       ${htmlDecote}
       ${htmlSurcotes}
+      ${htmlRachatSummary}
       <hr style="border:none;border-top:0.5px solid #e2e8f0;margin:4px 0 20px;">
       <p style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:#6b7280;margin:0 0 10px;">
         A partir de votre retraite definitive · ${dateFinFmt}
@@ -1392,10 +1446,30 @@
       return{q,ttp,pen,tot,ok:Math.abs(q-I.quotite)<0.01};
     });
     const maxT=Math.max(...lignes.map(l=>l.tot));
-    const tab='<div class="result-section"><h3>Comparaison des revenus par quotite</h3><p style="font-size:.78rem;color:var(--gris-txt);margin-bottom:10px;">Traitement + pension provisoire pendant la RP.</p><table style="width:100%;border-collapse:collapse;font-size:.84rem;"><thead><tr style="background:var(--bleu);color:#fff;"><th style="padding:8px;text-align:center;">Quotite</th><th style="padding:8px;text-align:right;">Traitement</th><th style="padding:8px;text-align:right;">Pension provisoire</th><th style="padding:8px;text-align:right;">Total brut</th><th style="padding:8px;text-align:left;">Repartition</th></tr></thead><tbody>'+
+    const tab='<div class="result-section"><h3>Detail chiffre par quotite</h3><p style="font-size:.78rem;color:var(--gris-txt);margin-bottom:10px;">Traitement + pension provisoire pendant la RP.</p><table style="width:100%;border-collapse:collapse;font-size:.84rem;"><thead><tr style="background:var(--bleu);color:#fff;"><th style="padding:8px;text-align:center;">Quotite</th><th style="padding:8px;text-align:right;">Traitement</th><th style="padding:8px;text-align:right;">Pension provisoire</th><th style="padding:8px;text-align:right;">Total brut</th><th style="padding:8px;text-align:left;">Repartition</th></tr></thead><tbody>'+
       lignes.map(l=>'<tr style="background:'+(l.ok?'#eff6ff':'#fff')+';border-bottom:1px solid var(--gris-bord);"><td style="padding:8px;text-align:center;font-weight:'+(l.ok?'700':'400')+';color:'+(l.ok?'var(--bleu)':'inherit')+';">'+(l.q*100).toFixed(0)+' %'+(l.ok?' <':'')+'</td><td style="padding:8px;text-align:right;">'+formatEuro(l.ttp)+'</td><td style="padding:8px;text-align:right;">'+formatEuro(l.pen)+'</td><td style="padding:8px;text-align:right;font-weight:700;color:'+(l.ok?'var(--bleu)':'var(--vert)')+';">'+formatEuro(l.tot)+'</td><td style="padding:8px;"><div style="background:var(--gris-bord);border-radius:3px;height:10px;"><div style="background:'+(l.ok?'var(--bleu)':'var(--vert)')+';border-radius:3px;height:10px;width:'+(l.tot/maxT*100).toFixed(1)+'%;"></div></div></td></tr>').join('')+
       '</tbody></table><p style="font-size:.74rem;color:var(--gris-txt);margin-top:6px;">Pour la retraite definitive : <a href="simulateur_retraite_progressiveV.04.2.8.html" target="_blank">Mode Expert V04.2.8</a>.</p></div>';
     document.getElementById('tableau-comparaison').innerHTML=tab;
+    dessinerGraphiqueWizard(lignes);
+  }
+
+  let graphiqueWizardChart=null;
+  function dessinerGraphiqueWizard(lignes){
+    const canvas=document.getElementById('graphique-wizard');
+    if(!canvas||typeof Chart==='undefined')return;
+    if(graphiqueWizardChart){graphiqueWizardChart.destroy();}
+    const labels=lignes.map(l=>(l.q*100).toFixed(0)+' %');
+    const data=lignes.map(l=>l.tot);
+    const couleurs=lignes.map(l=>l.ok?'#1e40af':'#16a34a');
+    graphiqueWizardChart=new Chart(canvas.getContext('2d'),{
+      type:'bar',
+      data:{labels:labels,datasets:[{label:'Total brut mensuel pendant la RP (EUR)',data:data,backgroundColor:couleurs,borderRadius:4}]},
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>formatEuro(ctx.parsed.y)}}},
+        scales:{y:{beginAtZero:false,ticks:{callback:v=>v.toFixed(0)+' EUR'}}}
+      }
+    });
   }
 
   function modifierSimulation(){
