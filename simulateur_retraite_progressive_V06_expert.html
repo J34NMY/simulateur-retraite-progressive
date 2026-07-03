@@ -1825,13 +1825,29 @@
     document.getElementById('rachat-assurance').textContent = (inputs.trimAssuranceReleve + inputs.joursAssuranceReleve/90).toFixed(2) + ' trimestres';
     document.getElementById('rachat-liquidables').textContent = (inputs.trimLiquidablesReleve + inputs.joursLiquidablesReleve/90).toFixed(2) + ' trimestres';
     document.getElementById('rachat-requis').textContent = inputs.trimestresRequis + ' trimestres';
+
+    // Age actuel — on ne peut pas legalement demander un rachat a un age deja depasse
+    if (inputs.dateNaissance && !isNaN(inputs.dateNaissance)) {
+      const ageActuel = Math.floor((new Date() - inputs.dateNaissance) / (1000 * 60 * 60 * 24 * 365.25));
+      const champAge = document.getElementById('rachat-ageRachat');
+      champAge.min = Math.max(20, ageActuel);
+      if (parseInt(champAge.value) < ageActuel) champAge.value = Math.min(66, ageActuel);
+    }
   }
 
   function analyserRachat() {
     const inputs = lireInputs();
 
     const nbTrimestres = parseInt(document.getElementById('rachat-nbTrimestres').value);
-    const ageRachat = parseInt(document.getElementById('rachat-ageRachat').value);
+    let ageRachat = parseInt(document.getElementById('rachat-ageRachat').value);
+    if (inputs.dateNaissance && !isNaN(inputs.dateNaissance)) {
+      const ageActuel = Math.floor((new Date() - inputs.dateNaissance) / (1000 * 60 * 60 * 24 * 365.25));
+      if (ageRachat < ageActuel) {
+        alert('L\'âge au moment du rachat (' + ageRachat + ' ans) ne peut pas être inférieur à votre âge actuel (' + ageActuel + ' ans). Ajustement automatique.');
+        ageRachat = ageActuel;
+        document.getElementById('rachat-ageRachat').value = ageActuel;
+      }
+    }
     const typeRachat = document.getElementById('rachat-typeRachat').value;
     const optionRachat = document.getElementById('rachat-optionRachat').value;
     const TMI = parseFloat(document.getElementById('rachat-TMI').value) / 100;
@@ -2693,7 +2709,7 @@
       trimLiquidablesReleve: inputs.trimLiquidablesReleve, joursLiquidablesReleve: inputs.joursLiquidablesReleve,
       dateNaissance: document.getElementById('dateNaissance').value, sexe: inputs.sexe,
       dateDebut: document.getElementById('dateDebut').value, dateFin: document.getElementById('dateFin').value,
-      quotiteAvant: inputs.quotiteAvant, quotite: inputs.quotite, surcotisation: inputs.surcotisation,
+      quotiteAvant: document.getElementById('quotiteAvant').value, quotite: document.getElementById('quotite').value, surcotisation: inputs.surcotisation,
       enfantsAvant2004: inputs.nbEnfantsAvant2004, enfantsApres2003: inputs.nbEnfantsApres2003,
       totalEnfantsEleves: inputs.totalEnfantsEleves, bonifEnfants: inputs.conditionsEnfantsAvant2004,
       majorationEnfants: inputs.conditionsEnfantsApres2003, appliquerDecret1982: inputs.appliquerDecret1982
