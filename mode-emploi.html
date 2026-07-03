@@ -712,15 +712,33 @@
         <table>
           <thead><tr><th>Type de rachat</th><th>Base légale</th></tr></thead>
           <tbody>
-            <tr><td>Années d'études supérieures</td><td>Décret n°2007-262 (coefficients par âge)</td></tr>
+            <tr><td>Années d'études supérieures</td><td>Décret n°2007-262, actualisé par le Décret n°2025-1340 du 26/12/2025 — plafond 12 trimestres, coefficients par âge</td></tr>
             <tr><td>Années civiles incomplètes</td><td>Décret n°2007-262 (coefficients par âge)</td></tr>
           </tbody>
         </table>
       </div>
+      <p style="font-size:.86rem;color:var(--gris-txt);">Ces deux plafonds sont indépendants de celui de la surcotisation rétroactive : un agent ayant déjà utilisé ses 4 trimestres de surcotisation rétroactive peut tout de même racheter des trimestres d'études ou d'années incomplètes. Seule règle de non-cumul : max 4 trimestres validés par année civile, tous types confondus (cotisés + rachetés).</p>
       <p style="font-size:.86rem;color:var(--gris-txt);">Pour récupérer des trimestres liés à une période à temps partiel déjà effectuée (surcotisation rétroactive, Art. L11 bis CPCMR), utilisez l'option <strong>Surcotisation</strong> dans l'onglet Paramètres — le plafond de 4 trimestres y est géré de façon cohérente avec le reste de la simulation.</p>
-      <div class="alert alert-orange">
-        ⚠️ Les coefficients de rachat sont indicatifs (base 2024, catégorie sédentaire). Demandez toujours un devis officiel au SRE via <a href="https://ensap.gouv.fr" target="_blank" style="color:#92400e;font-weight:600;">ensap.gouv.fr</a>.
+
+      <h4>Les 3 options de rachat</h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Option</th><th>Effet sur la décote</th><th>Effet sur le montant de la pension</th></tr></thead>
+          <tbody>
+            <tr><td>1 — Liquidation seule</td><td>Aucun</td><td>Oui — augmente les trimestres liquidables</td></tr>
+            <tr><td>2 — Durée d'assurance seule</td><td>Oui — réduit/évite la décote</td><td>Aucun</td></tr>
+            <tr><td>3 — Liquidation + Durée</td><td>Oui</td><td>Oui</td></tr>
+          </tbody>
+        </table>
       </div>
+      <div class="alert alert-orange">
+        ⚠️ <strong>Important :</strong> être au taux plein (pas de décote) ne signifie pas que vos trimestres <em>liquidables</em> sont au maximum — ce sont deux compteurs différents. Après une période à temps partiel ou de retraite progressive, il est fréquent d'être au taux plein tout en ayant encore de la marge sur les liquidables. Dans ce cas, l'Option 1 reste utile pour augmenter le montant de la pension, même sans décote à éviter. Au-delà du plafond de trimestres liquidables, l'Option 1 n'a plus d'effet (le calcul de la pension est plafonné à 100%).
+      </div>
+
+      <div class="alert alert-orange">
+        ⚠️ Barème officiel du Décret n°2025-1340 du 26/12/2025 (catégorie sédentaire). L'abattement forfaitaire &lt;40 ans n'est pas appliqué par ce simulateur. Demandez toujours un devis officiel au SRE via <a href="https://ensap.gouv.fr" target="_blank" style="color:#92400e;font-weight:600;">ensap.gouv.fr</a>.
+      </div>
+
 
       <h3>Export / Import de session</h3>
       <p>Le Mode Expert permet de sauvegarder tous vos paramètres en fichier JSON et de les recharger lors d'une session ultérieure.</p>
@@ -759,7 +777,7 @@
             <tr><td>LFSS 2026, art. 105</td><td>Suspension de la réforme des retraites 2023 du 01/09/2026 au 01/01/2028 (gel)</td></tr>
             <tr><td>Décret n°82-624 du 20/07/1982</td><td>Modalités du temps partiel (quotités 6/7ème et 32/35ème)</td></tr>
             <tr><td>Décret n°2023-799 du 21/08/2023</td><td>Extension de la retraite progressive aux fonctionnaires ; surcote parentale</td></tr>
-            <tr><td>Décret n°2007-262 du 27/02/2007</td><td>Rachat de trimestres — années d'études supérieures et années incomplètes</td></tr>
+            <tr><td>Décret n°2007-262 du 27/02/2007, actualisé par le Décret n°2025-1340 du 26/12/2025</td><td>Rachat de trimestres — années d'études supérieures et années incomplètes. Plafond de 12 trimestres pour les études ; règle de non-cumul par année civile (max 4 trimestres validés par année civile, tous types confondus — cotisés + rachetés)</td></tr>
             <tr><td>Décret n°2004-678 du 08/07/2004 — Art. L11 bis CPCMR</td><td>Surcotisation rétroactive pour périodes à temps partiel depuis le 01/01/2004 (max. 4 trimestres)</td></tr>
             <tr><td>FAQ DGAFP 2025 — Retraite progressive dans la fonction publique</td><td>Précisions administratives sur l'éligibilité, la fin du dispositif et les cas particuliers</td></tr>
           </tbody>

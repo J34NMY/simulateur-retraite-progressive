@@ -785,6 +785,46 @@
     let htmlPost2028='';
     if(I.dateFin>=new Date('2028-01-01')){htmlPost2028=`<div style="background:#fef2f2;border-left:3px solid #dc2626;padding:10px 12px;margin-bottom:16px;font-size:12px;"><strong style="color:#991b1b;">Date hors perimetre du gel 2026</strong><br>Votre depart definitif (${I.dateFin.toLocaleDateString('fr-FR')}) est apres le 01/01/2028. Resultats indicatifs uniquement.</div>`;}
 
+    // Sauvegarde des donnees pour transfert vers le Mode Expert (evite la ressaisie)
+    try{
+      localStorage.setItem('simulateur_transfert_guide',JSON.stringify({version:'V.06',date:new Date().toISOString(),parametres:{
+        indice:I.indice,valeurPoint:I.valeurPoint,
+        dateReleve:document.getElementById('dateReleve').value,
+        trimAssuranceReleve:I.trimAssuranceReleve,joursAssuranceReleve:I.joursAssuranceReleve,
+        trimLiquidablesReleve:I.trimLiquidablesReleve,joursLiquidablesReleve:I.joursLiquidablesReleve,
+        dateNaissance:document.getElementById('dateNaissance').value,sexe:I.sexe,
+        dateDebut:document.getElementById('dateDebut').value,dateFin:document.getElementById('dateFin').value,
+        quotiteAvant:I.quotiteAvant,quotite:I.quotite,surcotisation:I.surcotisation,
+        enfantsAvant2004:I.nbEnfantsAvant2004,enfantsApres2003:I.nbEnfantsApres2003,
+        totalEnfantsEleves:I.totalEnfantsEleves,bonifEnfants:I.conditionsEnfantsAvant2004,
+        majorationEnfants:I.conditionsEnfantsApres2003,appliquerDecret1982:I.appliquerDecret1982
+      }}));
+    }catch(e){}
+
+    // Bloc contextuel rachat de trimestres, sans nouveau calcul (renvoie vers le Mode Expert deja pre-rempli)
+    // Distinction essentielle : assF (assurance, evite la decote) != liqF (liquidables, determine le MONTANT de la pension)
+    let htmlRachatSummary='';
+    {
+      const manqueAssurance=Math.max(0,TR-assF);
+      const margeLiquidation=Math.max(0,TR-liqF);
+      const lienRachat='simulateur_retraite_progressive_V06_expert.html?depuis=guide&onglet=rachat';
+      if(manqueAssurance>0){
+        htmlRachatSummary=`<div style="background:#eff6ff;border-left:3px solid #1e40af;padding:12px 14px;margin-bottom:16px;font-size:13px;">
+          <strong style="color:#1e40af;">Racheter des trimestres ?</strong><br>
+          Il vous manque <strong>${manqueAssurance} trimestre(s) d'assurance</strong> pour le taux plein (${assF}/${TR}), ce qui entraine une decote. Le rachat de trimestres d'etudes superieures ou d'annees incompletes (option Duree d'assurance) peut reduire cet ecart.<br>
+          <a href="${lienRachat}" target="_blank" style="display:inline-block;margin-top:8px;background:#1e40af;color:#fff;padding:7px 14px;border-radius:6px;text-decoration:none;font-weight:500;font-size:12.5px;">Tester le rachat de trimestres &rarr;</a>
+        </div>`;
+      }else if(margeLiquidation>0){
+        htmlRachatSummary=`<div style="background:#f0fdf4;border-left:3px solid #15803d;padding:12px 14px;margin-bottom:16px;font-size:13px;">
+          <strong style="color:#15803d;">Aller plus loin avec le rachat de trimestres</strong><br>
+          Vous etes deja au taux plein (pas de decote), mais vos trimestres liquidables (${liqF}/${TR}) restent en dessous du maximum — c'est frequent apres une periode a temps partiel ou en RP. Un rachat en option "Supplement de liquidation" peut encore augmenter le <strong>montant</strong> de votre pension.<br>
+          <a href="${lienRachat}" target="_blank" style="display:inline-block;margin-top:8px;background:#15803d;color:#fff;padding:7px 14px;border-radius:6px;text-decoration:none;font-weight:500;font-size:12.5px;">Tester le rachat de trimestres &rarr;</a>
+        </div>`;
+      }
+      // Si assF>=TR ET liqF>=TR : aucune marge, le rachat n'aurait aucun effet — on n'affiche rien pour eviter de pousser vers une depense inutile
+    }
+
+
     let blocSurcotisationGuide='';
     if(I.surcotisation){
       const cT=coutSurcotMensuel*(P2.totalJours/30);
@@ -862,6 +902,7 @@
       </div>
       ${htmlDecote}
       ${htmlSurcotes}
+      ${htmlRachatSummary}
       <hr style="border:none;border-top:0.5px solid #e2e8f0;margin:4px 0 20px;">
       <p style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:#6b7280;margin:0 0 10px;">
         A partir de votre retraite definitive · ${dateFinFmt}
