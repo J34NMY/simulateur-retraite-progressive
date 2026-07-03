@@ -85,42 +85,6 @@
     <p><strong>Version :</strong> V.04.2.8 - <strong>Réglementation :</strong> Décret n° 2023-799 du 21 août 2023</p>
   </div>
 
-  <div id="consent-banner" style="margin: 20px 0; padding: 20px; background: #fff4e6; border: 3px solid #f97316; border-radius: 8px; display: none;">
-    <h3 style="margin-top: 0; color: #c2410c;">⚠️ Avertissement important - À lire avant utilisation</h3>
-    
-    <div style="background: white; padding: 15px; border-radius: 6px; margin: 10px 0;">
-      <p style="margin: 5px 0; font-weight: bold;">Ce simulateur est un outil ÉDUCATIF GRATUIT et NON OFFICIEL</p>
-      <ul style="margin: 10px 0; padding-left: 20px;">
-        <li>Résultats <strong>indicatifs uniquement</strong></li>
-        <li>Résultats validés par comparaison avec le simulateur M@rel (info-retraite.fr)</li>
-        <li>Ne constitue <strong>pas un conseil financier</strong></li>
-        <li>L'éditeur <strong>décline toute responsabilité</strong> en cas d'écart avec les calculs officiels</li>
-      </ul>
-    </div>
-    
-    <div style="background: #fee2e2; padding: 15px; border-radius: 6px; margin: 10px 0; border-left: 4px solid #dc2626;">
-      <p style="margin: 5px 0; font-weight: bold; color: #991b1b;">⚠️ IMPORTANT :</p>
-      <p style="margin: 5px 0; color: #991b1b;">Ce simulateur ne remplace en aucun cas les outils officiels de l'État. Pour votre estimation officielle, consultez le simulateur M@rel sur info-retraite.fr.</p>
-    </div>
-    
-    <div style="background: #fef3c7; padding: 15px; border-radius: 6px; margin: 10px 0; border-left: 4px solid #f59e0b;">
-      <p style="margin: 5px 0; font-weight: bold;">✓ Pour votre estimation officielle :</p>
-      <p style="margin: 5px 0;">Consultez impérativement <a href="https://ensap.gouv.fr" target="_blank" style="color: #92400e; font-weight: bold; text-decoration: underline;">ensap.gouv.fr</a></p>
-    </div>
-    
-    <div style="background: #e0f2fe; padding: 15px; border-radius: 6px; margin: 10px 0;">
-      <p style="margin: 5px 0; font-size: 0.9rem;">
-        <strong>Précision :</strong> Ce simulateur a été validé par comparaison avec le simulateur officiel M@rel (info-retraite.fr). Pour votre estimation officielle, consultez info-retraite.fr.
-      </p>
-    </div>
-    
-    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px;">
-      <button onclick="accepterConditions()" class="primary">J'ai lu et j'accepte ces conditions</button>
-      <button onclick="window.open('https://ensap.gouv.fr', '_blank')" class="secondary">Aller sur ENSAP (officiel)</button>
-      <button onclick="switchTab('legal')" class="secondary">Lire les mentions légales complètes</button>
-    </div>
-  </div>
-
   <div class="tabs-container">
     <nav class="tabs-nav">
       <button class="tab-button active" onclick="switchTab('parametres')">Paramètres</button>
@@ -1529,11 +1493,6 @@ if (nbEnfantsTotal !== sommeEnfants) {
       } else {
         tauxContainer.classList.add('hidden');
       }
-    }
-
-    function accepterConditions() {
-      localStorage.setItem('simulateur_consent', 'accepted');
-      document.getElementById('consent-banner').style.display = 'none';
     }
 
    // ============================================
@@ -3585,12 +3544,6 @@ function validerParametresDefinitive() {
 // ============================================
 
 document.addEventListener('DOMContentLoaded', function() {
-  // Vérifier le consentement
-  const consent = localStorage.getItem('simulateur_consent');
-  if (!consent) {
-    document.getElementById('consent-banner').style.display = 'block';
-  }
-  
   // Initialisation des trimestres requis
   const anneeNaissance = 1964;
   const trSelect = document.getElementById('trimestresRequis');
