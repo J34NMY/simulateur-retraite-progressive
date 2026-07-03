@@ -2701,6 +2701,7 @@
       const trSelect = document.getElementById('trimestresRequis');
       trSelect.innerHTML = '<option value="' + tr + '" selected>' + tr + '</option>';
     }
+    mettreAJourAgeMinRachat();
   }
 
   function exporterParams() {
@@ -2750,6 +2751,7 @@
     mettreAJourTauxSurcotisation();
     const tr = autoRemplirTrimestres(new Date(p.dateNaissance));
     if (tr) { const s = document.getElementById('trimestresRequis'); s.innerHTML = '<option value="' + tr + '" selected>' + tr + '</option>'; }
+    mettreAJourAgeMinRachat();
   }
 
   function importerParams() {
@@ -2828,10 +2830,15 @@
     document.getElementById('def-quotiteFuture').addEventListener('change', mettreAJourTauxSurcotisationDefinitive);
     document.getElementById('btnCalculerDefinitive').addEventListener('click', calculerRetraiteDefinitive);
     document.getElementById('btnAnalyserRachat').addEventListener('click', analyserRachat);
+    document.getElementById('rachat-ageRachat').addEventListener('change', function() {
+      const min = parseInt(this.min) || 20;
+      if (this.value !== '' && parseInt(this.value) < min) this.value = min;
+    });
 
     document.getElementById('dateNaissance').addEventListener('change', function() {
       const tr = autoRemplirTrimestres(new Date(this.value));
       if (tr) { const s = document.getElementById('trimestresRequis'); s.innerHTML = '<option value="' + tr + '" selected>' + tr + '</option>'; }
+      mettreAJourAgeMinRachat();
     });
 
     document.getElementById('bonifEnfants').addEventListener('change', function() {
