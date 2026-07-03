@@ -617,12 +617,12 @@
       return{...s,capital:cap,interets:int,renteMensuelle:int/12};
     });
     const pm=gA>0?cout/gA:Infinity;
-    const strat=gM>=scenarios[0].renteMensuelle?'surcotisation':'placement';
-    let eval2,couleur,reco;
-    if(strat==='placement'){eval2='defavorable';couleur='#dc2626';reco='Le placement semble plus avantageux que la surcotisation.';}
-    else if(pm<eva*0.5){eval2='favorable';couleur='#16a34a';reco='La surcotisation est rentable et se rentabilise rapidement.';}
-    else{eval2='neutre';couleur='#ca8a04';reco='La surcotisation genere plus qu\'un Livret A mais la rentabilisation est longue.';}
-    return{gainMensuel:gM,gainAnnuel:gA,pointMort:pm,esperanceVie:eva,evaluation:eval2,couleur,recommandation:reco,coutTotal:cout,dureePeriodeAnnees:dA,scenarios};
+    // Couleur indicative liee a la duree de retour sur investissement (accent visuel neutre, pas un verdict ecrit)
+    let couleur;
+    if(gM<scenarios[0].renteMensuelle)couleur='#dc2626';
+    else if(pm<eva*0.5)couleur='#16a34a';
+    else couleur='#ca8a04';
+    return{gainMensuel:gM,gainAnnuel:gA,pointMort:pm,esperanceVie:eva,couleur,coutTotal:cout,dureePeriodeAnnees:dA,scenarios};
   }
 
   function afficherAnalyseRentabilite(a){

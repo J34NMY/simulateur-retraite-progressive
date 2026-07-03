@@ -654,29 +654,17 @@
 
     const pointMort = gainAnnuel > 0 ? coutTotalSurcotisation / gainAnnuel : Infinity;
 
-    let strategieOptimale = gainMensuel >= renteMensuelleRef ? "surcotisation" : "placement";
-    let avantageComparatif = Math.abs(gainMensuel - renteMensuelleRef);
-
-    let evaluation, couleur, recommandation;
-    if (strategieOptimale === "placement") {
-      evaluation = "défavorable";
-      couleur = "#dc2626";
-      recommandation = "Le placement semble plus avantageux que la surcotisation, même sur le Livret A.";
-    } else if (pointMort < esperanceVieAjustee * 0.5) {
-      evaluation = "favorable";
-      couleur = "#16a34a";
-      recommandation = "La surcotisation est rentable : elle génère plus qu'un placement et se rentabilise rapidement.";
-    } else {
-      evaluation = "neutre";
-      couleur = "#ca8a04";
-      recommandation = "La surcotisation génère plus qu'un Livret A mais la durée de rentabilisation est longue. À évaluer selon votre situation.";
-    }
+    // Couleur indicative liee a la duree de retour sur investissement (accent visuel neutre, pas un verdict ecrit)
+    let couleur;
+    if (gainMensuel < renteMensuelleRef) couleur = "#dc2626";
+    else if (pointMort < esperanceVieAjustee * 0.5) couleur = "#16a34a";
+    else couleur = "#ca8a04";
 
     return {
       gainMensuel, gainAnnuel, valeurActualiseGains, pointMort,
-      esperanceVie: esperanceVieAjustee, evaluation, couleur, recommandation,
+      esperanceVie: esperanceVieAjustee, couleur,
       coutTotal: coutTotalSurcotisation, sexeAnalyse: sexe === 'F' ? 'Femme' : 'Homme',
-      strategieOptimale, avantageComparatif, dureePeriodeAnnees, scenarios
+      dureePeriodeAnnees, scenarios
     };
   }
 
