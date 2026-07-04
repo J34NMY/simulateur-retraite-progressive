@@ -155,22 +155,58 @@
       padding: 0 24px;
     }
     .version-banner-inner {
-      background: #eff6ff;
-      border-left: 4px solid #2563eb;
-      border-radius: 8px;
-      padding: 18px 22px;
+      background: #fff7ed;
+      border: 2px solid #f59e0b;
+      border-left: 6px solid #d97706;
+      border-radius: 10px;
+      padding: 22px 26px;
+      box-shadow: 0 4px 18px rgba(217,119,6,.12);
     }
     .version-banner-inner h3 {
-      font-size: .9rem;
+      font-size: 1.05rem;
       font-weight: 700;
-      color: #1d4ed8;
-      margin-bottom: 10px;
+      color: #92400e;
+      margin-bottom: 6px;
     }
-    .version-banner-inner ul {
-      margin: 8px 0 8px 18px;
-      font-size: .85rem;
+    .version-banner-inner > p:first-of-type {
+      font-size: .88rem;
       color: var(--navy);
-      line-height: 1.8;
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+    .version-choice-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+    .version-choice-card {
+      background: #fff;
+      border: 1.5px solid #fcd34d;
+      border-radius: 8px;
+      padding: 14px 16px;
+    }
+    .version-choice-card .vc-when {
+      font-size: .72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      color: #92400e;
+      margin-bottom: 4px;
+    }
+    .version-choice-card .vc-version {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 8px;
+    }
+    .version-choice-card ul {
+      margin: 0 0 0 4px;
+      font-size: .83rem;
+      color: var(--slate);
+      line-height: 1.7;
+      list-style: none;
     }
     .version-banner-inner ul ul {
       margin: 4px 0 4px 18px;
@@ -411,12 +447,6 @@
     <br><strong>Simple, gratuit et 100% privé</strong> — aucune donnée ne quitte votre appareil.
   </p>
   <div class="btn-group">
-    <a href="simulateur_retraite_progressive_V06_guide.html" class="btn btn-purple" target="_blank">
-      <span>✨</span> Simuler en mode Assistant
-    </a>
-    <a href="simulateur_retraite_progressive_V06_expert.html" class="btn btn-gold" target="_blank">
-      <span>🔧</span> Mode Expert V06
-    </a>
     <a href="mode-emploi.html" class="btn btn-outline" target="_blank">
       <span>📖</span> Mode d'emploi
     </a>
@@ -451,19 +481,27 @@
 <!-- BANDEAU VERSION -->
 <div class="version-banner">
   <div class="version-banner-inner">
-    <h3>🧭 Quelle version choisir ?</h3>
-    <p style="font-size:.85rem;color:var(--navy);margin-bottom:8px;">
-      La réforme des retraites de 2023 est <strong>suspendue du 1<sup>er</sup> septembre 2026 au 1<sup>er</sup> janvier 2028</strong> (LFSS 2026, art. 105).
+    <h3>⚠️ Étape importante — Quelle version choisir ?</h3>
+    <p>
+      La réforme des retraites de 2023 est <strong>suspendue du 1<sup>er</sup> septembre 2026 au 1<sup>er</sup> janvier 2028</strong> (LFSS 2026, art. 105). Le simulateur à utiliser dépend de votre date de départ prévue :
     </p>
-    <ul>
-      <li><strong>Départ prévu avant le 01/01/2028</strong> → utilisez la <strong>V06</strong> (règles du gel en vigueur) :
+    <div class="version-choice-grid">
+      <div class="version-choice-card">
+        <div class="vc-when">Départ prévu avant le 01/01/2028</div>
+        <div class="vc-version">V06</div>
         <ul>
-          <li>✨ <strong>Assistant Guidé</strong> — première utilisation, saisie pas à pas</li>
-          <li>🔧 <strong>Mode Expert</strong> — accès complet : Définitive, Rachat, Graphiques, PDF</li>
+          <li>✨ <strong>Assistant Guidé</strong> — première utilisation</li>
+          <li>🔧 <strong>Mode Expert</strong> — Définitive, Rachat, Graphiques, PDF</li>
         </ul>
-      </li>
-      <li><strong>Départ prévu à partir du 01/01/2028</strong> → utilisez la <strong>V.04.2.8</strong> (réforme 2023, sauf nouvelle décision)</li>
-    </ul>
+      </div>
+      <div class="version-choice-card">
+        <div class="vc-when">Départ prévu à partir du 01/01/2028</div>
+        <div class="vc-version">V.04.2.8</div>
+        <ul>
+          <li>Réforme 2023, sauf nouvelle décision</li>
+        </ul>
+      </div>
+    </div>
     <p class="note">⚠️ Ce qui se passera après le 01/01/2028 n'est pas encore tranché. La V.04.2.8 reste affichée à titre pédagogique et sera mise à jour si la situation évolue après l'élection présidentielle de mai 2027.</p>
   </div>
 </div>
@@ -519,7 +557,7 @@
 
     <!-- V06 Expert -->
     <div class="sim-card v06e">
-      <span class="sim-badge">⭐ Gel 2026 — Mode Expert</span>
+      <span class="sim-badge">⭐ Suspension 2026 — Mode Expert</span>
       <h3>Simulateur V.06</h3>
       <p class="sim-sub">LFSS 2026, art. 105 — Suspension réforme 2023 au 01/09/2026 — Version recommandée</p>
       <ul class="sim-features">
@@ -535,14 +573,14 @@
       </div>
       <div class="sim-card-footer">
         <a href="simulateur_retraite_progressive_V06_expert.html" class="btn btn-green" target="_blank" style="width:100%;justify-content:center;">
-          🔧 Ouvrir le Mode Expert V.06
+          🔧 Mode Expert V.06
         </a>
       </div>
     </div>
 
     <!-- V06 Guide -->
     <div class="sim-card v06g">
-      <span class="sim-badge">✨ Gel 2026 — Assistant Guidé</span>
+      <span class="sim-badge">✨ Suspension 2026 — Assistant Guidé</span>
       <h3>Assistant Guidé V.06</h3>
       <p class="sim-sub">Même réglementation que le Mode Expert V.06 · Idéal pour une première simulation</p>
       <ul class="sim-features">
@@ -557,7 +595,7 @@
       </div>
       <div class="sim-card-footer">
         <a href="simulateur_retraite_progressive_V06_guide.html" class="btn btn-purple" target="_blank" style="width:100%;justify-content:center;">
-          ✨ Ouvrir l'Assistant Guidé V.06
+          ✨ Assistant Guidé V.06
         </a>
       </div>
     </div>
@@ -602,30 +640,28 @@
   </div>
 </section>
 
-<!-- CTA -->
-<section class="cta">
-  <h2>Prêt à simuler votre retraite ?</h2>
-  <p>Aucune installation. Ouvrez directement dans votre navigateur.</p>
-  <div class="btn-group">
-    <a href="simulateur_retraite_progressive_V06_guide.html" class="btn btn-purple" target="_blank">
-      ✨ Simuler en mode Assistant
-    </a>
-    <a href="simulateur_retraite_progressive_V06_expert.html" class="btn btn-gold" target="_blank">
-      🔧 Mode Expert
+<!-- AVIS -->
+<div style="background:#f0f4ff;border-top:1px solid #e0e7ff;padding:32px 20px;text-align:center;">
+  <div style="max-width:480px;margin:0 auto;">
+    <h3 style="font-size:1.05rem;color:var(--navy);margin-bottom:8px;">💬 Donnez votre avis</h3>
+    <p style="font-size:.85rem;color:#6b7280;margin-bottom:14px;line-height:1.6;">Cet outil vous a-t-il été utile ? Votre retour nous aide à l'améliorer — 2 minutes suffisent.</p>
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSe03RqW5-BDHKrUkZcvuT6sa6SYraD5LS2FVkneO-4wkNTOqg/viewform" target="_blank"
+       style="display:inline-block;background:var(--navy);color:#fff;font-weight:700;padding:10px 24px;border-radius:8px;text-decoration:none;font-size:.9rem;">
+      💬 Donner mon avis
     </a>
   </div>
-</section>
+</div>
 
-<!-- MODE D'EMPLOI -->
-<div class="mode-emploi">
-  <a href="mode-emploi.html"
-     target="_blank"
-     style="display:inline-block;padding:12px 28px;background:#f0fdf4;border:2px solid #16a34a;border-radius:8px;color:#15803d;font-weight:600;text-decoration:none;font-size:.95rem;">
-    📖 Lire le mode d'emploi
-  </a>
-  <p style="margin-top:8px;font-size:.82rem;color:#6b7280;">
-    Guide complet : saisie des données, lecture du relevé, surcotisation, rachat de trimestres
-  </p>
+<!-- KO-FI -->
+<div style="background:#f9fafb;border-top:1px solid #e5e7eb;padding:40px 20px;text-align:center;">
+  <div style="max-width:480px;margin:0 auto;">
+    <h3 style="font-size:1.1rem;color:var(--navy);margin-bottom:10px;">☕ Soutenir le projet</h3>
+    <p style="font-size:.88rem;color:#6b7280;margin-bottom:18px;line-height:1.6;">Cet outil est développé bénévolement et mis à disposition gratuitement. Si vous le trouvez utile, vous pouvez soutenir son développement avec un petit don — aucune obligation.</p>
+    <a href="https://ko-fi.com/j34nmy" target="_blank"
+       style="display:inline-block;background:#FF5E5B;color:#fff;font-weight:700;padding:12px 28px;border-radius:8px;text-decoration:none;font-size:.95rem;">
+      ☕ Offrir un café sur Ko-fi
+    </a>
+  </div>
 </div>
 
 <!-- FOOTER -->
