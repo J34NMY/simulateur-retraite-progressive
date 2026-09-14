@@ -458,8 +458,9 @@
   function calculerSurcoteParentaleSRE(dn,TR,assF,bTr,mTr,q){
     if(!(dn instanceof Date)||isNaN(dn))return{applicable:false};
     const a=dn.getFullYear(),m=dn.getMonth();
-    if(a<1964||a===1964)return{applicable:false};
-    if(a===1965&&m<3)return{applicable:false};
+    if(a<1964)return{applicable:false};
+    if(a===1964)return{applicable:false,motif:'generation1964'};
+    if(a===1965&&m<3)return{applicable:false,motif:'generation1964'};
     if(bTr+mTr<1||assF<TR)return{applicable:false};
     const retenus=Math.min(4,Math.floor(q*4));
     if(retenus<=0)return{applicable:false};
@@ -777,8 +778,13 @@
     if(assF<TR){const tm=TR-assF;htmlDecote=`<div style="background:#fff7ed;border-left:3px solid #f59e0b;padding:10px 12px;margin-bottom:16px;font-size:13px;"><strong>Decote :</strong> ${tm} trimestre(s) manquant(s) — coefficient ${(tm*1.25).toFixed(2)} %</div>`;}
 
     let htmlSurcotes='';
+    const noteExclusionParentale=(sp&&sp.motif==='generation1964')
+      ?`<div style="background:#fff7ed;border-left:3px solid #f59e0b;padding:10px 12px;margin-bottom:16px;font-size:13px;color:#92400e;"><strong>ℹ️ Surcote parentale non applicable — génération 1964 / début 1965</strong><br>L'âge légal de votre génération est fixé à 62 ans et 9 mois avec le gel — un seuil qui n'atteint jamais 63 ans, quelle que soit votre date de départ personnelle. Or la surcote parentale exige que l'âge légal <strong>de la génération</strong> (pas votre date de départ individuelle) soit d'au moins 63 ans.<br><small style="color:#a16207;">Source : retraitesdeletat.gouv.fr / ENSAP.</small></div>`
+      :'';
     if(surcoteOk&&tSF>0){
-      htmlSurcotes=`<div style="background:#f0fdf4;border-left:3px solid #15803d;padding:10px 12px;margin-bottom:16px;font-size:13px;"><strong style="color:#14532d;">Majorations SRE appliquees</strong><br>${tSP>0?'+ Surcote parentale : <strong>+'+tSP.toFixed(2)+' %</strong><br>':''}${tSC>0?'+ Surcote classique : <strong>+'+tSC.toFixed(2)+' % ('+trimSC+' trim. x 1,25 %)</strong><br>':''}<strong>Total : +${tSF.toFixed(2)} %</strong></div>`;
+      htmlSurcotes=`<div style="background:#f0fdf4;border-left:3px solid #15803d;padding:10px 12px;margin-bottom:16px;font-size:13px;"><strong style="color:#14532d;">Majorations SRE appliquees</strong><br>${tSP>0?'+ Surcote parentale : <strong>+'+tSP.toFixed(2)+' %</strong><br>':''}${tSC>0?'+ Surcote classique : <strong>+'+tSC.toFixed(2)+' % ('+trimSC+' trim. x 1,25 %)</strong><br>':''}<strong>Total : +${tSF.toFixed(2)} %</strong></div>`+noteExclusionParentale;
+    } else {
+      htmlSurcotes=noteExclusionParentale;
     }
 
     let htmlPlafond='';
