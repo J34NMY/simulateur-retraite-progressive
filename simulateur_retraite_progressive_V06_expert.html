@@ -784,8 +784,8 @@
     const moisNaissance = dateNaissance.getMonth();
     const ageLegal = calculerAgeSurcote(dateNaissance);
     if (anneeNaissance < 1964) return { applicable: false };
-    if (anneeNaissance === 1964) return { applicable: false };
-    if (anneeNaissance === 1965 && moisNaissance < 3) return { applicable: false };
+    if (anneeNaissance === 1964) return { applicable: false, motif: 'generation1964' };
+    if (anneeNaissance === 1965 && moisNaissance < 3) return { applicable: false, motif: 'generation1964' };
     const trimestresEnfants = bonifEnfantsTr + majorationsApres2003Tr;
     if (trimestresEnfants < 1) return { applicable: false };
     if (assuranceFinale < trimestresRequis) return { applicable: false };
@@ -1098,6 +1098,13 @@
 
     // Bloc surcotes detail
     let htmlSurcotes = '';
+    const noteExclusionParentale = (surcoteParentale && surcoteParentale.motif === 'generation1964')
+      ? `<div style="background:#fff7ed;border-left:3px solid #f59e0b;padding:10px 12px;margin-bottom:16px;font-size:13px;color:#92400e;">
+          <strong>ℹ️ Surcote parentale non applicable — génération 1964 / début 1965</strong><br>
+          Avec le gel, l'âge légal de votre génération est fixé à 62 ans et 9 mois — un seuil qui n'atteint jamais 63 ans, quelle que soit votre date de départ personnelle. Or la surcote parentale exige que <strong>l'âge légal de la génération</strong> (pas votre date de départ individuelle) soit d'au moins 63 ans. Partir plus tard que votre âge légal ne change rien à cette éligibilité : c'est un seuil collectif, par génération, pas un seuil individuel.
+          <br><small style="color:#a16207;">Source : retraitesdeletat.gouv.fr / ENSAP.</small>
+        </div>`
+      : '';
     if (surcoteAppliquee && tauxSurcoteFinale > 0) {
       htmlSurcotes = `<div style="background:#f0fdf4;border-left:3px solid #15803d;padding:10px 12px;margin-bottom:16px;font-size:13px;">
         <strong style="color:#14532d;">Majorations SRE appliquees</strong><br>
@@ -1105,15 +1112,12 @@
         ${tauxSurcoteClassique > 0 ? '+ Surcote classique : <strong>+' + tauxSurcoteClassique.toFixed(2) + ' % (' + trimestresSurcotes + ' trim. x 1,25 %)</strong><br>' : ''}
         <strong>Total : +${tauxSurcoteFinale.toFixed(2)} %</strong>
         <br><span style="color:#166534;font-size:11px;">Methode SRE : ${(0.75 * (liquidablesFinale/TR) * 100).toFixed(2)} % x (1 + ${tauxSurcoteFinale.toFixed(2)} %) = ${(pensionBrute/traitementFin*100).toFixed(2)} % brut${plafondL13Atteint ? ' → plafonné 100% Art. L13' : ''}</span>
-      </div>`;
+      </div>` + noteExclusionParentale;
     } else if (!surcoteAppliquee) {
       const anneeN = I.dateNaissance ? I.dateNaissance.getFullYear() : 0;
       const moisN = I.dateNaissance ? I.dateNaissance.getMonth() : 0;
       if (anneeN === 1964 || (anneeN === 1965 && moisN < 3)) {
-        htmlSurcotes = `<div style="background:#fef3c7;border-left:3px solid #f59e0b;padding:10px 12px;margin-bottom:16px;font-size:13px;">
-          <strong>Surcote parentale non applicable</strong> — Generation 1964 / 1er trim. 1965<br>
-          <span style="font-size:11px;color:#92400e;">Age legal 62T3 &lt; 63 ans requis. Source : retraitesdeletat.gouv.fr</span>
-        </div>`;
+        htmlSurcotes = noteExclusionParentale;
       }
     }
 
