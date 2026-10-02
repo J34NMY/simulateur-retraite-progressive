@@ -330,6 +330,13 @@
       <div id="nbEnfantsApres2003Container" style="display:none;margin:0 0 10px 28px;">
         <label style="font-size:.81rem;font-weight:600;">Nombre d'enfants</label>
         <input id="nbEnfantsApres2003" type="number" min="1" max="10" value="1" style="max-width:75px;padding:7px;border:1px solid var(--gris-bord);border-radius:6px;display:block;margin-top:4px;" />
+        <div class="check-field" style="margin-top:10px;">
+          <input type="checkbox" id="accouchementApresRecrutement" />
+          <div class="check-label">
+            <strong>Femme fonctionnaire ayant accouche apres son recrutement</strong>
+            <span>Depuis le 01/09/2026 (decret n&deg;2026-699) : +1 trimestre liquidable par enfant, en plus des 2 trimestres d'assurance. Ne cochez pas pour une adoption ou un accouchement avant le recrutement.</span>
+          </div>
+        </div>
       </div>
       <div class="check-field">
         <input type="checkbox" id="majorationFamilialeCheck" onchange="toggleMajorationFamiliale()" />
@@ -537,7 +544,7 @@
     if(qPendant<0.5||qPendant>0.9)erreurs.push('La quotite pendant la retraite progressive doit etre entre 50% et 90%');
 
     const bE=document.getElementById('bonifEnfants').checked;
-    const mE=document.getElementById('majorationEnfants').checked;
+    const mE=document.getElementById('conditionsEnfantsApres2003').checked;
     const nE1=parseInt(document.getElementById('enfantsAvant2004').value)||0;
     const nE2=parseInt(document.getElementById('enfantsApres2003').value)||0;
     const nET=parseInt(document.getElementById('totalEnfantsEleves').value)||0;
@@ -575,7 +582,8 @@
       nbEnfantsApres2003:parseInt(document.getElementById('enfantsApres2003').value||'0',10),
       totalEnfantsEleves:parseInt(document.getElementById('totalEnfantsEleves').value||'0',10),
       conditionsEnfantsAvant2004:document.getElementById('bonifEnfants').checked,
-      conditionsEnfantsApres2003:document.getElementById('majorationEnfants').checked,
+      conditionsEnfantsApres2003:document.getElementById('conditionsEnfantsApres2003').checked,
+      accouchementApresRecrutement:document.getElementById('accouchementApresRecrutement').checked,
       dateNaissance:dn,
       sexe:document.getElementById('sexe').value||'H',
       appliquerDecret1982:document.getElementById('appliquerDecret1982').checked
@@ -697,6 +705,8 @@
     const bETr=bEJ/90;
     const mA3J=I.conditionsEnfantsApres2003?I.nbEnfantsApres2003*2*90:0;
     const mA3Tr=mA3J/90;
+    // Decret n°2026-699 (01/09/2026) : si accouchement apres recrutement, 1 des 2 trimestres devient liquidable
+    const bLA3J=(I.conditionsEnfantsApres2003&&I.accouchementApresRecrutement)?I.nbEnfantsApres2003*1*90:0;
 
     let jLP2;
     if(I.surcotisation&&I.trimSurcotDisponibles>0){
@@ -708,9 +718,9 @@
     }
 
     const assF=calculerDureeAssurance(jAR+P1.totalJours+P2.totalJours+bEJ+mA3J).trimestres;
-    const liqF=arrondirTrimestresLiquidables(jLR+jLP1+bEJ+jLP2);
+    const liqF=arrondirTrimestresLiquidables(jLR+jLP1+bEJ+jLP2+bLA3J);
     const assD=calculerDureeAssurance(jAR+P1.totalJours+bEJ+mA3J).trimestres;
-    const liqD=arrondirTrimestresLiquidables(jLR+jLP1+bEJ);
+    const liqD=arrondirTrimestresLiquidables(jLR+jLP1+bEJ+bLA3J);
 
     const tF=I.indice*I.valeurPoint;
     const rF=clamp(liqF/TR,0,1);
@@ -810,7 +820,8 @@
       quotiteAvant:document.getElementById('quotiteAvant').value,quotite:document.getElementById('quotite').value,surcotisation:I.surcotisation,
       enfantsAvant2004:I.nbEnfantsAvant2004,enfantsApres2003:I.nbEnfantsApres2003,
       totalEnfantsEleves:I.totalEnfantsEleves,bonifEnfants:I.conditionsEnfantsAvant2004,
-      majorationEnfants:I.conditionsEnfantsApres2003,appliquerDecret1982:I.appliquerDecret1982
+      majorationEnfants:I.conditionsEnfantsApres2003,accouchementApresRecrutement:I.accouchementApresRecrutement,
+      appliquerDecret1982:I.appliquerDecret1982
     };
     const payload=JSON.stringify({version:'V.06',date:new Date().toISOString(),parametres:parametresTransfert});
     try{
@@ -847,7 +858,7 @@
     if(I.surcotisation){
       const cT=coutSurcotMensuel*(P2.totalJours/30);
       const jLP2s=Math.floor(P2.totalJours*I.quotite);
-      const lFs=arrondirTrimestresLiquidables(jLR+jLP1+bEJ+jLP2s);
+      const lFs=arrondirTrimestresLiquidables(jLR+jLP1+bEJ+jLP2s+bLA3J);
       let tSans=0.75*clamp(lFs/TR,0,1),tAvec=0.75*rF;
       if(surcoteOk&&tSF>0){tSans*=(1+tSF/100);tAvec*=(1+tSF/100);}
       if(assF<TR){const c=(TR-assF)*1.25/100;tSans=(0.75*clamp(lFs/TR,0,1))*(1-c);tAvec=(0.75*rF)*(1-c);}
@@ -1421,7 +1432,8 @@
     const P1=diffDetaillee(I.dateReleve,I.dateDebut);
     const jLR=(I.trimLiquidablesReleve*90)+I.joursLiquidablesReleve;
     const bEJ=I.conditionsEnfantsAvant2004?I.nbEnfantsAvant2004*4*90:0;
-    const jLD=jLR+Math.floor(P1.totalJours*I.quotiteAvant)+bEJ;
+    const bLA3J=(I.conditionsEnfantsApres2003&&I.accouchementApresRecrutement)?I.nbEnfantsApres2003*1*90:0;
+    const jLD=jLR+Math.floor(P1.totalJours*I.quotiteAvant)+bEJ+bLA3J;
     const jAR=(I.trimAssuranceReleve*90)+I.joursAssuranceReleve;
     const jAD=jAR+P1.totalJours+bEJ;
     const lD=arrondirTrimestresLiquidables(jLD);
@@ -1473,7 +1485,9 @@
     document.getElementById('bonifEnfants').checked=ok;syncEnfants();
   }
   function toggleEnfantsApres2003(){
-    document.getElementById('nbEnfantsApres2003Container').style.display=document.getElementById('conditionsEnfantsApres2003').checked?'block':'none';
+    const ok=document.getElementById('conditionsEnfantsApres2003').checked;
+    document.getElementById('nbEnfantsApres2003Container').style.display=ok?'block':'none';
+    if(!ok)document.getElementById('accouchementApresRecrutement').checked=false;
     syncEnfants();
   }
   function toggleMajorationFamiliale(){

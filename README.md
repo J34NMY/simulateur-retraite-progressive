@@ -58,7 +58,7 @@ La réforme des retraites de 2023 est **suspendue du 1er septembre 2026 au 1er j
 ### Communes à tous les simulateurs
 - Retraite progressive et définitive (méthode SRE, base 360 j/an)
 - Décote, surcote classique et parentale, majoration familiale
-- Bonifications enfants (avant/après 2004)
+- Bonifications enfants (avant/après 2004) — V06 : trimestre liquidable supplémentaire pour les femmes ayant accouché après leur recrutement, enfants nés depuis 2004 (décret n°2026-699, pensions à effet du 01/09/2026)
 - Décret n°82-624 (6/7ème pour 80%, 32/35ème pour 90%)
 - Surcotisation Art. L11 bis CPCMR (max 4 trimestres, analyse rentabilité)
 - Tableau comparatif 3 placements : Livret A / Assurance-vie / PEA ETF
