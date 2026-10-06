@@ -292,7 +292,7 @@
                     • Enfant né ou adopté à partir du 1er janvier 2004<br>
                     • Après recrutement dans la fonction publique<br>
                     • 2 trimestres d'assurance par enfant<br>
-                    • Pas d'impact sur les trimestres liquidables<br>
+                    • Depuis le 01/09/2026 (décret n°2026-699) : 1 des 2 trimestres devient liquidable pour les femmes ayant accouché après leur recrutement — voir case ci-dessous<br>
                     • Attribution automatique sans conditions d'interruption
                   </span>
                 </span>
@@ -311,6 +311,13 @@
                 <input id="enfantsApres2003" type="number" min="0" step="1" value="0" />
                 <small>2 trimestres d'assurance par enfant</small>
               </div>
+            </div>
+            <div id="blocAccouchementRecrutement" style="margin-top:10px;display:none;">
+              <label class="bonif-label">
+                <input type="checkbox" id="accouchementApresRecrutement">
+                <span>Femme fonctionnaire ayant accouché <strong>après</strong> son recrutement dans la fonction publique</span>
+              </label>
+              <small style="display:block;margin-top:4px;color:#666;">Depuis le 01/09/2026 (décret n°2026-699), cette condition ouvre droit, en plus des 2 trimestres d'assurance, à <strong>1 trimestre supplémentaire par enfant compté dans le calcul du montant de la pension</strong>. Ne cochez pas pour une adoption ou un accouchement avant le recrutement.</small>
             </div>
             
             <div style="margin-top: 15px;">
@@ -1413,6 +1420,7 @@ if (nbEnfantsTotal !== sommeEnfants) {
       const majorationEnfants = document.getElementById('majorationEnfants').checked;
       const nbEnfantsAvant2004 = parseInt(document.getElementById('enfantsAvant2004').value || '0', 10);
       const nbEnfantsApres2003 = parseInt(document.getElementById('enfantsApres2003').value || '0', 10);
+      const accouchementApresRecrutement = document.getElementById('accouchementApresRecrutement').checked;
       const totalEnfantsEleves = parseInt(document.getElementById('totalEnfantsEleves').value || '0', 10);
       const dateNaissance = new Date(document.getElementById('dateNaissance').value);
       const appliquerDecret1982 = document.getElementById('appliquerDecret1982').checked;
@@ -1421,7 +1429,8 @@ if (nbEnfantsTotal !== sommeEnfants) {
         indice, valeurPoint, tauxSurcotisation, dateReleve, trimAssuranceReleve, joursAssuranceReleve,
         trimLiquidablesReleve, joursLiquidablesReleve, trimestresRequis, dateDebut, dateFin,
         quotiteAvant, quotite, surcotisation, nbEnfantsAvant2004, nbEnfantsApres2003, totalEnfantsEleves,
-        conditionsEnfantsAvant2004: bonifEnfants, conditionsEnfantsApres2003: majorationEnfants, dateNaissance, sexe,
+        conditionsEnfantsAvant2004: bonifEnfants, conditionsEnfantsApres2003: majorationEnfants,
+        accouchementApresRecrutement, dateNaissance, sexe,
         appliquerDecret1982
       };
     }
@@ -1567,6 +1576,7 @@ if (erreurs.length > 0) {
   // Majorations durée assurance enfants après 2004 (Article L12 bis)
   const majorationsApres2003Jours = I.conditionsEnfantsApres2003 ? I.nbEnfantsApres2003 * 2 * 90 : 0;
   const majorationsApres2003Tr = majorationsApres2003Jours / 90;
+  const bonifLiquidableApres2003Jours = (I.conditionsEnfantsApres2003 && I.accouchementApresRecrutement) ? I.nbEnfantsApres2003 * 1 * 90 : 0; // Decret 2026-699
 
   // Liquidables période progressive (avec ou sans surcotisation)
   // Art. L11 bis CPCMR : la surcotisation est limitée à 4 trimestres sur toute la carrière
@@ -1587,7 +1597,7 @@ if (erreurs.length > 0) {
   const dureeAssuranceCalcul = calculerDureeAssurance(totalJoursAssurance);
   const assuranceFinale = dureeAssuranceCalcul.trimestres;
   
-  const totalJoursLiquidables = joursLiqReleve + joursLiqP1 + bonifEnfantsJours + joursLiqP2;
+  const totalJoursLiquidables = joursLiqReleve + joursLiqP1 + bonifEnfantsJours + joursLiqP2 + bonifLiquidableApres2003Jours;
   const liquidablesFinale = arrondirTrimestresLiquidables(totalJoursLiquidables);
 
   // Compteurs au départ progressif
@@ -1595,7 +1605,7 @@ if (erreurs.length > 0) {
   const dureeAssuranceDepartCalcul = calculerDureeAssurance(totalJoursAssuranceDepart);
   const assuranceDepart = dureeAssuranceDepartCalcul.trimestres;
   
-  const totalJoursLiquidablesDepart = joursLiqReleve + joursLiqP1 + bonifEnfantsJours;
+  const totalJoursLiquidablesDepart = joursLiqReleve + joursLiqP1 + bonifEnfantsJours + bonifLiquidableApres2003Jours;
   const liquidablesDepart = arrondirTrimestresLiquidables(totalJoursLiquidablesDepart);
 
   // Vérification conditions retraite progressive
@@ -1775,7 +1785,7 @@ if (erreurs.length > 0) {
     
     // Calcul pension sans surcotisation pour comparaison
     const joursLiqP2SansSurcotisation = Math.floor(P2.totalJours * I.quotite);
-    const totalJoursLiquidablesSansSurcotisation = joursLiqReleve + joursLiqP1 + bonifEnfantsJours + joursLiqP2SansSurcotisation;
+    const totalJoursLiquidablesSansSurcotisation = joursLiqReleve + joursLiqP1 + bonifEnfantsJours + joursLiqP2SansSurcotisation + bonifLiquidableApres2003Jours;
     const liquidablesFinalesSansSurcotisation = arrondirTrimestresLiquidables(totalJoursLiquidablesSansSurcotisation);
     const ratioFinSansSurcotisation = clamp(liquidablesFinalesSansSurcotisation / TR, 0, 1);
     
@@ -2046,8 +2056,9 @@ if (erreurs.length > 0) {
     const jAR_rp=(I.trimAssuranceReleve*90)+I.joursAssuranceReleve;
     const jLR_rp=(I.trimLiquidablesReleve*90)+I.joursLiquidablesReleve;
     const bEJ_rp=I.conditionsEnfantsAvant2004?I.nbEnfantsAvant2004*4*90:0;
+    const bLA3J_rp=(I.conditionsEnfantsApres2003&&I.accouchementApresRecrutement)?I.nbEnfantsApres2003*1*90:0; // Decret 2026-699
     const jLP1_rp=Math.floor(P1_rp.totalJours*(I.quotiteAvant||1));
-    const liqDepart_rp=arrondirTrimestresLiquidables(jLR_rp+jLP1_rp+bEJ_rp);
+    const liqDepart_rp=arrondirTrimestresLiquidables(jLR_rp+jLP1_rp+bEJ_rp+bLA3J_rp);
     const assDepart_rp=calculerDureeAssurance(jAR_rp+P1_rp.totalJours+bEJ_rp).trimestres;
     const TR_rp=I.trimestresRequis||171;
     let tauxRef_rp=0.75*(liqDepart_rp/TR_rp);
@@ -2088,6 +2099,7 @@ if (erreurs.length > 0) {
     const P2_pdf=diffDetaillee(I.dateDebut,I.dateFin);
     const bEJ_pdf=I.conditionsEnfantsAvant2004?I.nbEnfantsAvant2004*4*90:0;
     const mA3J_pdf=I.conditionsEnfantsApres2003?I.nbEnfantsApres2003*2*90:0;
+    const bLA3J_pdf=(I.conditionsEnfantsApres2003&&I.accouchementApresRecrutement)?I.nbEnfantsApres2003*1*90:0; // Decret 2026-699
     const bETr_pdf=bEJ_pdf/90;
     const mA3Tr_pdf=mA3J_pdf/90;
     let jLP2_pdf;
@@ -2100,7 +2112,7 @@ if (erreurs.length > 0) {
     }
     const jLP1_pdf=Math.floor(P1_pdf.totalJours*(I.quotiteAvant||1));
     const assF_pdf=calculerDureeAssurance(jAR_pdf+P1_pdf.totalJours+P2_pdf.totalJours+bEJ_pdf+mA3J_pdf).trimestres;
-    const liqF_pdf=arrondirTrimestresLiquidables(jLR_pdf+jLP1_pdf+bEJ_pdf+jLP2_pdf);
+    const liqF_pdf=arrondirTrimestresLiquidables(jLR_pdf+jLP1_pdf+bEJ_pdf+jLP2_pdf+bLA3J_pdf);
     const rF_pdf=clamp(liqF_pdf/TR_pdf,0,1);
     let taux_pdf=0.75*rF_pdf;
     if(assF_pdf<TR_pdf)taux_pdf=(0.75*rF_pdf)*(1-(TR_pdf-assF_pdf)*1.25/100);
@@ -2127,7 +2139,7 @@ if (erreurs.length > 0) {
       // pDefNum = pension avec surcotisation (déjà calculé ci-dessus)
       // Calculer pension sans surcotisation
       const jLiqP2sans2=Math.floor(P2_rp.totalJours*I.quotite);
-      const liqSans2=arrondirTrimestresLiquidables(jLR_rp+jLP1_rp+bEJ_rp+jLiqP2sans2);
+      const liqSans2=arrondirTrimestresLiquidables(jLR_rp+jLP1_rp+bEJ_rp+jLiqP2sans2+bLA3J_rp);
       const rSans2=clamp(liqSans2/TR,0,1);
       let tauxSans2=0.75*rSans2;
       if(assF_pdf<TR){tauxSans2=(0.75*rSans2)*(1-(TR-assF_pdf)*1.25/100);}
@@ -2238,6 +2250,7 @@ if (erreurs.length > 0) {
       const jLR=(I.trimLiquidablesReleve*90)+I.joursLiquidablesReleve;
       const bEJ=I.conditionsEnfantsAvant2004?I.nbEnfantsAvant2004*4*90:0;
       const mA3J=I.conditionsEnfantsApres2003?I.nbEnfantsApres2003*2*90:0;
+      const bLA3J=(I.conditionsEnfantsApres2003&&I.accouchementApresRecrutement)?I.nbEnfantsApres2003*1*90:0; // Decret 2026-699
       const bETr=bEJ/90;const mA3Tr=mA3J/90;
       const trimSurcotDispo=I.trimSurcotDisponibles||0;
 
@@ -2254,7 +2267,7 @@ if (erreurs.length > 0) {
         jLiqProj=Math.floor(periodeProj.totalJours*quotiteDef);
       }
       const assuranceFinale=calculerDureeAssurance(jAR+periodeProj.totalJours+bEJ+mA3J).trimestres;
-      const liquidablesFinale=arrondirTrimestresLiquidables(jLR+jLiqProj+bEJ);
+      const liquidablesFinale=arrondirTrimestresLiquidables(jLR+jLiqProj+bEJ+bLA3J);
       const ratioFin=clamp(liquidablesFinale/TR,0,1);
       const ageDepartDef=(dateDepartDef-I.dateNaissance)/(1000*60*60*24*365.25);
       const ageSurcoteReq=calculerAgeSurcote(I.dateNaissance);
@@ -2335,7 +2348,7 @@ if (erreurs.length > 0) {
         const coutTotalDef=coutSurcotDef*moisProjDef;
         // Pension sans surcotisation : mêmes règles mais liquidables sans surcot
         const jLiqSansDef=Math.floor(periodeProj.totalJours*quotiteDef);
-        const liqSansDef=arrondirTrimestresLiquidables(jLR+jLiqSansDef+bEJ);
+        const liqSansDef=arrondirTrimestresLiquidables(jLR+jLiqSansDef+bEJ+bLA3J);
         const ratioSansDef=clamp(liqSansDef/TR,0,1);
         let tauxSansDef=0.75*ratioSansDef;
         if(assuranceFinale<TR){
@@ -2414,7 +2427,7 @@ if (erreurs.length > 0) {
           jLiqQ=Math.floor(periodeProj.totalJours*q);
         }
         const assQ=calculerDureeAssurance(jAR+periodeProj.totalJours+bEJ+mA3J).trimestres;
-        const liqQ=arrondirTrimestresLiquidables(jLR+jLiqQ+bEJ);
+        const liqQ=arrondirTrimestresLiquidables(jLR+jLiqQ+bEJ+bLA3J);
         const ratioQ=clamp(liqQ/TR,0,1);
         const ageSRQ=calculerAgeSurcote(I.dateNaissance);
         let tQ=0.75*ratioQ,tSQ=0,scOk=false;
@@ -2866,12 +2879,13 @@ function validerParametresDefinitive() {
       
       const majorationsApres2003Jours = inputs.conditionsEnfantsApres2003 ? inputs.nbEnfantsApres2003 * 2 * 90 : 0;
       const majorationsApres2003Tr = majorationsApres2003Jours / 90;
+      const bonifLiquidableApres2003Jours = (inputs.conditionsEnfantsApres2003 && inputs.accouchementApresRecrutement) ? inputs.nbEnfantsApres2003 * 1 * 90 : 0; // Decret 2026-699
       
       const totalJoursAssurance = joursAssuranceReleve + joursAssuranceProjection + bonifEnfantsJours + majorationsApres2003Jours;
       const dureeAssuranceCalcul = calculerDureeAssurance(totalJoursAssurance);
       const assuranceFinale = dureeAssuranceCalcul.trimestres;
       
-      const totalJoursLiquidables = joursLiquidablesReleve + joursLiquidablesProjection + bonifEnfantsJours;
+      const totalJoursLiquidables = joursLiquidablesReleve + joursLiquidablesProjection + bonifEnfantsJours + bonifLiquidableApres2003Jours;
       const liquidablesFinale = arrondirTrimestresLiquidables(totalJoursLiquidables);
       
       const TR = inputs.trimestresRequis;
@@ -2958,7 +2972,7 @@ function validerParametresDefinitive() {
         const montantSurcotisationTotal = montantSurcotisationMensuel * periodeProjection.moisApprox;
         
         const joursLiquidablesSansSurcotisation = Math.floor(periodeProjection.totalJours * quotiteFuture);
-        const totalJoursLiquidablesSansSurcotisation = joursLiquidablesReleve + joursLiquidablesSansSurcotisation + bonifEnfantsJours;
+        const totalJoursLiquidablesSansSurcotisation = joursLiquidablesReleve + joursLiquidablesSansSurcotisation + bonifEnfantsJours + bonifLiquidableApres2003Jours;
         const liquidablesFinalesSansSurcotisation = arrondirTrimestresLiquidables(totalJoursLiquidablesSansSurcotisation);
         const ratioFinSansSurcotisation = clamp(liquidablesFinalesSansSurcotisation / TR, 0, 1);
         
@@ -3038,6 +3052,7 @@ function validerParametresDefinitive() {
       const bonifEnfantsTr = bonifEnfantsJours / 90;
       const majorationsApres2003Jours = inputs.conditionsEnfantsApres2003 ? inputs.nbEnfantsApres2003 * 2 * 90 : 0;
       const majorationsApres2003Tr = majorationsApres2003Jours / 90;
+      const bonifLiquidableApres2003Jours = (inputs.conditionsEnfantsApres2003 && inputs.accouchementApresRecrutement) ? inputs.nbEnfantsApres2003 * 1 * 90 : 0; // Decret 2026-699
 
       const ageDepartDefinitif = (dateDepart - inputs.dateNaissance) / (1000 * 60 * 60 * 24 * 365.25);
       const ageSurcoteRequis = calculerAgeSurcote(inputs.dateNaissance);
@@ -3056,7 +3071,7 @@ function validerParametresDefinitive() {
         } else {
           joursLiquidablesProjection = Math.floor(periodeProjection.totalJours * q);
         }
-        const totalJoursLiquidables = joursLiquidablesReleve + joursLiquidablesProjection + bonifEnfantsJours;
+        const totalJoursLiquidables = joursLiquidablesReleve + joursLiquidablesProjection + bonifEnfantsJours + bonifLiquidableApres2003Jours;
         const liquidablesFinale = arrondirTrimestresLiquidables(totalJoursLiquidables);
         const ratioFin = clamp(liquidablesFinale / TR, 0, 1);
         let tauxFinal = 0.75 * ratioFin;
@@ -3583,12 +3598,14 @@ document.addEventListener('DOMContentLoaded', function() {
   // Gestion majoration enfants après 2003
   document.getElementById('majorationEnfants').addEventListener('change', function() {
     const champEnfantsApres2003 = document.getElementById('enfantsApres2003');
+    document.getElementById('blocAccouchementRecrutement').style.display = this.checked ? 'block' : 'none';
     if (this.checked) {
       champEnfantsApres2003.disabled = false;
       champEnfantsApres2003.style.backgroundColor = '';
     } else {
       champEnfantsApres2003.disabled = true;
       champEnfantsApres2003.value = '0';
+      document.getElementById('accouchementApresRecrutement').checked = false;
       champEnfantsApres2003.style.backgroundColor = '#f3f4f6';
       mettreAJourTotalEnfants();
     }
@@ -3604,6 +3621,8 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('enfantsApres2003').disabled = true;
     document.getElementById('enfantsApres2003').value = '0';
     document.getElementById('enfantsApres2003').style.backgroundColor = '#f3f4f6';
+  } else {
+    document.getElementById('blocAccouchementRecrutement').style.display = 'block';
   }
   
   // Mise à jour du total au chargement
