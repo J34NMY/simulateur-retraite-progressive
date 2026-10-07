@@ -67,6 +67,7 @@
   </div>
   <div style="margin:20px 0;padding:12px;background:#fff4e6;border-left:4px solid #f97316;border-radius:6px;text-align:center;">
     <p><strong>Version :</strong> V.06 - <strong>Réglementation :</strong> LFSS 2026, art. 105 – Suspension de la réforme 2023 au 01/09/2026</p>
+    <p style="font-size:0.82rem;color:#92400e;margin:6px 0 0;">Le simulateur applique automatiquement le bon régime à chaque phase : la <strong>pension provisoire</strong> (retraite progressive) suit le régime en vigueur à la <strong>date de la demande de RP</strong>, et la <strong>pension définitive</strong> suit le régime en vigueur à la <strong>date de la demande de retraite définitive</strong> — même si une demande de RP antérieure au 01/09/2026 est liquidée après cette date.</p>
   </div>
 
   <div id="transfert-banner" style="margin: 20px 0; padding: 16px 18px; background: #eff6ff; border: 2px solid #1e40af; border-radius: 8px; display: none;">
@@ -769,7 +770,8 @@
     `;
   }
 
-  const trimestresParAnnee = [
+  // GEL 2026 (LFSS 2026, art. 105) — applicable aux droits ouverts a partir du 01/09/2026
+  const trimestresParAnnee_Gel2026 = [
     { min: 1958, max: 1960, trimestres: 168 },
     { min: 1961, max: 1962, trimestres: 169 },
     { min: 1963, max: 1965, trimestres: 170 },
@@ -778,13 +780,43 @@
     { min: 1968, max: 2100, trimestres: 172 }
   ];
 
-  // Âge légal de surcote classique – GEL 2026
-  function calculerAgeSurcote(dateNaissance) {
+  // Reforme septembre 2023 (Decret n°2023-799) — applicable aux droits ouverts avant le 01/09/2026
+  const trimestresParAnnee_Sept2023 = [
+    { min: 1958, max: 1960, trimestres: 167 },
+    { min: 1961, max: 1961, trimestres: 168 },
+    { min: 1962, max: 1962, trimestres: 169 },
+    { min: 1963, max: 1963, trimestres: 170 },
+    { min: 1964, max: 1964, trimestres: 171 },
+    { min: 1965, max: 2100, trimestres: 172 }
+  ];
+
+  // Date de bascule entre les deux regimes (LFSS 2026, art. 105)
+  const DATE_GEL_2026 = new Date('2026-09-01');
+
+  // Determine le regime applicable (sept2023 ou gel2026) selon la date a laquelle
+  // le droit est ouvert : date de la demande de RP pour la pension provisoire,
+  // date de la demande de retraite definitive pour la pension definitive.
+  // Chaque phase reste figee sur le regime en vigueur a SA propre date d'ouverture du droit,
+  // independamment de l'autre phase.
+  function determinerRegime(date) {
+    if (!(date instanceof Date) || isNaN(date)) return 'gel2026';
+    return date < DATE_GEL_2026 ? 'sept2023' : 'gel2026';
+  }
+
+  // Âge légal de surcote classique – selon regime (sept2023 ou gel2026)
+  function calculerAgeSurcote(dateNaissance, regime) {
     if (!(dateNaissance instanceof Date) || isNaN(dateNaissance)) return 62;
     const anneeNaissance = dateNaissance.getFullYear();
     const moisNaissance = dateNaissance.getMonth();
     if (anneeNaissance < 1961 || (anneeNaissance === 1961 && moisNaissance < 8)) return 62;
     if (anneeNaissance === 1961) return 62.25;
+    if (regime === 'sept2023') {
+      const agesParAnneeSept2023 = {
+        1962: 62.5, 1963: 62.75, 1964: 63, 1965: 63.25, 1966: 63.5, 1967: 63.75
+      };
+      if (anneeNaissance >= 1968) return 64;
+      return agesParAnneeSept2023[anneeNaissance] || 62;
+    }
     const agesParAnnee = {
       1962: 62.5,
       1963: 62.75,
@@ -798,17 +830,19 @@
     return agesParAnnee[anneeNaissance] || 62;
   }
 
-  // SURCOTE PARENTALE – GEL 2026
-  // Génération 1964 et 1er trim. 1965 NON ÉLIGIBLES (âge légal 62T3 < 63 ans requis)
+  // SURCOTE PARENTALE – selon regime (sept2023 ou gel2026)
+  // GEL 2026 : Génération 1964 et 1er trim. 1965 NON ÉLIGIBLES (âge légal 62T3 < 63 ans requis)
   // Source : retraitesdeletat.gouv.fr + ENSAP
-  function calculerSurcoteParentaleSRE(dateNaissance, trimestresRequis, assuranceFinale, bonifEnfantsTr, majorationsApres2003Tr, quotiteProgressive) {
+  function calculerSurcoteParentaleSRE(dateNaissance, trimestresRequis, assuranceFinale, bonifEnfantsTr, majorationsApres2003Tr, quotiteProgressive, regime) {
     if (!(dateNaissance instanceof Date) || isNaN(dateNaissance)) return { applicable: false };
     const anneeNaissance = dateNaissance.getFullYear();
     const moisNaissance = dateNaissance.getMonth();
-    const ageLegal = calculerAgeSurcote(dateNaissance);
+    const ageLegal = calculerAgeSurcote(dateNaissance, regime);
     if (anneeNaissance < 1964) return { applicable: false };
-    if (anneeNaissance === 1964) return { applicable: false, motif: 'generation1964' };
-    if (anneeNaissance === 1965 && moisNaissance < 3) return { applicable: false, motif: 'generation1964' };
+    if (regime !== 'sept2023') {
+      if (anneeNaissance === 1964) return { applicable: false, motif: 'generation1964' };
+      if (anneeNaissance === 1965 && moisNaissance < 3) return { applicable: false, motif: 'generation1964' };
+    }
     const trimestresEnfants = bonifEnfantsTr + majorationsApres2003Tr;
     if (trimestresEnfants < 1) return { applicable: false };
     if (assuranceFinale < trimestresRequis) return { applicable: false };
@@ -828,10 +862,11 @@
     };
   }
 
-  function autoRemplirTrimestres(dateNaissance) {
+  function autoRemplirTrimestres(dateNaissance, regime) {
     if (!(dateNaissance instanceof Date) || isNaN(dateNaissance)) return '';
     const annee = dateNaissance.getFullYear();
-    for (const r of trimestresParAnnee) {
+    const table = regime === 'sept2023' ? trimestresParAnnee_Sept2023 : trimestresParAnnee_Gel2026;
+    for (const r of table) {
       if (annee >= r.min && annee <= r.max) return r.trimestres;
     }
     return '';
@@ -978,13 +1013,15 @@
     const trimLiquidablesReleve = parseFloat(document.getElementById('trimLiquidablesReleve').value) || 0;
     const joursLiquidablesReleve = parseFloat(document.getElementById('joursLiquidablesReleve').value) || 0;
     const sexe = document.getElementById('sexe').value || 'H';
+    const dateDebut = new Date(document.getElementById('dateDebut').value);
+    const dateFin = new Date(document.getElementById('dateFin').value);
     let trimestresRequis = parseFloat(document.getElementById('trimestresRequis').value);
     if (!trimestresRequis) {
       const dateNaissance = new Date(document.getElementById('dateNaissance').value);
-      trimestresRequis = autoRemplirTrimestres(dateNaissance) || 0;
+      // Le droit a la pension definitive se fige sur le regime en vigueur a la date
+      // de la demande de retraite definitive (dateFin), pas a celle de la RP.
+      trimestresRequis = autoRemplirTrimestres(dateNaissance, determinerRegime(dateFin)) || 0;
     }
-    const dateDebut = new Date(document.getElementById('dateDebut').value);
-    const dateFin = new Date(document.getElementById('dateFin').value);
     const quotiteAvant = parseFloat(document.getElementById('quotiteAvant').value);
     const quotite = parseFloat(document.getElementById('quotite').value);
     const surcotisation = document.getElementById('surcotisation').checked;
@@ -1324,12 +1361,21 @@
       return;
     }
 
-    const val = autoRemplirTrimestres(I.dateNaissance);
+    // Deux regimes independants, chacun fige sur sa propre date d'ouverture du droit :
+    // - regimeProg : date de la demande de retraite progressive (I.dateDebut) -> pilote la pension provisoire
+    // - regimeDef  : date de la demande de retraite definitive (I.dateFin)   -> pilote la pension definitive
+    const regimeProg = determinerRegime(I.dateDebut);
+    const regimeDef = determinerRegime(I.dateFin);
+
+    const val = autoRemplirTrimestres(I.dateNaissance, regimeDef);
     if (val) {
       const trSelect = document.getElementById('trimestresRequis');
       trSelect.innerHTML = '<option value="' + val + '" selected>' + val + '</option>';
     }
     const TR = val || I.trimestresRequis;
+    // TR_prog : trimestres requis au regime en vigueur a la date de demande de la RP
+    // (reste figes meme si la liquidation definitive intervient sous un autre regime)
+    const TR_prog = autoRemplirTrimestres(I.dateNaissance, regimeProg) || TR;
 
     // CALCUL DES DURÉES – MÉTHODE SRE (base 360 jours/an, 1 trimestre = 90 jours)
     // Source : Code des pensions civiles et militaires de retraite, Article L13
@@ -1395,22 +1441,21 @@
     }
 
     const ageDepartDefinitif = (I.dateFin - I.dateNaissance) / (1000 * 60 * 60 * 24 * 365.25);
-    const ageSurcoteRequis = calculerAgeSurcote(I.dateNaissance);
+    const ageSurcoteRequis = calculerAgeSurcote(I.dateNaissance, regimeDef);
     let tauxSurcoteClassique = 0, tauxSurcoteParentale = 0, tauxMajorationExcedentaire = 0;
     let surcoteAppliquee = false;
     let trimestresSurcotes = 0;
 
-    // SURCOTES – Article L14 CPCMR + Décret n°2023-799
-    // GEL 2026 : seule la surcote classique est applicable
+    // SURCOTES – Article L14 CPCMR + Décret n°2023-799 — selon le régime en vigueur à dateFin (regimeDef)
     //   - Surcote classique : 1,25% par trimestre au-delà de l'âge légal (jusqu'à 70 ans)
-    //   - Surcote parentale : NON applicable générations 1964 et 1er trimestre 1965
-    //     (âge légal 62T3 < 63 ans requis – source : retraitesdeletat.gouv.fr)
-    //   - Majoration excédentaire : SUSPENDUE (LFSS 2026, art. 105)
+    //   - Surcote parentale : GEL 2026 = NON applicable générations 1964 et 1er trimestre 1965
+    //     (âge légal 62T3 < 63 ans requis – source : retraitesdeletat.gouv.fr) ; sept. 2023 = applicable
+    //   - Majoration excédentaire : SUSPENDUE sous le régime gel 2026 (LFSS 2026, art. 105), active sous sept. 2023
     const trimestresExcedentaires = Math.max(0, assuranceFinale - TR);
     let trimestresExcedentairesRestants = trimestresExcedentaires;
 
     const surcoteParentale = calculerSurcoteParentaleSRE(
-      I.dateNaissance, TR, assuranceFinale, bonifEnfantsTr, majorationsApres2003Tr, I.quotite
+      I.dateNaissance, TR, assuranceFinale, bonifEnfantsTr, majorationsApres2003Tr, I.quotite, regimeDef
     );
     if (surcoteParentale.applicable) {
       tauxSurcoteParentale = surcoteParentale.tauxSurcote;
@@ -1418,7 +1463,7 @@
       trimestresExcedentairesRestants = Math.max(0, trimestresExcedentairesRestants - surcoteParentale.trimestresRetenus);
     }
 
-    // CORRECTION GEL 2026 : surcote classique de l'âge légal jusqu'à 70 ans.
+    // Surcote classique de l'âge légal jusqu'à 70 ans.
     // Utilise min(ageDepartDefinitif, 70) pour couvrir les départs à exactement 70 ans.
     // Confirmation ENSAP (01/07/2034, né 25/06/1964) : +36,25% (29 trimestres).
     if (assuranceFinale >= TR && ageDepartDefinitif >= ageSurcoteRequis) {
@@ -1431,12 +1476,11 @@
       }
     }
 
-    // GEL 2026 : la majoration excédentaire est suspendue.
-    // Confirmation ENSAP : majoration totale = surcote classique uniquement.
-    // if (trimestresExcedentairesRestants > 0) {
-    //   tauxMajorationExcedentaire = trimestresExcedentairesRestants * 1.25;
-    //   surcoteAppliquee = true;
-    // }
+    // Majoration excédentaire : suspendue sous le régime gel 2026, active sous sept. 2023.
+    if (regimeDef === 'sept2023' && trimestresExcedentairesRestants > 0) {
+      tauxMajorationExcedentaire = trimestresExcedentairesRestants * 1.25;
+      surcoteAppliquee = true;
+    }
 
     let tauxSurcoteFinale = tauxSurcoteClassique + tauxSurcoteParentale + tauxMajorationExcedentaire;
     let typesSurcoteAppliquees = [];
@@ -1461,11 +1505,11 @@
     const pensionDefinitive = Math.min(pensionBrute, traitementFin);
     const pensionAvecMajorationFamiliale = pensionDefinitive * (1 + majorationFamiliale / 100);
 
-    // Calcul revenus progressifs
+    // Calcul revenus progressifs — regime fige a la date de demande de la RP (TR_prog)
     const traitementPleinDepart = I.indice * I.valeurPoint;
-    let tauxReferenceDepart = 0.75 * (liquidablesDepart / TR);
-    if (assuranceDepart < TR) {
-      const coeffDecoteDepart = (TR - assuranceDepart) * 1.25 / 100;
+    let tauxReferenceDepart = 0.75 * (liquidablesDepart / TR_prog);
+    if (assuranceDepart < TR_prog) {
+      const coeffDecoteDepart = (TR_prog - assuranceDepart) * 1.25 / 100;
       tauxReferenceDepart = tauxReferenceDepart * (1 - coeffDecoteDepart);
     }
     const montantReferenceDepart = traitementPleinDepart * tauxReferenceDepart;
@@ -1529,7 +1573,7 @@
       '<div style="text-align:center;margin-top:20px;"><button onclick="exporterResultatsPDF()" class="primary">Télécharger les résultats en PDF</button></div>';
 
     switchTab('resultats');
-    updateChart(I, liquidablesDepart, TR, assuranceDepart);
+    updateChart(I, liquidablesDepart, TR_prog, assuranceDepart);
   }
 
   function updateChart(inputs, liquidablesDepart, trimestresRequis, assuranceDepart) {
@@ -1614,7 +1658,9 @@
     const totalJoursLiquidables = joursLiquidablesReleve + joursLiquidablesProjection + bonifEnfantsJours + bonifLiquidableApres2003Jours;
     const liquidablesFinale = arrondirTrimestresLiquidables(totalJoursLiquidables);
 
-    const TR = inputs.trimestresRequis;
+    // Regime fige a la date de la demande de retraite definitive saisie dans cet onglet (dateDepart)
+    const regimeDefOnglet = determinerRegime(dateDepart);
+    const TR = autoRemplirTrimestres(inputs.dateNaissance, regimeDefOnglet) || inputs.trimestresRequis;
     const traitementFin = inputs.indice * inputs.valeurPoint;
     const ratioFin = clamp(liquidablesFinale / TR, 0, 1);
     let tauxFinal = 0.75 * ratioFin;
@@ -1625,26 +1671,25 @@
     }
 
     const ageDepartDefinitif = (dateDepart - inputs.dateNaissance) / (1000*60*60*24*365.25);
-    const ageSurcoteRequis = calculerAgeSurcote(inputs.dateNaissance);
+    const ageSurcoteRequis = calculerAgeSurcote(inputs.dateNaissance, regimeDefOnglet);
     let tauxSurcoteFinale = 0;
     let surcoteAppliquee = false;
-    // SURCOTES – Article L14 CPCMR + Décret n°2023-799
-    // GEL 2026 : seule la surcote classique est applicable
+    // SURCOTES – Article L14 CPCMR + Décret n°2023-799 — selon le régime en vigueur à dateDepart
     //   - Surcote classique : 1,25% par trimestre au-delà de l'âge légal (jusqu'à 70 ans)
-    //   - Surcote parentale : NON applicable générations 1964 et 1er trimestre 1965
-    //     (âge légal 62T3 < 63 ans requis – source : retraitesdeletat.gouv.fr)
-    //   - Majoration excédentaire : SUSPENDUE (LFSS 2026, art. 105)
+    //   - Surcote parentale : GEL 2026 = NON applicable générations 1964 et 1er trimestre 1965
+    //     (âge légal 62T3 < 63 ans requis – source : retraitesdeletat.gouv.fr) ; sept. 2023 = applicable
+    //   - Majoration excédentaire : SUSPENDUE sous gel 2026, active sous sept. 2023
     const trimestresExcedentaires = Math.max(0, assuranceFinale - TR);
     let trimestresExcedentairesRestants = trimestresExcedentaires;
 
-    const surcoteParentale = calculerSurcoteParentaleSRE(inputs.dateNaissance, TR, assuranceFinale, bonifEnfantsTr, majorationsApres2003Tr, quotiteFuture);
+    const surcoteParentale = calculerSurcoteParentaleSRE(inputs.dateNaissance, TR, assuranceFinale, bonifEnfantsTr, majorationsApres2003Tr, quotiteFuture, regimeDefOnglet);
     if (surcoteParentale.applicable) {
       tauxSurcoteFinale += surcoteParentale.tauxSurcote;
       surcoteAppliquee = true;
       trimestresExcedentairesRestants = Math.max(0, trimestresExcedentairesRestants - surcoteParentale.trimestresRetenus);
     }
 
-    // CORRECTION GEL 2026 : surcote classique jusqu'à 70 ans via min(age, 70)
+    // Surcote classique jusqu'à 70 ans via min(age, 70)
     if (assuranceFinale >= TR && ageDepartDefinitif >= ageSurcoteRequis) {
       const ageEffectifSurcote = Math.min(ageDepartDefinitif, 70);
       const ts = Math.floor((ageEffectifSurcote - ageSurcoteRequis) * 4);
@@ -1655,11 +1700,11 @@
       }
     }
 
-    // GEL 2026 : majoration excédentaire suspendue
-    // if (trimestresExcedentairesRestants > 0) {
-    //   tauxSurcoteFinale += trimestresExcedentairesRestants * 1.25;
-    //   surcoteAppliquee = true;
-    // }
+    // Majoration excédentaire : suspendue sous gel 2026, active sous sept. 2023.
+    if (regimeDefOnglet === 'sept2023' && trimestresExcedentairesRestants > 0) {
+      tauxSurcoteFinale += trimestresExcedentairesRestants * 1.25;
+      surcoteAppliquee = true;
+    }
 
     if (surcoteAppliquee && tauxSurcoteFinale > 0) {
       tauxFinal = (0.75 * ratioFin) * (1 + tauxSurcoteFinale / 100);
@@ -1743,7 +1788,9 @@
     const canvas = document.getElementById('graphique-definitive');
     const ctx = canvas.getContext('2d');
     if (chartDefinitive) chartDefinitive.destroy();
-    const TR = inputs.trimestresRequis;
+    // Regime fige a la date de la demande de retraite definitive de cet onglet (dateDepart)
+    const regimeDefChart = determinerRegime(dateDepart);
+    const TR = autoRemplirTrimestres(inputs.dateNaissance, regimeDefChart) || inputs.trimestresRequis;
     const traitementFin = inputs.indice * inputs.valeurPoint;
     const periodeProjection = diffDetaillee(inputs.dateReleve, dateDepart);
     const joursLiqReleve = (inputs.trimLiquidablesReleve * 90) + inputs.joursLiquidablesReleve;
@@ -1753,10 +1800,10 @@
     const majorationsApres2003Jours = inputs.conditionsEnfantsApres2003 ? inputs.nbEnfantsApres2003 * 2 * 90 : 0;
     const majorationsApres2003Tr = majorationsApres2003Jours / 90;
     const ageDepartDefinitif = (dateDepart - inputs.dateNaissance) / (1000*60*60*24*365.25);
-    const ageSurcoteRequis = calculerAgeSurcote(inputs.dateNaissance);
+    const ageSurcoteRequis = calculerAgeSurcote(inputs.dateNaissance, regimeDefChart);
 
     // Pour chaque quotité testée, appliquer la même logique complète
-    // (surcotisation limitée Art. L11 bis + décote + surcote gel 2026) que calculerRetraiteDefinitive()
+    // (surcotisation limitée Art. L11 bis + décote + surcote selon régime) que calculerRetraiteDefinitive()
     const data = quotites.map(q => {
       let joursLiqProjection;
       if (surcotisationActive && trimSurcotDispo > 0) {
@@ -1785,22 +1832,27 @@
         const trimestresExcedentairesQ = Math.max(0, assuranceFinaleQ - TR);
         let trimestresExcedentairesRestantsQ = trimestresExcedentairesQ;
 
-        const surcoteParentaleQ = calculerSurcoteParentaleSRE(inputs.dateNaissance, TR, assuranceFinaleQ, bonifEnfantsTr, majorationsApres2003Tr, q);
+        const surcoteParentaleQ = calculerSurcoteParentaleSRE(inputs.dateNaissance, TR, assuranceFinaleQ, bonifEnfantsTr, majorationsApres2003Tr, q, regimeDefChart);
         if (surcoteParentaleQ.applicable) {
           tauxSurcoteQ += surcoteParentaleQ.tauxSurcote;
           surcoteAppliqueeQ = true;
           trimestresExcedentairesRestantsQ = Math.max(0, trimestresExcedentairesRestantsQ - surcoteParentaleQ.trimestresRetenus);
         }
-        // GEL 2026 : surcote classique jusqu'à 70 ans
+        // Surcote classique jusqu'à 70 ans
         if (assuranceFinaleQ >= TR && ageDepartDefinitif >= ageSurcoteRequis) {
           const ageEffectifSurcoteQ = Math.min(ageDepartDefinitif, 70);
           const tsQ = Math.floor((ageEffectifSurcoteQ - ageSurcoteRequis) * 4);
           if (tsQ > 0) {
             tauxSurcoteQ += tsQ * 1.25;
             surcoteAppliqueeQ = true;
+            trimestresExcedentairesRestantsQ = Math.max(0, trimestresExcedentairesRestantsQ - tsQ);
           }
         }
-        // GEL 2026 : majoration excédentaire suspendue (non appliquée volontairement)
+        // Majoration excédentaire : suspendue sous gel 2026, active sous sept. 2023
+        if (regimeDefChart === 'sept2023' && trimestresExcedentairesRestantsQ > 0) {
+          tauxSurcoteQ += trimestresExcedentairesRestantsQ * 1.25;
+          surcoteAppliqueeQ = true;
+        }
         if (surcoteAppliqueeQ && tauxSurcoteQ > 0) {
           tauxFinal = tauxFinal * (1 + tauxSurcoteQ / 100);
         }
@@ -2046,6 +2098,10 @@
     const{jsPDF}=window.jspdf;
     const doc=new jsPDF();
     const I=lireInputs();
+    // Deux regimes independants (voir calculer()) : regimeProg pour la pension provisoire,
+    // regimeDef pour la pension definitive.
+    const regimeProg=determinerRegime(I.dateDebut);
+    const regimeDef=determinerRegime(I.dateFin);
     let y=0;
     const lm=15,rm=195,pw=rm-lm;
     const BLEU=[30,64,175],VERT=[21,128,61],GRIS=[249,250,251],GRISD=[100,116,139],NOIR=[15,23,42];
@@ -2104,7 +2160,7 @@
     const jLP1_rp=Math.floor(P1_rp.totalJours*(I.quotiteAvant||1));
     const liqDepart_rp=arrondirTrimestresLiquidables(jLR_rp+jLP1_rp+bEJ_rp);
     const assDepart_rp=calculerDureeAssurance(jAR_rp+P1_rp.totalJours+bEJ_rp).trimestres;
-    const TR_rp=I.trimestresRequis||170;
+    const TR_rp=autoRemplirTrimestres(I.dateNaissance,regimeProg)||I.trimestresRequis||170;
     let tauxRef_rp=0.75*(liqDepart_rp/TR_rp);
     if(assDepart_rp<TR_rp)tauxRef_rp=tauxRef_rp*(1-(TR_rp-assDepart_rp)*1.25/100);
     const pensionProv_rp=traitPlein_rp*tauxRef_rp*(1-I.quotite);
@@ -2120,7 +2176,7 @@
     banniere('Total brut mensuel pendant la RP',totBrut,'Traitement + pension provisoire - avant impot',...VERT);y+=2;
 
 
-    const TR=I.trimestresRequis||170;
+    const TR=autoRemplirTrimestres(I.dateNaissance,regimeDef)||I.trimestresRequis||170;
     const flexD=divRes?Array.from(divRes.querySelectorAll('div[style*="display:flex;justify-content:space-between"]')):[];
     let assVal=0,liqVal=0,tauxLiq='—',trRef='—';
     flexD.forEach(d=>{const spans=d.querySelectorAll('span');if(spans.length>=2){const lab=(spans[0].textContent||'').toLowerCase();const val=nettoyer((spans[1].textContent||'').trim());if(lab.includes('assurance')){const m=val.match(/^(\d+)/);if(m)assVal=parseInt(m[1]);}if(lab.includes('liquidable')){const m=val.match(/^(\d+)/);if(m)liqVal=parseInt(m[1]);}}});
@@ -2136,7 +2192,7 @@
 
     // ═══ PENSION DÉFINITIVE — recalcul complet depuis les inputs (pas de DOM) ═══
     const tRefPDF=I.indice*I.valeurPoint;
-    const TR_pdf=I.trimestresRequis||170;
+    const TR_pdf=autoRemplirTrimestres(I.dateNaissance,regimeDef)||I.trimestresRequis||170;
     const jAR_pdf=(I.trimAssuranceReleve*90)+I.joursAssuranceReleve;
     const jLR_pdf=(I.trimLiquidablesReleve*90)+I.joursLiquidablesReleve;
     const P1_pdf=diffDetaillee(I.dateReleve,I.dateDebut);
@@ -2160,9 +2216,9 @@
     let taux_pdf=0.75*rF_pdf;
     if(assF_pdf<TR_pdf)taux_pdf=(0.75*rF_pdf)*(1-(TR_pdf-assF_pdf)*1.25/100);
     const ageD_pdf=(I.dateFin-I.dateNaissance)/(1000*60*60*24*365.25);
-    const ageSR_pdf=calculerAgeSurcote(I.dateNaissance);
+    const ageSR_pdf=calculerAgeSurcote(I.dateNaissance,regimeDef);
     let tSC_pdf=0,tSP_pdf=0,surcoteOk_pdf=false;
-    const sp_pdf=calculerSurcoteParentaleSRE(I.dateNaissance,TR_pdf,assF_pdf,bETr_pdf,mA3Tr_pdf,I.quotite);
+    const sp_pdf=calculerSurcoteParentaleSRE(I.dateNaissance,TR_pdf,assF_pdf,bETr_pdf,mA3Tr_pdf,I.quotite,regimeDef);
     if(sp_pdf.applicable){tSP_pdf=sp_pdf.tauxSurcote;surcoteOk_pdf=true;}
     if(assF_pdf>=TR_pdf&&ageD_pdf>=ageSR_pdf){
       const trimSC_pdf=Math.floor((Math.min(ageD_pdf,70)-ageSR_pdf)*4);
@@ -2281,15 +2337,18 @@
       titreSec('PARAMETRES DE SIMULATION',...BLEU);
       const dn=I.dateNaissance instanceof Date&&!isNaN(I.dateNaissance)?I.dateNaissance.toLocaleDateString('fr-FR'):'—';
       const dd=dateDepartDef instanceof Date&&!isNaN(dateDepartDef)?dateDepartDef.toLocaleDateString('fr-FR'):'—';
+      // Regime fige a la date de la demande de retraite definitive de cet onglet (dateDepartDef)
+      const regimeDefPdf=determinerRegime(dateDepartDef);
+      const trAffichePdf=autoRemplirTrimestres(I.dateNaissance,regimeDefPdf)||I.trimestresRequis;
       const col1=[['Naissance',dn],['Depart definitif',dd],['Quotite jusqu\'au depart',(quotiteDef*100).toFixed(0)+' %']];
-      const col2=[['Indice',''+I.indice],['Trimestres requis',''+I.trimestresRequis],['Traitement de ref.',(I.indice*I.valeurPoint).toFixed(2)+' EUR']];
+      const col2=[['Indice',''+I.indice],['Trimestres requis',''+trAffichePdf],['Traitement de ref.',(I.indice*I.valeurPoint).toFixed(2)+' EUR']];
       const cw=(pw-6)/2;
       checkY(30);
       col1.forEach(([k,v],i)=>{const ry=y+i*9;doc.setFontSize(7.5);doc.setFont(undefined,'normal');doc.setTextColor(...GRISD);doc.text(k,lm,ry);doc.setFont(undefined,'bold');doc.setTextColor(...NOIR);doc.text(v,lm+cw,ry,{align:'right'});doc.setFontSize(7.5);doc.setFont(undefined,'normal');doc.setTextColor(...GRISD);doc.text(col2[i][0],lm+cw+6,ry);doc.setFont(undefined,'bold');doc.setTextColor(...NOIR);doc.text(col2[i][1],rm,ry,{align:'right'});});
       y+=32;ligne();
 
       // ── RECALCUL COMPLET (même logique que calculerRetraiteDefinitive) ──
-      const TR=I.trimestresRequis||170;
+      const TR=trAffichePdf||170;
       const traitementFin=I.indice*I.valeurPoint;
       const periodeProj=diffDetaillee(I.dateReleve,dateDepartDef);
       const jAR=(I.trimAssuranceReleve*90)+I.joursAssuranceReleve;
@@ -2316,16 +2375,18 @@
       const liquidablesFinale=arrondirTrimestresLiquidables(jLR+jLiqProj+bEJ+bLA3J);
       const ratioFin=clamp(liquidablesFinale/TR,0,1);
       const ageDepartDef=(dateDepartDef-I.dateNaissance)/(1000*60*60*24*365.25);
-      const ageSurcoteReq=calculerAgeSurcote(I.dateNaissance);
+      const ageSurcoteReq=calculerAgeSurcote(I.dateNaissance,regimeDefPdf);
 
       let tauxFinal=0.75*ratioFin;
       let tauxSurcoteFinale=0,surcoteAppliquee=false;
-      const sp=calculerSurcoteParentaleSRE(I.dateNaissance,TR,assuranceFinale,bETr,mA3Tr,quotiteDef);
-      if(sp.applicable){tauxSurcoteFinale+=sp.tauxSurcote;surcoteAppliquee=true;}
+      let trimExcRestPdf=Math.max(0,assuranceFinale-TR);
+      const sp=calculerSurcoteParentaleSRE(I.dateNaissance,TR,assuranceFinale,bETr,mA3Tr,quotiteDef,regimeDefPdf);
+      if(sp.applicable){tauxSurcoteFinale+=sp.tauxSurcote;surcoteAppliquee=true;trimExcRestPdf=Math.max(0,trimExcRestPdf-sp.trimestresRetenus);}
       if(assuranceFinale>=TR&&ageDepartDef>=ageSurcoteReq){
         const trimSC=Math.floor((Math.min(ageDepartDef,70)-ageSurcoteReq)*4);
-        if(trimSC>0){tauxSurcoteFinale+=trimSC*1.25;surcoteAppliquee=true;}
+        if(trimSC>0){tauxSurcoteFinale+=trimSC*1.25;surcoteAppliquee=true;trimExcRestPdf=Math.max(0,trimExcRestPdf-trimSC);}
       }
+      if(regimeDefPdf==='sept2023'&&trimExcRestPdf>0){tauxSurcoteFinale+=trimExcRestPdf*1.25;surcoteAppliquee=true;}
       if(assuranceFinale<TR){
         const coefDec=(TR-assuranceFinale)*1.25/100;
         tauxFinal=(0.75*ratioFin)*(1-coefDec);
@@ -2475,11 +2536,13 @@
         const assQ=calculerDureeAssurance(jAR+periodeProj.totalJours+bEJ+mA3J).trimestres;
         const liqQ=arrondirTrimestresLiquidables(jLR+jLiqQ+bEJ+bLA3J);
         const ratioQ=clamp(liqQ/TR,0,1);
-        const ageSRQ=calculerAgeSurcote(I.dateNaissance);
+        const ageSRQ=calculerAgeSurcote(I.dateNaissance,regimeDefPdf);
         let tQ=0.75*ratioQ,tSQ=0,scOk=false;
-        const spQ=calculerSurcoteParentaleSRE(I.dateNaissance,TR,assQ,bETr,mA3Tr,q);
-        if(spQ.applicable){tSQ+=spQ.tauxSurcote;scOk=true;}
-        if(assQ>=TR&&ageDepartDef>=ageSRQ){const trimSCQ=Math.floor((Math.min(ageDepartDef,70)-ageSRQ)*4);if(trimSCQ>0){tSQ+=trimSCQ*1.25;scOk=true;}}
+        let trimExcRestQ=Math.max(0,assQ-TR);
+        const spQ=calculerSurcoteParentaleSRE(I.dateNaissance,TR,assQ,bETr,mA3Tr,q,regimeDefPdf);
+        if(spQ.applicable){tSQ+=spQ.tauxSurcote;scOk=true;trimExcRestQ=Math.max(0,trimExcRestQ-spQ.trimestresRetenus);}
+        if(assQ>=TR&&ageDepartDef>=ageSRQ){const trimSCQ=Math.floor((Math.min(ageDepartDef,70)-ageSRQ)*4);if(trimSCQ>0){tSQ+=trimSCQ*1.25;scOk=true;trimExcRestQ=Math.max(0,trimExcRestQ-trimSCQ);}}
+        if(regimeDefPdf==='sept2023'&&trimExcRestQ>0){tSQ+=trimExcRestQ*1.25;scOk=true;}
         if(assQ<TR){tQ=(0.75*ratioQ)*(1-(TR-assQ)*1.25/100);}
         else if(scOk&&tSQ>0){tQ=(0.75*ratioQ)*(1+tSQ/100);}
         const pQ=Math.min(traitementFin*tQ,traitementFin);
@@ -2689,7 +2752,8 @@
     document.getElementById('appliquerDecret1982').checked = true;
     mettreAJourTauxSurcotisation();
     const dateNaissance = new Date(document.getElementById('dateNaissance').value);
-    const tr = autoRemplirTrimestres(dateNaissance);
+    const dateFinPreview = new Date(document.getElementById('dateFin').value);
+    const tr = autoRemplirTrimestres(dateNaissance, determinerRegime(dateFinPreview));
     if (tr) {
       const trSelect = document.getElementById('trimestresRequis');
       trSelect.innerHTML = '<option value="' + tr + '" selected>' + tr + '</option>';
@@ -2745,7 +2809,7 @@
     document.getElementById('blocAccouchementRecrutement').style.display = p.majorationEnfants ? 'block' : 'none';
     document.getElementById('appliquerDecret1982').checked = p.appliquerDecret1982 !== undefined ? p.appliquerDecret1982 : true;
     mettreAJourTauxSurcotisation();
-    const tr = autoRemplirTrimestres(new Date(p.dateNaissance));
+    const tr = autoRemplirTrimestres(new Date(p.dateNaissance), determinerRegime(new Date(p.dateFin)));
     if (tr) { const s = document.getElementById('trimestresRequis'); s.innerHTML = '<option value="' + tr + '" selected>' + tr + '</option>'; }
     mettreAJourAgeMinRachat();
   }
@@ -2836,7 +2900,8 @@
     });
 
     document.getElementById('dateNaissance').addEventListener('change', function() {
-      const tr = autoRemplirTrimestres(new Date(this.value));
+      const dateFinPreview = new Date(document.getElementById('dateFin').value);
+      const tr = autoRemplirTrimestres(new Date(this.value), determinerRegime(dateFinPreview));
       if (tr) { const s = document.getElementById('trimestresRequis'); s.innerHTML = '<option value="' + tr + '" selected>' + tr + '</option>'; }
       mettreAJourAgeMinRachat();
     });

@@ -139,7 +139,7 @@
       </div>
       <div id="field-trimRequis" style="display:none;">
         <div style="padding:10px 14px;background:var(--bleu-clair);border-radius:7px;font-weight:700;color:var(--bleu);font-size:1.05rem;" id="trimRequisAffichage">&mdash;</div>
-        <small style="color:var(--gris-txt);display:block;margin-top:4px;">Trimestres requis calcules automatiquement (Gel 2026, LFSS 2026 art. 105)</small>
+        <small style="color:var(--gris-txt);display:block;margin-top:4px;">Trimestres requis calcules automatiquement selon le regime en vigueur a la date de retraite definitive saisie (sept. 2023 ou gel 2026, LFSS 2026 art. 105)</small>
       </div>
       <div id="err-1" class="validation-error"></div>
     </div>
@@ -452,39 +452,63 @@
     return{annees:a,mois:m,jours:j,totalJours:tj,anneesDec:tj/360,moisApprox:tj/30};
   }
 
-  const trimestresParAnnee=[
+  // GEL 2026 (LFSS 2026, art. 105) — droits ouverts a partir du 01/09/2026
+  const trimestresParAnnee_Gel2026=[
     {min:1958,max:1960,trimestres:168},{min:1961,max:1962,trimestres:169},
     {min:1963,max:1965,trimestres:170},{min:1966,max:1966,trimestres:171},
     {min:1967,max:1967,trimestres:171},{min:1968,max:2100,trimestres:172}
   ];
+  // Reforme septembre 2023 (Decret n°2023-799) — droits ouverts avant le 01/09/2026
+  const trimestresParAnnee_Sept2023=[
+    {min:1958,max:1960,trimestres:167},{min:1961,max:1961,trimestres:168},
+    {min:1962,max:1962,trimestres:169},{min:1963,max:1963,trimestres:170},
+    {min:1964,max:1964,trimestres:171},{min:1965,max:2100,trimestres:172}
+  ];
+  const DATE_GEL_2026=new Date('2026-09-01');
 
-  function calculerAgeSurcote(dn){
+  // Regime applicable (sept2023 ou gel2026) selon la date d'ouverture du droit :
+  // date de demande de RP pour la pension provisoire, date de demande de retraite
+  // definitive pour la pension definitive. Chaque phase reste figee sur SA propre date.
+  function determinerRegime(d){
+    if(!(d instanceof Date)||isNaN(d))return'gel2026';
+    return d<DATE_GEL_2026?'sept2023':'gel2026';
+  }
+
+  function calculerAgeSurcote(dn,regime){
     if(!(dn instanceof Date)||isNaN(dn))return 62;
     const a=dn.getFullYear(),m=dn.getMonth();
     if(a<1961||(a===1961&&m<8))return 62;
     if(a===1961)return 62.25;
+    if(regime==='sept2023'){
+      const tS={1962:62.5,1963:62.75,1964:63,1965:63.25,1966:63.5,1967:63.75};
+      if(a>=1968)return 64;
+      return tS[a]||62;
+    }
     const t={1962:62.5,1963:62.75,1964:62.75,1965:62.75,1966:63.25,1967:63.5};
     if(a===1965&&m>=3)return 63.0;
     if(a>=1968)return 64;
     return t[a]||62;
   }
 
-  function calculerSurcoteParentaleSRE(dn,TR,assF,bTr,mTr,q){
+  function calculerSurcoteParentaleSRE(dn,TR,assF,bTr,mTr,q,regime){
     if(!(dn instanceof Date)||isNaN(dn))return{applicable:false};
     const a=dn.getFullYear(),m=dn.getMonth();
     if(a<1964)return{applicable:false};
-    if(a===1964)return{applicable:false,motif:'generation1964'};
-    if(a===1965&&m<3)return{applicable:false,motif:'generation1964'};
+    if(regime!=='sept2023'){
+      if(a===1964)return{applicable:false,motif:'generation1964'};
+      if(a===1965&&m<3)return{applicable:false,motif:'generation1964'};
+    }
     if(bTr+mTr<1||assF<TR)return{applicable:false};
     const retenus=Math.min(4,Math.floor(q*4));
     if(retenus<=0)return{applicable:false};
     return{applicable:true,tauxSurcote:retenus*1.25,trimestresRetenus:retenus};
   }
 
-  function autoRemplirTrimestres(dn){
+  function autoRemplirTrimestres(dn,regime){
     if(!(dn instanceof Date)||isNaN(dn))return'';
     const a=dn.getFullYear();
-    for(const r of trimestresParAnnee)if(a>=r.min&&a<=r.max)return r.trimestres;
+    const table=regime==='sept2023'?trimestresParAnnee_Sept2023:trimestresParAnnee_Gel2026;
+    for(const r of table)if(a>=r.min&&a<=r.max)return r.trimestres;
     return'';
   }
 
@@ -569,6 +593,9 @@
 
   function lireInputs(){
     const dn=new Date(document.getElementById('dateNaissance').value);
+    const dFin=new Date(document.getElementById('dateFin').value);
+    // Le droit a la pension definitive se fige sur le regime en vigueur a la date
+    // de la demande de retraite definitive (dateFin), pas a celle de la RP.
     return{
       indice:parseFloat(document.getElementById('indice').value)||0,
       valeurPoint:parseFloat(document.getElementById('valeurPoint').value)||0,
@@ -578,9 +605,9 @@
       joursAssuranceReleve:parseFloat(document.getElementById('joursAssuranceReleve').value)||0,
       trimLiquidablesReleve:parseFloat(document.getElementById('trimLiquidablesReleve').value)||0,
       joursLiquidablesReleve:parseFloat(document.getElementById('joursLiquidablesReleve').value)||0,
-      trimestresRequis:parseFloat(document.getElementById('trimestresRequis').value)||autoRemplirTrimestres(dn)||170,
+      trimestresRequis:parseFloat(document.getElementById('trimestresRequis').value)||autoRemplirTrimestres(dn,determinerRegime(dFin))||170,
       dateDebut:new Date(document.getElementById('dateDebut').value),
-      dateFin:new Date(document.getElementById('dateFin').value),
+      dateFin:dFin,
       quotiteAvant:parseFloat(document.getElementById('quotiteAvant').value),
       quotite:parseFloat(document.getElementById('quotite').value),
       surcotisation:document.getElementById('surcotisation').checked,
@@ -699,9 +726,17 @@
     if(isNaN(I.dateReleve)||isNaN(I.dateDebut)||isNaN(I.dateFin)||I.dateDebut<=I.dateReleve||I.dateFin<=I.dateDebut){
       document.getElementById('resultat').innerHTML='<p class="warn"><strong>Verifiez les dates.</strong></p>';return;
     }
-    const val=autoRemplirTrimestres(I.dateNaissance);
+    // Deux regimes independants, chacun fige sur sa propre date d'ouverture du droit :
+    // regimeProg (date de demande de la RP = I.dateDebut) pour la pension provisoire,
+    // regimeDef (date de demande de la retraite definitive = I.dateFin) pour la pension definitive.
+    const regimeProg=determinerRegime(I.dateDebut);
+    const regimeDef=determinerRegime(I.dateFin);
+
+    const val=autoRemplirTrimestres(I.dateNaissance,regimeDef);
     if(val){document.getElementById('trimestresRequis').innerHTML='<option value="'+val+'" selected>'+val+'</option>';}
     const TR=val||I.trimestresRequis;
+    // TR_prog : trimestres requis au regime en vigueur a la date de demande de la RP
+    const TR_prog=autoRemplirTrimestres(I.dateNaissance,regimeProg)||TR;
 
     const jAR=(I.trimAssuranceReleve*90)+I.joursAssuranceReleve;
     const jLR=(I.trimLiquidablesReleve*90)+I.joursLiquidablesReleve;
@@ -735,18 +770,20 @@
     if(assF<TR)taux=(0.75*rF)*(1-(TR-assF)*1.25/100);
 
     const ageD=(I.dateFin-I.dateNaissance)/(1000*60*60*24*365.25);
-    const ageSR=calculerAgeSurcote(I.dateNaissance);
+    const ageSR=calculerAgeSurcote(I.dateNaissance,regimeDef);
     let tSC=0,tSP=0,tME=0,surcoteOk=false,trimSC=0;
     const excTr=Math.max(0,assF-TR);
     let excRest=excTr;
 
-    const sp=calculerSurcoteParentaleSRE(I.dateNaissance,TR,assF,bETr,mA3Tr,I.quotite);
+    const sp=calculerSurcoteParentaleSRE(I.dateNaissance,TR,assF,bETr,mA3Tr,I.quotite,regimeDef);
     if(sp.applicable){tSP=sp.tauxSurcote;surcoteOk=true;excRest=Math.max(0,excRest-sp.trimestresRetenus);}
 
     if(assF>=TR&&ageD>=ageSR){
       trimSC=Math.floor((Math.min(ageD,70)-ageSR)*4);
-      if(trimSC>0){tSC=trimSC*1.25;surcoteOk=true;}
+      if(trimSC>0){tSC=trimSC*1.25;surcoteOk=true;excRest=Math.max(0,excRest-trimSC);}
     }
+    // Majoration excedentaire : suspendue sous gel 2026, active sous sept. 2023
+    if(regimeDef==='sept2023'&&excRest>0){tME=excRest*1.25;surcoteOk=true;}
     const tSF=tSC+tSP+tME;
     if(surcoteOk&&tSF>0)taux=(0.75*rF)*(1+tSF/100);
 
@@ -757,9 +794,10 @@
     const pDef=Math.min(pBrute,tF);
     const pMaj=pDef*(1+majF/100);
 
+    // Pension provisoire (RP) — regime fige a la date de demande de la RP (TR_prog)
     const tpD=I.indice*I.valeurPoint;
-    let tauxRefD=0.75*(liqD/TR);
-    if(assD<TR)tauxRefD=tauxRefD*(1-(TR-assD)*1.25/100);
+    let tauxRefD=0.75*(liqD/TR_prog);
+    if(assD<TR_prog)tauxRefD=tauxRefD*(1-(TR_prog-assD)*1.25/100);
     const montRefD=tpD*tauxRefD;
     const ttpD=calcTraitementTP(tpD,I.quotite,I.appliquerDecret1982);
     const ppD=montRefD*(1-I.quotite);
@@ -1454,7 +1492,8 @@
     const jAD=jAR+P1.totalJours+bEJ;
     const lD=arrondirTrimestresLiquidables(jLD);
     const aD=calculerDureeAssurance(jAD).trimestres;
-    const TR=I.trimestresRequis;
+    // Pension provisoire (RP) : regime fige a la date de demande de la RP (I.dateDebut)
+    const TR=autoRemplirTrimestres(I.dateNaissance,determinerRegime(I.dateDebut))||I.trimestresRequis;
     let tR=0.75*clamp(lD/TR,0,1);
     if(aD<TR)tR*=(1-(TR-aD)*1.25/100);
     const mR=tp*tR;
@@ -1533,9 +1572,9 @@
     });
     document.getElementById('dateNaissance').addEventListener('change',function(){
       if(!this.value)return;
-      const a=new Date(this.value).getFullYear();
-      let tr=172;
-      if(a<=1960)tr=168;else if(a===1961)tr=168;else if(a===1962)tr=169;else if(a<=1965)tr=170;else if(a<=1967)tr=171;
+      const dn=new Date(this.value);
+      const dFinPreview=new Date(document.getElementById('dateFin').value);
+      const tr=autoRemplirTrimestres(dn,determinerRegime(dFinPreview))||172;
       document.getElementById('trimestresRequis').innerHTML='<option value="'+tr+'" selected>'+tr+'</option>';
       document.getElementById('trimRequisAffichage').textContent=tr+' trimestres';
       document.getElementById('field-trimRequis').style.display='block';
