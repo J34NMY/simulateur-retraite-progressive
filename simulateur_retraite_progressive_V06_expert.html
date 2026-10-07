@@ -287,6 +287,13 @@
           <button onclick="switchTab('parametres')" class="primary">← Retour aux paramètres</button>
         </div>
       </div>
+      <div id="feedback-widget" style="text-align:center;margin-top:16px;padding:10px 14px;background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;font-size:.84rem;color:#475569;">
+        <span id="feedback-question">Cette estimation vous a-t-elle été utile&nbsp;?</span>
+        <span id="feedback-boutons" style="margin-left:8px;">
+          <a href="#" data-goatcounter-click="avis-utile-v06-expert" onclick="feedbackReagir(true);return false;" style="text-decoration:none;margin-right:12px;">&#128578; Oui</a>
+          <a href="#" data-goatcounter-click="avis-pasclair-v06-expert" onclick="feedbackReagir(false);return false;" style="text-decoration:none;">&#128533; Pas clair</a>
+        </span>
+      </div>
     </div>
 
     <div id="tab-definitive" class="tab-content">
@@ -518,6 +525,15 @@
   <script>
   let chart;
   let chartDefinitive;
+
+  function feedbackReagir(positif){
+    document.getElementById('feedback-question').style.display = 'none';
+    if(positif){
+      document.getElementById('feedback-boutons').innerHTML = 'Merci pour votre retour&nbsp;! &#128153;';
+    } else {
+      document.getElementById('feedback-boutons').innerHTML = 'Merci, c\'est noté. <a href="https://docs.google.com/forms/d/e/1FAIpQLSf6orgVhDEdZjnqAQcKt4MwJIpSYxwY09ubipJFemq3lQdQPw/viewform" target="_blank">Dites-nous ce qui manque &rarr;</a>';
+    }
+  }
 
   function switchTab(tabName) {
     document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
