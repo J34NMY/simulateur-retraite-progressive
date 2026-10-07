@@ -5,6 +5,23 @@ Format : [Version] — Date — Description
 
 ---
 
+## [V.06] — Octobre 2026 — Regime fige par phase (RP vs definitive)
+
+### Fichiers : `simulateur_retraite_progressive_V06_expert.html`, `simulateur_retraite_progressive_V06_guide.html`
+
+**Correction :** jusqu'ici, V06 appliquait systematiquement le bareme Gel 2026 (LFSS 2026, art. 105) a l'ensemble du calcul, y compris a la pension provisoire d'une retraite progressive demandee avant le 01/09/2026. Or le droit a pension se fige a la date a laquelle il est ouvert, pas a la date de liquidation finale.
+
+#### Nouveau comportement
+- La **pension provisoire** (pendant la RP) applique desormais le regime en vigueur a la **date de demande de la retraite progressive** (`dateDebut`) : Reforme 2023 si cette date est anterieure au 01/09/2026, Gel 2026 sinon.
+- La **pension definitive** applique le regime en vigueur a la **date de demande de retraite definitive** (`dateFin`), independamment du regime applique a la phase provisoire.
+- Chaque phase reste figee sur son propre regime : une RP demandee le 01/01/2026 et liquidee le 01/10/2027 combine desormais une pension provisoire sous Reforme 2023 et une pension definitive sous Gel 2026, dans le **meme fichier** V06 (expert et guide).
+- Impact concret : barème des trimestres requis, age legal de surcote classique, eligibilite a la surcote parentale (generations 1964 / 1965 T1) et majoration excedentaire (suspendue sous Gel 2026, active sous Reforme 2023) sont desormais determines independamment pour chaque phase.
+- Correctif applique a tous les points de calcul : formulaire principal, graphiques (RP et definitive), export PDF (RP, definitive, et tableau comparatif par quotite), et previsualisation du nombre de trimestres requis a la saisie de la date de naissance.
+
+**Cadre reglementaire :** Decret n°2023-799 du 21 aout 2023 (Reforme 2023) et LFSS 2026, art. 105 (suspension / gel), coexistant desormais dans un seul fichier selon la date de chaque demande.
+
+---
+
 ## [V.05] — Juin 2026 — Gel 2026 (LFSS 2026, art. 103)
 
 ### Nouveau fichier : `simulateur_gel_2026_V05.html`

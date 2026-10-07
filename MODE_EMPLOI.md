@@ -77,9 +77,9 @@ Obligatoire — détermine l'âge légal et les trimestres requis selon votre g�
 Utilisé uniquement pour l'analyse actuarielle de rentabilité (tables de mortalité INSEE 2024).
 
 **Trimestres requis**
-Calculé automatiquement selon votre année de naissance.
+Calculé automatiquement selon votre année de naissance **et** le régime applicable.
 
-| Génération | Réforme 2023 (V04.2.8) | Gel 2026 (V06) |
+| Génération | Réforme 2023 | Gel 2026 |
 |---|---|---|
 | 1958-1961 | 168 | 168 |
 | 1962 | 169 | 169 |
@@ -88,6 +88,12 @@ Calculé automatiquement selon votre année de naissance.
 | **1965** | **172** | **170** |
 | 1966-1967 | 172 | 171 |
 | 1968+ | 172 | 172 |
+
+> 🔄 **Depuis la version V06, ce choix de régime n'est plus lié au fichier utilisé mais à la date de la demande.** La V06 calcule indépendamment :
+> - la **pension provisoire** (pendant la RP) selon le régime en vigueur à la **date de demande de la retraite progressive** ;
+> - la **pension définitive** selon le régime en vigueur à la **date de demande de retraite définitive**.
+>
+> Exemple : une RP demandée le 01/01/2026 (avant le gel) puis liquidée définitivement le 01/10/2027 (après le gel) donnera une pension provisoire calculée sur la Réforme 2023, et une pension définitive calculée sur le Gel 2026 — les deux dans le **même simulateur V06**, sans action de votre part. La V.04.2.8 reste disponible pour un scénario entièrement antérieur au 01/09/2026.
 
 **Indice majoré (IM)**
 Votre indice majoré actuel, visible sur votre bulletin de paie (ligne traitement brut).

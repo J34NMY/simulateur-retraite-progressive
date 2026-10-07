@@ -24,10 +24,12 @@ La réforme des retraites de 2023 est **suspendue du 1er septembre 2026 au 1er j
 
 | Version | Cadre réglementaire | Pour qui ? |
 |---|---|---|
-| **V04.2.8 — Mode Expert** 🔧 | Réforme 2023 — Décret n°2023-799 du 21 août 2023 | Départ prévu à partir de 2028 · Simulation avancée |
-| **V04.2.8 — Assistant Guidé** ✨ | Réforme 2023 — Décret n°2023-799 du 21 août 2023 | Départ prévu à partir de 2028 · Première utilisation |
-| **V06 — Mode Expert** ⭐🔧 | Gel 2026 — LFSS 2026, art. 105 | Utilisateurs à l'aise avec les formulaires |
-| **V06 — Assistant Guidé** ✨ | Gel 2026 — LFSS 2026, art. 105 | Première utilisation · Découverte |
+| **V04.2.8 — Mode Expert** 🔧 | Réforme 2023 — Décret n°2023-799 du 21 août 2023 | Départ (RP et définitif) prévu avant le 01/09/2026 · Simulation avancée |
+| **V04.2.8 — Assistant Guidé** ✨ | Réforme 2023 — Décret n°2023-799 du 21 août 2023 | Départ (RP et définitif) prévu avant le 01/09/2026 · Première utilisation |
+| **V06 — Mode Expert** ⭐🔧 | Réforme 2023 **et/ou** Gel 2026 — bascule automatique | Utilisateurs à l'aise avec les formulaires |
+| **V06 — Assistant Guidé** ✨ | Réforme 2023 **et/ou** Gel 2026 — bascule automatique | Première utilisation · Découverte |
+
+> 🔄 **V06 gère désormais les deux régimes dans un seul fichier.** La **pension provisoire** (retraite progressive) applique le régime en vigueur à la **date de demande de la RP**, et la **pension définitive** applique le régime en vigueur à la **date de demande de retraite définitive** — chaque phase se fige indépendamment sur sa propre date, même si la RP a été demandée avant le 01/09/2026 et la liquidation définitive après. V.04.2.8 reste utile pour un scénario entièrement situé avant le 01/09/2026, ou à titre de comparaison.
 
 ### 🧭 Expert ou Guidé ? (valable pour V04.2.8 et V06)
 
