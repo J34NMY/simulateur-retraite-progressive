@@ -10,7 +10,7 @@ Format : [Version] — Date — Description
 ### Fichiers : `simulateur_retraite_progressive_V06_expert.html`, `simulateur_retraite_progressive_V06_guide.html`
 
 - Le plafond de controle de l'indice majore passe de **900 a 1600** (expert et guide ; le champ du guide passe de `max="1200"` a `max="1600"`). La grille des magistrats de l'ordre judiciaire en vigueur depuis le 01/12/2025 va jusqu'a l'IM 1596 (circulaire JUSB2533423C) : jusqu'ici tout indice superieur a 900 bloquait le calcul.
-- Mode d'emploi : ajout d'une note sur l'usage indicatif par un magistrat (retraite progressive ouverte, limite d'age 67 ans, maintien en activite jusqu'a 70 ans, RAFP non incluse).
+- Mode d'emploi : ajout d'une note sur l'usage indicatif par un magistrat (retraite progressive ouverte, limite d'age 67 ans, maintien en activite jusqu'a 70 ans, la RAFP n'est incluse pour aucune catégorie).
 - Aucune modification de la formule de calcul.
 
 ---

@@ -1,6 +1,6 @@
 # 📖 Mode d'emploi – Simulateur de Retraite Progressive
 
-**Fonctionnaire d'État – Catégorie sédentaire**
+**Fonctionnaire d'État – Catégorie sédentaire – et magistrats de l'ordre judiciaire (usage indicatif)**
 
 > ⚠️ Outil éducatif non officiel. Pour votre estimation officielle, consultez le simulateur M@rel sur [info-retraite.fr](https://www.info-retraite.fr) et le SRE via [ensap.gouv.fr](https://ensap.gouv.fr).
 
@@ -99,7 +99,7 @@ Calculé automatiquement selon votre année de naissance **et** le régime appli
 Votre indice majoré actuel, visible sur votre bulletin de paie (ligne traitement brut).
 > ⚠️ Règle des 6 mois : une augmentation d'indice doit avoir au moins 6 mois d'ancienneté avant le départ pour être prise en compte.
 
-> ⚖️ **Magistrats de l'ordre judiciaire (usage indicatif)** : le simulateur accepte les indices jusqu'à **1600** (grille en vigueur depuis le 01/12/2025, jusqu'à IM 1596). Les magistrats ont accès à la retraite progressive (quotités 50 à 90 %, fractions 6/7 pour 80 % et 32/35 pour 90 %, art. L.612-5 du code général de la fonction publique, rendu applicable par l'art. 68 de l'ordonnance 58-1270 et la décision du Conseil d'État du 22/12/2025). Limite d'âge : **67 ans** (68 ans pour le premier président et le procureur général de la Cour de cassation, art. 76) ; maintien en activité possible jusqu'à 70 ans sur demande (art. 76-1-1), avec un supplément de liquidation limité au taux plein de 75 % (art. L.26 bis du code des pensions). **Non inclus : la RAFP** (retraite additionnelle sur les primes), à consulter sur [info-retraite.fr](https://www.info-retraite.fr). Les résultats restent des estimations.
+> ⚖️ **Magistrats de l'ordre judiciaire (usage indicatif)** : le simulateur accepte les indices jusqu'à **1600** (grille en vigueur depuis le 01/12/2025, jusqu'à IM 1596). Les magistrats ont accès à la retraite progressive (quotités 50 à 90 %, fractions 6/7 pour 80 % et 32/35 pour 90 %, art. L.612-5 du code général de la fonction publique, rendu applicable par l'art. 68 de l'ordonnance 58-1270 et la décision du Conseil d'État du 22/12/2025). Limite d'âge : **67 ans** (68 ans pour le premier président et le procureur général de la Cour de cassation, art. 76) ; maintien en activité possible jusqu'à 70 ans sur demande (art. 76-1-1), avec un supplément de liquidation limité au taux plein de 75 % (art. L.26 bis du code des pensions). **La RAFP** (retraite additionnelle sur les primes) **n'est incluse pour aucun agent, sédentaire ou magistrat** ; à consulter sur [info-retraite.fr](https://www.info-retraite.fr). Les résultats restent des estimations.
 
 **Valeur du point**
 Valeur officielle : **4,92278 €** (depuis le 1er juillet 2023).

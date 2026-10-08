@@ -6,7 +6,7 @@
 [![V06 Guidé](https://img.shields.io/badge/V06-Assistant%20Guid%C3%A9-purple.svg)](https://github.com/J34NMY/simulateur-retraite-progressive/blob/main/simulateur_retraite_progressive_V06_guide.html)
 [![Licence CC BY-NC-SA 4.0](https://img.shields.io/badge/licence-CC%20BY--NC--SA%204.0-lightgrey.svg)](LICENSE.md)
 
-Outil pédagogique gratuit pour estimer la retraite progressive et définitive des **fonctionnaires d'État sédentaires**, basé sur la méthode de calcul du Service des Retraites de l'État (SRE).
+Outil pédagogique gratuit pour estimer la retraite progressive et définitive des **fonctionnaires d'État sédentaires** et des **magistrats de l'ordre judiciaire** (usage indicatif). La RAFP n'est incluse pour aucune catégorie, basé sur la méthode de calcul du Service des Retraites de l'État (SRE).
 
 > ⚠️ **Outil éducatif non officiel.** Pour votre estimation officielle, consultez le simulateur M@rel sur [info-retraite.fr](https://www.info-retraite.fr) et contactez le SRE via [ensap.gouv.fr](https://ensap.gouv.fr).
 
