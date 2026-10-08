@@ -965,7 +965,7 @@
     const valeurPoint = parseFloat(document.getElementById('valeurPoint').value) || 0;
     if (indice <= 0) erreurs.push('L\'indice majoré doit être supérieur à 0');
     if (valeurPoint <= 0) erreurs.push('La valeur du point d\'indice doit être supérieure à 0');
-    if (indice < 350 || indice > 900) erreurs.push(`⚠️ Indice majoré inhabituel (\${indice}). Plage normale FP État : 350-900.`);
+    if (indice < 350 || indice > 1600) erreurs.push(`⚠️ Indice majoré inhabituel (\${indice}). Plage admise : 350-1600 (jusqu'à IM 1596 pour les magistrats).`);
     if (valeurPoint < 4.5 || valeurPoint > 5.5) erreurs.push(`⚠️ Valeur du point inhabituelle (\${valeurPoint.toFixed(5)} €). Valeur officielle 2025 : 4,92278 €.`);
     const trimestresRequis = parseInt(document.getElementById('trimestresRequis').value) || 0;
     if (trimestresRequis < 150 || trimestresRequis > 180) erreurs.push(`❌ Trimestres requis incorrects (\${trimestresRequis}). Plage normale : 150-180 trimestres.`);
