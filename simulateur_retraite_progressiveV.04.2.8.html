@@ -1087,8 +1087,8 @@ if (valeurPoint <= 0) {
 }
 
 // Validation plages réalistes (basées sur les grilles officielles FP État 2025)
-if (indice < 350 || indice > 900) {
-  erreurs.push(`⚠️ Indice majoré inhabituel (${indice}). Plage normale FP État : 350-900. Vérifiez votre saisie.`);
+if (indice < 350 || indice > 1600) {
+  erreurs.push(`⚠️ Indice majoré inhabituel (${indice}). Plage admise : 350-1600 (jusqu'à IM 1596 pour les magistrats). Vérifiez votre saisie.`);
 }
 
 if (valeurPoint < 4.5 || valeurPoint > 5.5) {
